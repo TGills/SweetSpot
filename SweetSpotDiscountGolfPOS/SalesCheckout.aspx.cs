@@ -1,0 +1,540 @@
+﻿using SweetShop;
+using SweetSpotDiscountGolfPOS.ClassLibrary;
+using SweetSpotProShop;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace SweetSpotDiscountGolfPOS
+{
+
+    public partial class SalesCheckout : System.Web.UI.Page
+    {
+        SweetShopManager ssm = new SweetShopManager();
+        List<Checkout> mopList = new List<Checkout>();
+        ItemDataUtilities idu = new ItemDataUtilities();
+        CheckoutManager ckm;
+
+        public double dblRemaining;
+        public double subtotal;
+        public double gst;
+        public double pst;
+        public double balancedue;
+        public double dblAmountPaid;
+        public double tradeInCost;
+        public double taxAmount;
+        //Remove Prov or Gov Tax
+        bool chargeGST;
+        bool chargePST;
+        double amountPaid;
+        double dblShippingAmount;
+        int tranType;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!Page.IsPostBack)
+            {
+
+                List<Tax> t = new List<Tax>();
+                List<Cart> cart = new List<Cart>();
+                CalculationManager cm = new CalculationManager();
+                cart = (List<Cart>)Session["ItemsInCart"];
+
+
+                bool bolShipping = Convert.ToBoolean(Session["shipping"]);
+                if (bolShipping)
+                {
+                    int custNum = (int)Convert.ToInt32(Session["key"].ToString());
+                    Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
+                    t = ssm.getTaxes(c.province);
+                    lblShipping.Visible = true;
+                    lblShippingAmount.Visible = true;
+                    dblShippingAmount = Convert.ToDouble(Session["ShippingAmount".ToString()]);
+                }
+                else
+                {
+                    //**Will need to be enabled not shipping 
+                    t = ssm.getTaxes(cm.returnLocationID(Convert.ToString(Session["Loc"])));
+                    lblShipping.Visible = false;
+                    lblShippingAmount.Visible = false;
+                    dblShippingAmount = 0;
+                }
+
+                ckm = new CheckoutManager(cm.returnTotalAmount(cart), cm.returnDiscount(cart), cm.returnTradeInAmount(cart), dblShippingAmount, true, true, 0, 0, 0);
+                foreach (var T in t)
+                {
+                    switch (T.taxName)
+                    {
+                        case "GST":
+                            lblGovernment.Visible = true;
+                            ckm.dblGst = cm.returnGSTAmount(T.taxRate, ckm.dblSubTotal);
+                            lblGovernmentAmount.Text = "$ " + ckm.dblGst.ToString("#0.00");
+                            lblGovernmentAmount.Visible = true;
+                            btnRemoveGov.Visible = true;
+                            break;
+                        case "PST":
+                            lblProvincial.Visible = true;
+                            ckm.dblPst = cm.returnPSTAmount(T.taxRate, ckm.dblSubTotal);
+                            lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
+                            lblProvincialAmount.Visible = true;
+                            btnRemoveProv.Visible = true;
+                            break;
+                        case "HST":
+                            lblProvincial.Visible = false;
+                            lblGovernment.Text = "HST";
+                            ckm.dblGst = cm.returnGSTAmount(T.taxRate, ckm.dblSubTotal);
+                            lblGovernmentAmount.Text = "$ " + gst.ToString("#0.00");
+                            lblGovernmentAmount.Visible = true;
+                            btnRemoveProv.Visible = false;
+                            btnRemoveGov.Text = "HST";
+                            break;
+                        case "RST":
+                            lblProvincial.Visible = true;
+                            lblProvincial.Text = "RST";
+                            ckm.dblPst = cm.returnPSTAmount(T.taxRate, ckm.dblSubTotal);
+                            lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
+                            lblProvincialAmount.Visible = true;
+                            btnRemoveProv.Visible = true;
+                            btnRemoveProv.Text = "RST";
+                            break;
+                        case "QST":
+                            lblProvincial.Visible = true;
+                            lblProvincial.Text = "QST";
+                            ckm.dblPst = cm.returnPSTAmount(T.taxRate, ckm.dblSubTotal);
+                            lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
+                            lblProvincialAmount.Visible = true;
+                            btnRemoveProv.Visible = true;
+                            btnRemoveProv.Text = "QST";
+                            break;
+                    }
+                }
+                ckm.dblBalanceDue += ckm.dblGst + ckm.dblPst;
+                ckm.dblRemainingBalance += ckm.dblGst + ckm.dblPst;
+
+                if (Session["MethodsofPayment"] != null)
+                {
+                    mopList = (List<Checkout>)Session["MethodsofPayment"];
+                    foreach (var mop in mopList)
+                    {
+                        dblAmountPaid += mop.amountPaid;
+                    }
+                    gvCurrentMOPs.DataSource = mopList;
+                    gvCurrentMOPs.DataBind();
+                    ckm.dblAmountPaid = dblAmountPaid;
+                    ckm.dblRemainingBalance = ckm.dblBalanceDue - ckm.dblAmountPaid;
+                }
+
+                //***Assign each item to its Label.
+
+                lblTotalInCartAmount.Text = "$ " + ckm.dblTotal.ToString("#0.00");
+                lblTotalInDiscountsAmount.Text = "$ " + ckm.dblDiscounts.ToString("#0.00");
+                lblTradeInsAmount.Text = "$ " + ckm.dblTradeIn.ToString("#0.00");
+                lblSubTotalAmount.Text = "$ " + ckm.dblSubTotal.ToString("#0.00");
+                lblShippingAmount.Text = "$ " + ckm.dblShipping.ToString("#0.00");
+                lblGovernmentAmount.Text = "$ " + ckm.dblGst.ToString("#0.00");
+                lblProvincialAmount.Text = "$ " + ckm.dblPst.ToString("#0.00");
+                lblBalanceAmount.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
+                lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
+                Session["CheckOutTotals"] = ckm;
+                txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
+                //    //Assigning session brought from the cart to variables
+                //    int custNum = (int)(Convert.ToInt32(Session["key"].ToString()));
+                //    bool shipping = Convert.ToBoolean(Session["shipping"]);
+                //    cart = (List<Cart>)Session["ItemsInCart"];
+                //    double dblShippingAmount = Convert.ToDouble(Session["ShippingAmount"].ToString());
+                //    Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
+                //    //End of assigning
+
+                //    if (shipping == false)
+                //    {
+                //        //**Need to change to location for taxes
+                //        t = ssm.getTaxes(c.province);
+                //        lblShipping.Visible = false;
+                //        lblShippingAmount.Visible = false;
+                //        //txtShippingAmount.Visible = false;
+                //    }
+                //    else if (shipping == true)
+                //    {
+                //        t = ssm.getTaxes(c.province);
+                //        lblShipping.Visible = true;
+                //        lblShippingAmount.Visible = true;
+                //        //txtShippingAmount.Visible = true;
+                //    }
+
+                //    lblTotalInCartAmount.Text = "$ " + cm.returnTotalAmount(cart).ToString("#0.00");
+                //    lblTotalInDiscountsAmount.Text = "$ " + cm.returnDiscount(cart).ToString("#0.00");
+                //    lblTradeInsAmount.Text = "$ " + cm.returnTradeInAmount(cart).ToString("#0.00");
+                //    subtotal = cm.returnSubtotalAmount(cart);
+                //    lblSubTotalAmount.Text = "$ " + subtotal.ToString("#0.00");                
+                //    lblShippingAmount.Text = "$ " + dblShippingAmount.ToString("#0.00");
+
+                //    foreach (var T in t)
+                //    {
+                //        switch (T.taxName)
+                //        {
+                //            case "GST":
+                //                lblGovernment.Visible = true;
+                //                gst = cm.returnGSTAmount(T.taxRate, cart);
+                //                lblGovernmentAmount.Text = "$ " + gst.ToString("#0.00");
+                //                btnRemoveGov.Visible = true;
+                //                break;
+                //            case "PST":
+                //                lblProvincial.Visible = true;
+                //                pst = Math.Round((T.taxRate * subtotal), 2);
+                //                lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
+                //                btnRemoveProv.Visible = true;
+                //                break;
+                //            case "HST":
+                //                lblProvincial.Visible = false;
+                //                lblGovernment.Text = "HST";
+                //                gst = Math.Round((T.taxRate * subtotal), 2);
+                //                lblGovernmentAmount.Text = "$ " + gst.ToString("#0.00");
+                //                btnRemoveProv.Visible = false;
+                //                btnRemoveGov.Text = "HST";
+                //                break;
+                //            case "RST":
+                //                lblProvincial.Visible = true;
+                //                lblProvincial.Text = "RST";
+                //                pst = Math.Round((T.taxRate * subtotal), 2);
+                //                lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
+                //                btnRemoveProv.Visible = true;
+                //                btnRemoveProv.Text = "RST";
+                //                break;
+                //            case "QST":
+                //                lblProvincial.Visible = true;
+                //                lblProvincial.Text = "QST";
+                //                pst = Math.Round((T.taxRate * subtotal), 2);
+                //                lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
+                //                btnRemoveProv.Visible = true;
+                //                btnRemoveProv.Text = "QST";
+                //                break;
+                //        }
+                //    }
+                //    dblAmountPaid = 0;
+                //    //Checking if there are MOP's
+                //    if (Session["MethodsofPayment"] != null)
+                //    {
+                //        ck = (List<Checkout>)Session["MethodsofPayment"];
+                //        foreach (var mop in ck)
+                //        {
+                //            dblAmountPaid += mop.amountPaid;
+                //        }
+                //        gvCurrentMOPs.DataSource = ck;
+                //        gvCurrentMOPs.DataBind();
+                //    }
+                //    //End of checking MOP's
+
+                //    ckm = new CheckoutManager(cm.returnTotalAmount(cart), cm.returnDiscount(cart), cm.returnTradeInAmount(cart), dblShippingAmount, noGST, noPST, gst, pst,(cm.returnSubtotalAmount(cart)-dblAmountPaid));
+                //    balancedue = ckm.dblGst + ckm.dblPst + ckm.dblShipping + ckm.dblTotal - (ckm.dblDiscounts + ckm.dblTradeIn);
+                //    lblBalanceAmount.Text = "$ " + balancedue.ToString("#0.00");
+                //    lblRemainingBalanceDueDisplay.Text = "$ " + balancedue.ToString("#0.00");
+                //    Session["CheckOutTotals"] = ckm;
+                //}
+                //if (txtShippingAmount.Text == null || txtShippingAmount.Text == "")
+                //{
+                //    txtShippingAmount.Text = "0";
+                //}
+                //shippingCost = Convert.ToDouble(txtShippingAmount.Text);
+                //ckm = (CheckoutManager)Session["CheckOutTotals"];
+                //ckm.dblShipping = shippingCost;
+                //balancedue = ckm.dblGst + ckm.dblPst + ckm.dblShipping + ckm.dblTotal - (ckm.dblDiscounts + ckm.dblTradeIn);
+                //lblBalanceAmount.Text = "$ " + balancedue.ToString("#0.00");
+                //Session["CheckOutTotals"] = ckm;
+                //if (Session["MethodsofPayment"] == null)
+                //{
+                //    lblRemainingBalanceDueDisplay.Text = "$ " + balancedue.ToString("#0.00");
+                //}
+                //else
+                //{
+                //    ck = (List<Checkout>)Session["MethodsofPayment"];
+                //    gvCurrentMOPs.DataSource = ck;
+                //    gvCurrentMOPs.DataBind();
+                //    foreach (var mop in ck)
+                //    {
+                //        dblAmountPaid += mop.amountPaid;
+                //    }
+                //    if (!ckm.blGst)
+                //    {
+                //        dblRemaining += ckm.dblGst;
+                //    }
+                //    if (!ckm.blPst)
+                //    {
+                //        dblRemaining += ckm.dblPst;
+                //    }
+                //    dblRemaining += ckm.dblTotal + ckm.dblShipping - (ckm.dblDiscounts + ckm.dblTradeIn);
+                //    lblRemainingBalanceDueDisplay.Text = "$ " + (dblRemaining - dblAmountPaid).ToString("#0.00");
+            }
+        }
+
+        //American Express
+        protected void mopAmericanExpress_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "American Express";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+            
+        }
+        //Cash
+        protected void mopCash_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "Cash";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+        }
+        //Account
+        //protected void mopOnAccount_Click(object sender, EventArgs e)
+        //{
+        //    amountPaid = Convert.ToDouble(Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Account", "", -1, -1));
+        //    String methodOfPayment = "Account";
+
+        //    populateGridviewMOP(amountPaid, methodOfPayment);
+        //}
+
+        //Cheque
+        protected void mopCheque_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "Cheque";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+        }
+        //MasterCard
+        protected void mopMasterCard_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "MasterCard";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+        }
+        //Debit
+        protected void mopDebit_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "Debit";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+        }
+        //Visa
+        protected void mopVisa_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "Visa";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+        }
+        //Gift Card
+        protected void mopGiftCard_Click(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+            string boxResult = txtAmountPaying.Text;
+            if (boxResult != "")
+            {
+                amountPaid = Convert.ToDouble(boxResult);
+                string methodOfPayment = "Gift Card";
+                populateGridviewMOP(amountPaid, methodOfPayment);
+            }
+        }
+
+        //Populating gridview with MOPs
+        protected void populateGridviewMOP(double amountPaid, string methodOfPayment)
+        {
+
+            Checkout tempCK = new Checkout(methodOfPayment, amountPaid);
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            if (Session["MethodsofPayment"] != null)
+            {
+                mopList = (List<Checkout>)Session["MethodsofPayment"];
+            }
+            //ck = ckm.methodsOfPayment(methodOfPayment, amountPaid, ck);
+            mopList.Add(tempCK);
+            foreach (var mop in mopList)
+            {
+                dblAmountPaid += mop.amountPaid;
+            }
+            ckm.dblAmountPaid = dblAmountPaid;
+            ckm.dblRemainingBalance -= amountPaid;
+
+
+            foreach (GridViewRow row in gvCurrentMOPs.Rows)
+            {
+                foreach (TableCell cell in row.Cells)
+                {
+                    cell.Attributes.CssStyle["text-align"] = "center";
+                }
+            }
+            gvCurrentMOPs.DataSource = mopList;
+            gvCurrentMOPs.DataBind();
+            Session["MethodsofPayment"] = mopList;
+            lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
+            txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
+
+        }
+
+        //For some reason, its only subtracting one, and not the other
+        protected void btnRemoveGovTax(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            chargeGST = ckm.blGst;
+            taxAmount = 0;
+            if (chargeGST)
+            {
+                //chargeGST is now false so remove GST
+                chargeGST = false;
+                ckm.blGst = chargeGST;
+                lblGovernmentAmount.Text = "$ 0.00";
+                taxAmount = -(ckm.dblGst);
+                btnRemoveGov.Text = "Add GST"; //*** Need to figure out proper name of tax
+            }
+            else
+            {
+                //chargeGST is now True so add GST
+                chargeGST = true;
+                ckm.blGst = chargeGST;
+                lblGovernmentAmount.Text = "$ " + ckm.dblGst.ToString("#0.00");
+                taxAmount = ckm.dblGst;
+                btnRemoveGov.Text = "Remove GST";
+            }
+
+            ckm.dblBalanceDue += taxAmount;
+            lblBalanceAmount.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
+            ckm.dblRemainingBalance += taxAmount;
+            lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
+            Session["CheckOutTotals"] = ckm;
+
+
+        }
+        protected void btnRemoveProvTax(object sender, EventArgs e)
+        {
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            chargePST = ckm.blPst;
+            taxAmount = 0;
+            if (chargePST)
+            {
+                //chargePST is now false so remove PST
+                chargePST = false;
+                ckm.blPst = chargePST;
+                lblProvincialAmount.Text = "$ 0.00";
+                taxAmount = -(ckm.dblPst);
+                btnRemoveProv.Text = "Add PST"; //*** Need to figure out proper name of tax
+            }
+            else
+            {
+                //chargePST is now True so add PST
+                chargePST = true;
+                ckm.blPst = chargePST;
+                lblProvincialAmount.Text = "$ " + ckm.dblPst.ToString("#0.00");
+                taxAmount = ckm.dblPst;
+                btnRemoveProv.Text = "Remove PST";
+            }
+
+            ckm.dblBalanceDue += taxAmount;
+            lblBalanceAmount.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
+            ckm.dblRemainingBalance += taxAmount;
+            lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
+            Session["CheckOutTotals"] = ckm;
+
+
+        }
+        //Other functionality
+        protected void btnCancelSale_Click(object sender, EventArgs e)
+        {
+            List<Cart> itemsInCart = new List<Cart>();
+            if (Session["ItemsInCart"] != null)
+            {
+                itemsInCart = (List<Cart>)Session["ItemsInCart"];
+            }
+            foreach (var cart in itemsInCart)
+            {
+                int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + 1));
+            }
+            Session["key"] = null;
+            Session["shipping"] = null;
+            Session["ItemsInCart"] = null;
+            Session["CheckOutTotals"] = null;
+            Session["MethodsofPayment"] = null;
+            Session["Grid"] = null;
+            Session["SKU"] = null;
+            Session["Items"] = null;
+            Session["Invoice"] = null;
+            Response.Redirect("HomePage.aspx");
+        }
+
+        protected void btnReturnToCart_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("SalesCart.aspx");
+        }
+
+        protected void btnLayaway_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnFinalize_Click(object sender, EventArgs e)
+        {//Transaction type 1
+
+            //Gathering needed information for the invoice
+            //Cart
+            List<Cart> cart = (List<Cart>)Session["ItemsInCart"];
+            //Customer
+            int custNum = Convert.ToInt32(Session["key"]);
+            Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
+            //Employee
+            //******Need to get the employee somehow
+            EmployeeManager em = new EmployeeManager();
+            int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
+            Employee emp = em.getEmployeeByID(empNum);
+            //CheckoutTotals
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            //MOP
+            mopList = (List<Checkout>)Session["MethodsofPayment"];
+            tranType = Convert.ToInt32(Session["TranType"]);
+
+            //CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
+            idu.mainInvoice(ckm, cart, mopList, c, emp, tranType, (Session["Invoice"]).ToString(), txtComments.Text);
+
+            ssm.transferTradeInStart((List<Cart>)Session["ItemsInCart"]);
+            Session["shipping"] = null;
+            Session["Grid"] = null;
+            Session["SKU"] = null;
+            Session["Items"] = null;
+            Response.Redirect("PrintableInvoice.aspx");
+        }
+    }
+}
