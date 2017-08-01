@@ -19,6 +19,7 @@ namespace SweetShop
         public int quantity { get; set; }
         public int typeID { get; set; }
         public int locID { get; set; }
+        public string comments { get; set; }
 
         public Clothing() { }
         public Clothing(int s, int b, string z, string clr, string g, string syl, double p, double c, int q, int t, int l)
@@ -35,5 +36,21 @@ namespace SweetShop
             typeID = t;
             locID = l;
         }
+        public Clothing(int s, int b, string z, string clr, string g, string syl, double p, double c, int q, int t, int l, string com)
+        {
+            sku = s;
+            brandID = b;
+            size = z;
+            colour = clr;
+            gender = g;
+            style = syl;
+            price = p;
+            cost = c;
+            quantity = q;
+            typeID = t;
+            locID = l;
+            comments = com;
+        }
+
     }
 }

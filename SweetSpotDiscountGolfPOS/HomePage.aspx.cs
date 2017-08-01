@@ -1,5 +1,6 @@
 ﻿using SweetShop;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
+using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,6 +17,7 @@ namespace SweetSpotDiscountGolfPOS
     {
         SweetShopManager ssm = new SweetShopManager();
         LocationManager lm = new LocationManager();
+        ItemDataUtilities idu = new ItemDataUtilities();
         List<Invoice> invoiceList = new List<Invoice>();
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -51,6 +53,20 @@ namespace SweetSpotDiscountGolfPOS
             invoiceList = ssm.getInvoiceBySaleDate(DateTime.Today, lm.locationIDfromCity(Convert.ToString(Session["Loc"])));
             grdSameDaySales.DataSource = invoiceList;
             grdSameDaySales.DataBind();
+        }
+        //Currently used for Removing the row
+        protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            int index = e.RowIndex;
+            Label lblInvoice = (Label)grdSameDaySales.Rows[index].FindControl("lblInvoiceNumber");
+            string invoice = lblInvoice.Text;          
+            char[] splitchar = { '-' };
+            string[] invoiceSplit = invoice.Split(splitchar);
+            int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+            int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+            idu.deleteInvoice(invoiceNum, invoiceSubNum);
+            MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
+            Response.Redirect(Request.Url.AbsoluteUri);
         }
     }
 }

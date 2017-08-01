@@ -13,7 +13,6 @@ namespace SweetSpotDiscountGolfPOS
 {
     public partial class SalesCart : System.Web.UI.Page
     {
-
         public string skuString;
         public int skuInt;
         public int invNum;
@@ -46,7 +45,7 @@ namespace SweetSpotDiscountGolfPOS
                     invNum = idu.getNextInvoiceNum();
                     string loc = Convert.ToString(Session["Loc"]);
                     lblInvoiceNumberDisplay.Text = loc + "-" + (invNum + "-" + idu.getNextInvoiceSubNum(invNum)).ToString();
-                    lblInvoiceNumberDisplay.Text = loc + "-" + invNum;
+                    //lblInvoiceNumberDisplay.Text = loc + "-" + invNum;
                     Session["Invoice"] = lblInvoiceNumberDisplay.Text;
                     lblDateDisplay.Text = today.ToString("yyyy-MM-dd");
                     if (Session["ItemsInCart"] != null)
@@ -94,6 +93,16 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnCustomerSelect_Click(object sender, EventArgs e)
         {
+            if (Session["ItemsInCart"] != null)
+            {
+                itemsInCart = (List<Cart>)Session["ItemsInCart"];
+            }
+            foreach (var cart in itemsInCart)
+            {
+                int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
+            }
+
             lblInvalidQty.Visible = false;
             Session["key"] = null;
             Session["shipping"] = null;
@@ -109,21 +118,24 @@ namespace SweetSpotDiscountGolfPOS
         {
             lblInvalidQty.Visible = false;
             string loc = Convert.ToString(Session["Loc"]);
-            if (!int.TryParse(txtSearch.Text, out skuInt))
+            if (!txtSearch.Text.Equals("") && !txtSearch.Text.Equals(null))
             {
-                skuString = txtSearch.Text;
-                invoiceItems = ssm.returnSearchFromAllThreeItemSets(skuString, loc);
-            }
-            else
-            {
-                skuString = txtSearch.Text;
-                // this looks for the item in the database
-                List<Items> i = idu.getItemByID(Convert.ToInt32(skuInt), loc);// txtSearch.Text));
-
-                //if adding new item
-                if (i != null && i.Count >= 1)
+                if (!int.TryParse(txtSearch.Text, out skuInt))
                 {
-                    invoiceItems.Add(i.ElementAt(0));
+                    skuString = txtSearch.Text;
+                    invoiceItems = ssm.returnSearchFromAllThreeItemSets(skuString, loc);
+                }
+                else
+                {
+                    skuString = txtSearch.Text;
+                    // this looks for the item in the database
+                    List<Items> i = idu.getItemByID(Convert.ToInt32(skuInt), loc);// txtSearch.Text));
+
+                    //if adding new item
+                    if (i != null && i.Count >= 1)
+                    {
+                        invoiceItems.Add(i.ElementAt(0));
+                    }
                 }
             }
 
@@ -356,7 +368,7 @@ namespace SweetSpotDiscountGolfPOS
             }
             foreach(var cart in itemsInCart){
                 int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
-                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + 1));
+                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
             }
 
 
@@ -423,13 +435,14 @@ namespace SweetSpotDiscountGolfPOS
                 }
 
                 //int locationID = Convert.ToInt32(lblLocationID.Text);
-                int locationID = 0;
+                int locationID = 1;
                 //Finding the min and max range for trade ins
                 int[] range = idu.tradeInSkuRange(locationID);
 
                 //If the itemKey is between or equal to the ranges, do trade in
                 if (itemKey >= range[0] && itemKey < range[1])
                 {
+                    
                     //Trade In Sku to add in SK
                     string redirect = "<script>window.open('TradeINEntry.aspx');</script>";
                     Response.Write(redirect);
@@ -458,9 +471,11 @@ namespace SweetSpotDiscountGolfPOS
                     int remainingQTY = idu.getquantity(itemKey, itemType);
                     if (1 > remainingQTY)
                     {
+
+                        MessageBox.ShowMessage("This item has 0 quantity", this);
                         lblInvalidQty.Visible = true;
-                        lblInvalidQty.Text = "Quantity Exceeds the Remaining Inventory";
-                        lblInvalidQty.ForeColor = System.Drawing.Color.Red;
+                        //lblInvalidQty.Text = "Quantity Exceeds the Remaining Inventory";
+                        //lblInvalidQty.ForeColor = System.Drawing.Color.Red;
                     }
                     else
                     {
@@ -620,6 +635,13 @@ namespace SweetSpotDiscountGolfPOS
             grdInvoicedItems.DataSource = itemsInCart;
             grdInvoicedItems.DataBind();
             lblSubtotalDisplay.Text = "$ " + ssm.returnSubtotalAmount(returnedCart).ToString("#0.00");
+        }
+
+        protected void btnJumpToInventory_Click(object sender, EventArgs e)
+        {
+            //Inventory screen in new window/tab
+            string redirect = "<script>window.open('InventoryHomePage.aspx');</script>";
+            Response.Write(redirect);
         }
     }
 }

@@ -22,7 +22,8 @@ namespace SweetSpotDiscountGolfPOS
         protected void Page_Load(object sender, EventArgs e)
         {
             storeLocation = lm.locationID(Convert.ToString(Session["Loc"]));
-            lblSKUDisplay.Text = idu.tradeInSku(storeLocation).ToString();
+            lblSKUDisplay.Text = (idu.reserveTradeInSKu(storeLocation)).ToString();
+            //lblSKUDisplay.Text = idu.tradeInSku(storeLocation).ToString();
         }
         //Cancelling the trade-in item
         protected void btnCancel_Click(object sender, EventArgs e)
@@ -39,7 +40,8 @@ namespace SweetSpotDiscountGolfPOS
             int brandID = Convert.ToInt32(ddlBrand.SelectedValue);
             int modelID = Convert.ToInt32(ddlModel.SelectedValue);
             int quant = Convert.ToInt32(txtQuantity.Text);
-            string clubType = txtClubType.Text;
+            int clubTypeID = Convert.ToInt32(ddlClubType.SelectedValue);
+            string clubType = idu.getClubTypeName(clubTypeID);
             string shaft = txtShaft.Text;
             string clubSpec = txtClubSpec.Text;
             string shaftFlex = txtShaftFlex.Text;

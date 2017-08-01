@@ -101,11 +101,14 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 if (ch.tradeIn != 0)
                 {
-                    cashoutTotal += ch.tradeIn; //Adding because it is a negative value
+                    cashoutTotal -= ch.tradeIn; //Adding because it is a negative value //Switched to subtracting
                     tradeinTotal += ch.tradeIn;
+
                 }
 
             }
+            tradeinTotal = tradeinTotal * -1;
+            
 
             Cashout cas = new Cashout(tradeinTotal, giftCertTotal, cashTotal,
                 chequeTotal, debitTotal, mcTotal, visaTotal, amexTotal);

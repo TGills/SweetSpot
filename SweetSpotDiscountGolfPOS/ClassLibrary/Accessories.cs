@@ -17,6 +17,8 @@ namespace SweetShop
         public int quantity { get; set; }
         public int typeID { get; set; }
         public int locID { get; set; }
+        public string comments { get; set; }
+        public int modelID { get; set; }
 
         public Accessories() { }
         public Accessories(int s, int b, string z, string clr, double p, double c, int q, int t, int l)
@@ -30,6 +32,35 @@ namespace SweetShop
             quantity = q;
             typeID = t;
             locID = l;
+        }
+
+        public Accessories(int s, int b, string z, string clr, double p, double c, int q, int t, int l, string com)
+        {
+            sku = s;
+            brandID = b;
+            size = z;
+            colour = clr;
+            price = p;
+            cost = c;
+            quantity = q;
+            typeID = t;
+            locID = l;
+            comments = com;
+        }
+
+        public Accessories(int s, int b, int m, string z, string clr, double p, double c, int q, int t, int l, string com)
+        {
+            sku = s;
+            brandID = b;
+            modelID = m;
+            size = z;
+            colour = clr;
+            price = p;
+            cost = c;
+            quantity = q;
+            typeID = t;
+            locID = l;
+            comments = com;
         }
     }
 }

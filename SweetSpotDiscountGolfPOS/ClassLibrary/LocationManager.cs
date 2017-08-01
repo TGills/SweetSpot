@@ -94,6 +94,26 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             conn.Close();
             return countryID;
         }
+        //CountryID based on provinceID
+        public int countryIDFromProvince(int provID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select countryID from tbl_provState where provStateID = " + provID;
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            int countryID = 0;
+            while (reader.Read())
+            {
+                int n = Convert.ToInt32(reader["countryID"]);
+                countryID = n;
+            }
+            conn.Close();
+            return countryID;
+        }
         //Location name based on location ID
         public string locationName(int locationID)
         {

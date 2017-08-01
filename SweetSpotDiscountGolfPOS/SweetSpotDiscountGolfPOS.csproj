@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -79,6 +79,7 @@
     <Content Include="CustomerHomePage.aspx" />
     <Content Include="EmployeeAddNew.aspx" />
     <Content Include="HomePage.aspx" />
+    <Content Include="Images\combinedLogo.jpg" />
     <Content Include="Images\SweetSpotLogo.jpg" />
     <Content Include="InventoryAddNew.aspx" />
     <Content Include="InventoryHomePage.aspx" />
@@ -86,8 +87,14 @@
     <Content Include="packages.config" />
     <Content Include="MasterPage.Master" />
     <None Include="Properties\PublishProfiles\FolderProfile2.pubxml" />
+    <None Include="Properties\PublishProfiles\SweetSpotGolfShop - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\SweetSpotGolfShop - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\SweetSpotGolfShopDev - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\SweetSpotGolfShopDev - Web Deploy.pubxml" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -198,6 +205,11 @@
       <DependentUpon>PrintableInvoice.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="ReportsCashOut.aspx.cs">
       <DependentUpon>ReportsCashOut.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -260,6 +272,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\</OutputPath>

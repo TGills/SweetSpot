@@ -31,6 +31,12 @@ namespace SweetShop
             quantity = q;
         }
 
+        public Items(int s, int q)
+        {
+            sku = s;
+            quantity = q;
+        }
+
         public Items(int s, string d, int q, double p, double c)
         {
             sku = s;

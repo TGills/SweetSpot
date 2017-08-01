@@ -69,6 +69,8 @@
             <asp:RadioButton ID="RadioButton2" runat="server" Text="Shipping" GroupName="rgSales"/>
             <asp:Label ID="lblShipping" runat="server" Text="Shipping Amount:"></asp:Label>
             <asp:TextBox ID="txtShippingAmount" runat="server"></asp:TextBox>
+            <div>
+            <asp:Button ID="btnJumpToInventory" Text="Jump to Inventory" OnClick="btnJumpToInventory_Click" runat="server" /></div>
 
             <div style="text-align: right">
                 <asp:Label ID="lblInvoiceNumber" runat="server" Text="Invoice No:"></asp:Label>
@@ -82,7 +84,7 @@
             <div>
                 <asp:TextBox ID="txtSearch" runat="server"></asp:TextBox>
                 <asp:Button ID="btnInventorySearch" runat="server" Width="150" Text="Inventory Search" OnClick="btnInventorySearch_Click" />
-                <asp:RequiredFieldValidator ID="valInventorySearched" runat="server" ErrorMessage="Search criteria Must be entered" ControlToValidate="txtSearch"></asp:RequiredFieldValidator>
+                <%--<asp:RequiredFieldValidator ID="valInventorySearched" runat="server" ErrorMessage="Search criteria Must be entered" ControlToValidate="txtSearch"></asp:RequiredFieldValidator>--%>
             </div>
             <hr />
             <asp:GridView ID="grdInventorySearched" runat="server" AutoGenerateColumns="False" OnRowCommand="grdInventorySearched_RowCommand">

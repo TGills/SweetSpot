@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.Master" AutoEventWireup="true" CodeBehind="SettingsHomePage.aspx.cs" Inherits="SweetSpotDiscountGolfPOS.SettingsHomePage" Async="true"%>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPage.Master" AutoEventWireup="true" CodeBehind="SettingsHomePage.aspx.cs" Inherits="SweetSpotDiscountGolfPOS.SettingsHomePage" Async="true" %>
 
 <%--<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
@@ -65,14 +65,27 @@
             <h2>Load Files From Excel</h2>
             <hr />
             <div>
-                <asp:Label ID="lblproduct" runat="server" Text="Upload Items"></asp:Label>
-                <div>
-                    <asp:FileUpload ID="fupItemSheet" runat="server" />
+                <asp:Table runat="server" GridLines="Both" BorderStyle="Solid" BorderWidth="1px" BorderColor="Black">
+                    <asp:TableRow>
+                        <asp:TableCell>
+                            <asp:Label ID="lblproduct" runat="server" Text="Upload Items"></asp:Label>
+                            <div>
+                                <asp:FileUpload ID="fupItemSheet" runat="server" />
 
-                    <asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+                            </div>
+                            <asp:Button ID="btnLoadItems" runat="server" Width="150" Text="Import Items" OnClick="btnLoadItems_Click" />
+                        </asp:TableCell>
+                        <asp:TableCell>
+                            <asp:Label ID="lblLoadCustomers" runat="server" Text="Import Customers"></asp:Label>
+                            <div>
+                                <asp:FileUpload ID="fupCustomers" runat="server" />
 
-                </div>
-                <asp:Button ID="btnLoadItems" runat="server" Width="150" Text="Load Items" OnClick="btnLoadItems_Click" />
+                            </div>
+                            <asp:Button ID="btnImportCustomers" runat="server" Width="150" Text="Import Customers" onclick="btnImportCustomers_Click"/>
+                        </asp:TableCell>
+                    </asp:TableRow>
+                </asp:Table>
+
             </div>
 
             <%--<asp:Button ID="btnLoadCustomers" runat="server" Width="150" Text="Load Customers" OnClick="btnLoadCustomers_Click" />

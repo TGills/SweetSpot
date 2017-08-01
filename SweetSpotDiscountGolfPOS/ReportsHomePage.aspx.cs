@@ -1,4 +1,6 @@
 ﻿using SweetShop;
+using SweetSpotDiscountGolfPOS.ClassLibrary;
+using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,7 @@ namespace SweetSpotDiscountGolfPOS
     {
 
         SweetShopManager ssm = new SweetShopManager();
+        Reports r = new Reports();
         //List<Invoice> invoice;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -68,5 +71,10 @@ namespace SweetSpotDiscountGolfPOS
             Response.Redirect("ReportsCashOut.aspx");
         }
 
+        protected void btnExportInvoices_Click(object sender, EventArgs e)
+        {
+            r.exportAllSalesToExcel();
+            MessageBox.ShowMessage("Report Completed. Check Downloads", this);
+        }
     }
 }

@@ -66,8 +66,8 @@ namespace SweetSpotDiscountGolfPOS
 
                         lblClubType.Text = "Size: ";
                         lblClubTypeDisplay.Text = a.size.ToString();
-                        lblModel.Visible = false;
-                        lblModelDisplay.Visible = false;
+                        lblModel.Visible = true;
+                        lblModelDisplay.Text = idu.brandType(a.brandID);
                         lblShaft.Text = "Colour: ";
                         lblShaftDisplay.Text = a.colour.ToString();
                         lblNumberofClubs.Visible = false;
@@ -80,8 +80,8 @@ namespace SweetSpotDiscountGolfPOS
                         lblShaftFlexDisplay.Visible = false;
                         lblDexterity.Visible = false;
                         lblDexterityDisplay.Visible = false;
-                        lblComments.Visible = false;
-                        lblCommentsDisplay.Visible = false;
+                        lblComments.Visible = true;
+                        lblCommentsDisplay.Visible = true;
                         chkUsed.Visible = false;
 
                     }
@@ -157,8 +157,8 @@ namespace SweetSpotDiscountGolfPOS
                     txtClubSpec.Visible = false;
                     txtShaftFlex.Visible = false;
                     chkUsed.Visible = false;
-                    lblModel.Visible = false;
-                    ddlModel.Visible = false;
+                    lblModel.Visible = true;
+                    ddlModel.Visible = true;
                     lblNumberofClubs.Visible = false;
                     txtNumberofClubs.Visible = false;
                     lblClubSpec.Visible = false;

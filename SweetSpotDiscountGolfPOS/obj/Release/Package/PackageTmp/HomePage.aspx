@@ -19,7 +19,7 @@
     </div>
 
     <hr />
-    <asp:GridView ID="grdSameDaySales" runat="server" AutoGenerateColumns="false" Width="100%">
+    <asp:GridView ID="grdSameDaySales" runat="server" AutoGenerateColumns="False" Width="100%" OnRowDeleting="OnRowDeleting">
         <Columns>
             <asp:TemplateField HeaderText="Invoice Number">
                 <ItemTemplate>
@@ -38,6 +38,11 @@
             <asp:BoundField DataField="governmentTax" ReadOnly="true" HeaderText="Government Tax" DataFormatString="{0:0.00}" />
             <asp:BoundField DataField="provincialTax" ReadOnly="true" HeaderText="Provincial Tax" DataFormatString="{0:0.00}" />
             <asp:BoundField DataField="balanceDue" ReadOnly="true" HeaderText="Balance Paid" DataFormatString="{0:0.00}" />
+            <asp:TemplateField HeaderText="Delete Invoice">
+                <ItemTemplate>
+                    <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />
+                </ItemTemplate>
+            </asp:TemplateField>
         </Columns>
     </asp:GridView>
     <%--  </asp:Panel>--%>

@@ -32,9 +32,10 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             dblGst = dG;
             dblPst = dP;
             dblAmountPaid = AP;
-            dblSubTotal = T + S + TI - D;
-            dblRemainingBalance = dblSubTotal;
-            dblBalanceDue = dblSubTotal + dblGst + dblPst;
+            dblSubTotal = T + TI - D;
+            dblRemainingBalance = dblSubTotal + S;
+            dblBalanceDue = dblSubTotal + S + dblGst + dblPst;
+
         }
     }
 }

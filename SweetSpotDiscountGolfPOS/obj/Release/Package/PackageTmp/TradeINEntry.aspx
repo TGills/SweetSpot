@@ -23,6 +23,7 @@
             <asp:SqlDataSource ID="sqlItemType" runat="server" ConnectionString="<%$ ConnectionStrings:SweetSpotDevConnectionString %>" SelectCommand="SELECT [typeID], [typeDescription] FROM [tbl_itemType] ORDER BY [typeDescription]"></asp:SqlDataSource>
             <asp:SqlDataSource ID="sqlBrand" runat="server" ConnectionString="<%$ ConnectionStrings:SweetSpotDevConnectionString %>" SelectCommand="SELECT [brandID], [brandName] FROM [tbl_brand] ORDER BY [brandName]"></asp:SqlDataSource>
             <asp:SqlDataSource ID="SqlModel" runat="server" ConnectionString="<%$ ConnectionStrings:SweetSpotDevConnectionString %>" SelectCommand="SELECT [modelID], [modelName] FROM [tbl_model] ORDER BY [modelName]"></asp:SqlDataSource>
+            <asp:SqlDataSource ID="sqlClubType" runat="server" ConnectionString="<%$ ConnectionStrings:SweetSpotDevConnectionString %>" SelectCommand="SELECT [typeID], [typeName] FROM [tbl_clubType] ORDER BY [typeName]"></asp:SqlDataSource>
             <br />
             <br />
             <br />
@@ -88,9 +89,10 @@
                         <asp:Label ID="lblClubType" runat="server" Text="Club Type: "></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="txtClubType" runat="server" Visible="True"></asp:TextBox>
+                        <%--<asp:TextBox ID="txtClubType" runat="server" Visible="True"></asp:TextBox>--%>
+                        <asp:DropDownList ID="ddlClubType" runat="server" AutoPostBack="True" DataSourceID="sqlClubType" DataTextField="typeName" DataValueField="typeID" Visible="True"></asp:DropDownList>
                         <asp:RequiredFieldValidator ID="rfvClubType" 
-                            runat="server" ControlToValidate ="txtClubType"
+                            runat="server" ControlToValidate ="ddlClubType"
                             ErrorMessage="Club Type Required" 
                             ForeColor="Red">
                         </asp:RequiredFieldValidator>
@@ -146,12 +148,7 @@
                         <asp:Label ID="lblDexterity" runat="server" Text="Dexterity: "></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="txtDexterity" runat="server" Visible="True"></asp:TextBox>
-                        <asp:RequiredFieldValidator ID="rfvDexterity" 
-                            runat="server" ControlToValidate ="txtDexterity"
-                            ErrorMessage="Dexterity Required" 
-                            ForeColor="Red">
-                        </asp:RequiredFieldValidator>
+                        <asp:TextBox ID="txtDexterity" runat="server" Visible="True"></asp:TextBox>                        
                     </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>

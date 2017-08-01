@@ -32,6 +32,7 @@ namespace SweetSpotDiscountGolfPOS
         double amountPaid;
         double dblShippingAmount;
         int tranType;
+        int gridID;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -70,7 +71,7 @@ namespace SweetSpotDiscountGolfPOS
                     {
                         case "GST":
                             lblGovernment.Visible = true;
-                            ckm.dblGst = cm.returnGSTAmount(T.taxRate, ckm.dblSubTotal);
+                            ckm.dblGst = cm.returnGSTAmount(T.taxRate, ckm.dblSubTotal + ckm.dblShipping);
                             lblGovernmentAmount.Text = "$ " + ckm.dblGst.ToString("#0.00");
                             lblGovernmentAmount.Visible = true;
                             btnRemoveGov.Visible = true;
@@ -132,7 +133,7 @@ namespace SweetSpotDiscountGolfPOS
                 lblTotalInCartAmount.Text = "$ " + ckm.dblTotal.ToString("#0.00");
                 lblTotalInDiscountsAmount.Text = "$ " + ckm.dblDiscounts.ToString("#0.00");
                 lblTradeInsAmount.Text = "$ " + ckm.dblTradeIn.ToString("#0.00");
-                lblSubTotalAmount.Text = "$ " + ckm.dblSubTotal.ToString("#0.00");
+                lblSubTotalAmount.Text = "$ " + (ckm.dblSubTotal + ckm.dblShipping).ToString("#0.00");
                 lblShippingAmount.Text = "$ " + ckm.dblShipping.ToString("#0.00");
                 lblGovernmentAmount.Text = "$ " + ckm.dblGst.ToString("#0.00");
                 lblProvincialAmount.Text = "$ " + ckm.dblPst.ToString("#0.00");
@@ -374,13 +375,19 @@ namespace SweetSpotDiscountGolfPOS
         //Populating gridview with MOPs
         protected void populateGridviewMOP(double amountPaid, string methodOfPayment)
         {
-
-            Checkout tempCK = new Checkout(methodOfPayment, amountPaid);
-            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            gridID = 0;
             if (Session["MethodsofPayment"] != null)
             {
                 mopList = (List<Checkout>)Session["MethodsofPayment"];
+                foreach (var mop in mopList)
+                {
+                    if (mop.tableID > gridID)
+                        gridID = mop.tableID;
+                }
+
             }
+            Checkout tempCK = new Checkout(methodOfPayment, amountPaid, gridID + 1);
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
             //ck = ckm.methodsOfPayment(methodOfPayment, amountPaid, ck);
             mopList.Add(tempCK);
             foreach (var mop in mopList)
@@ -404,6 +411,35 @@ namespace SweetSpotDiscountGolfPOS
             lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
             txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
 
+        }
+
+        protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            int index = e.RowIndex;
+            ckm = (CheckoutManager)Session["CheckOutTotals"];
+            int mopRemovingID = Convert.ToInt32(((Label)gvCurrentMOPs.Rows[index].Cells[3].FindControl("lblTableID")).Text);
+            double paidAmount = Convert.ToDouble(gvCurrentMOPs.Rows[index].Cells[2].Text);
+
+            List<Checkout> tempMopList = (List<Checkout>)Session["MethodsofPayment"];
+            foreach (var mop in tempMopList)
+            {
+                if (mop.tableID != mopRemovingID)
+                {
+                    mopList.Add(mop);
+                    dblAmountPaid += mop.amountPaid;
+                }
+                else
+                {
+                    ckm.dblRemainingBalance += paidAmount;
+                }
+                ckm.dblAmountPaid = dblAmountPaid;
+            }
+            gvCurrentMOPs.EditIndex = -1;
+            Session["MethodsofPayment"] = mopList;
+            gvCurrentMOPs.DataSource = mopList;
+            gvCurrentMOPs.DataBind();
+            lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
+            txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
         }
 
         //For some reason, its only subtracting one, and not the other
@@ -482,7 +518,7 @@ namespace SweetSpotDiscountGolfPOS
             foreach (var cart in itemsInCart)
             {
                 int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
-                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + 1));
+                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
             }
             Session["key"] = null;
             Session["shipping"] = null;
@@ -529,7 +565,7 @@ namespace SweetSpotDiscountGolfPOS
             //CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
             idu.mainInvoice(ckm, cart, mopList, c, emp, tranType, (Session["Invoice"]).ToString(), txtComments.Text);
 
-            ssm.transferTradeInStart((List<Cart>)Session["ItemsInCart"]);
+            //ssm.transferTradeInStart((List<Cart>)Session["ItemsInCart"]);
             Session["shipping"] = null;
             Session["Grid"] = null;
             Session["SKU"] = null;

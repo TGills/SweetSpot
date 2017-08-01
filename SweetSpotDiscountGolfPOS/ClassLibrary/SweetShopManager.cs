@@ -503,7 +503,12 @@ namespace SweetShop
                 //if search type is accessories create accessories description
                 else if (itemType == "Accessories")
                 {
-                    description = brand + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
+                    //if model is not null return model description
+                    if (reader["modelID"] != null)
+                    {
+                        model = idu.modelType(Convert.ToInt32(reader["modelID"]));
+                    }
+                    description = brand + " " + model + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
                 }
                 //if search type is clothing create clothing description
                 else if (itemType == "Clothing")
@@ -783,15 +788,15 @@ namespace SweetShop
 
             if (a.sku < 30000000)
             {
-                cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, quantity, typeID, locationID)"
-            + " Values (@sku, @size, @colour, @price, @cost, @brandID, @quantity, @typeID, @locationID)";
+                cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, modelID, quantity, typeID, locationID, comments)"
+            + " Values (@sku, @size, @colour, @price, @cost, @brandID, @modelID, @quantity, @typeID, @locationID, @comments)";
                 cmd.Parameters.AddWithValue("sku", a.sku);
             }
             else
             {
                 int nextSku = idu.maxSku(a.sku, "accessories");
-                cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, quantity, typeID, locationID)"
-            + " Values (" + nextSku + ", @size, @colour, @price, @cost, @brandID, @quantity, @typeID, @locationID)";
+                cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, modelID, quantity, typeID, locationID, comments)"
+            + " Values (" + nextSku + ", @size, @colour, @price, @cost, @brandID, @modelID, @quantity, @typeID, @locationID, @comments)";
             }
                         
             cmd.Parameters.AddWithValue("size", a.size);
@@ -799,9 +804,11 @@ namespace SweetShop
             cmd.Parameters.AddWithValue("price", a.price);
             cmd.Parameters.AddWithValue("cost", a.cost);
             cmd.Parameters.AddWithValue("brandID", a.brandID);
+            cmd.Parameters.AddWithValue("modelID", a.modelID);
             cmd.Parameters.AddWithValue("quantity", a.quantity);
             cmd.Parameters.AddWithValue("typeID", a.typeID);
             cmd.Parameters.AddWithValue("locationID", a.locID);
+            cmd.Parameters.AddWithValue("comments", a.comments);
             //Declare and open connection
             cmd.Connection = con;
             con.Open();
@@ -816,15 +823,15 @@ namespace SweetShop
             SqlCommand cmd = new SqlCommand();
             if (c.sku < 50000000)
             {
-                cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID)"
-                + " Values (@sku, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID)";
+                cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID, comments)"
+                + " Values (@sku, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID, @comments)";
                 cmd.Parameters.AddWithValue("sku", c.sku);
             }
             else
             {
                 int nextSku = idu.maxSku(c.sku, "clothing");
-                cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID)"
-                + " Values (" + nextSku + ",, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID)";
+                cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID, comments)"
+                + " Values (" + nextSku + ",, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID, @comments)";
             }
             
             cmd.Parameters.AddWithValue("size", c.size);
@@ -837,6 +844,7 @@ namespace SweetShop
             cmd.Parameters.AddWithValue("quantity", c.quantity);
             cmd.Parameters.AddWithValue("typeID", c.typeID);
             cmd.Parameters.AddWithValue("locationID", c.locID);
+            cmd.Parameters.AddWithValue("@comments", c.comments);
             //Declare and open connection
             cmd.Connection = con;
             con.Open();
@@ -957,7 +965,7 @@ namespace SweetShop
             //New Command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "Select sku, brandID, size, colour, price, cost, quantity, typeID, locationID From tbl_accessories Where sku = @sku";
+            cmd.CommandText = "Select sku, brandID, modelID, size, colour, price, cost, quantity, typeID, locationID From tbl_accessories Where sku = @sku";
             cmd.Parameters.AddWithValue("sku", sku);
 
             //Open Database Connection
@@ -972,6 +980,7 @@ namespace SweetShop
             {
                 a.sku = Convert.ToInt32(reader["sku"]);
                 a.brandID = Convert.ToInt32(reader["brandID"]);
+                a.modelID = Convert.ToInt32(reader["modelID"]);
                 a.size = reader["size"].ToString();
                 a.colour = reader["colour"].ToString();
                 a.cost = Convert.ToDouble(reader["cost"]);
@@ -1135,15 +1144,17 @@ namespace SweetShop
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "UPDATE tbl_accessories SET size = @size, colour = @colour, price = @price, cost = @cost, brandID = @brandID,"
-                + " quantity = @quantity, locationID = @locationID WHERE sku = @sku";
+                + "modelID = @modelID, quantity = @quantity, locationID = @locationID, comments = @comments WHERE sku = @sku";
             cmd.Parameters.AddWithValue("@sku", a.sku);
             cmd.Parameters.AddWithValue("@size", a.size);
             cmd.Parameters.AddWithValue("@colour", a.colour);
             cmd.Parameters.AddWithValue("@price", a.price);
             cmd.Parameters.AddWithValue("@cost", a.cost);
             cmd.Parameters.AddWithValue("@brandID", a.brandID);
+            cmd.Parameters.AddWithValue("@modelID", a.modelID);
             cmd.Parameters.AddWithValue("@locationID", a.locID);
             cmd.Parameters.AddWithValue("@quantity", a.quantity);
+            cmd.Parameters.AddWithValue("@comments", a.comments);
             //Declare and open connection
             cmd.Connection = con;
             con.Open();
@@ -1157,7 +1168,7 @@ namespace SweetShop
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "UPDATE tbl_clothing SET size = @size, colour = @colour, gender = @gender, style = @style,"
-                + " price = @price, cost = @cost, brandID = @brandID, quantity = @quantity, locationID = @locationID WHERE sku = @sku";
+                + " price = @price, cost = @cost, brandID = @brandID, quantity = @quantity, locationID = @locationID, comments = @comments WHERE sku = @sku";
             cmd.Parameters.AddWithValue("@sku", cl.sku);
             cmd.Parameters.AddWithValue("@size", cl.size);
             cmd.Parameters.AddWithValue("@colour", cl.colour);
@@ -1168,6 +1179,7 @@ namespace SweetShop
             cmd.Parameters.AddWithValue("@brandID", cl.brandID);
             cmd.Parameters.AddWithValue("@quantity", cl.quantity);
             cmd.Parameters.AddWithValue("@locationID", cl.locID);
+            cmd.Parameters.AddWithValue("@comments", cl.comments);
             //Declare and open connection
             cmd.Connection = con;
             con.Open();
@@ -1251,7 +1263,7 @@ namespace SweetShop
             }
             else if (type == 2)
             {
-                cmd.CommandText = "Select brandID, size, color from tbl_accessories where sku = @skuAc";
+                cmd.CommandText = "Select brandID, modelID, size, color from tbl_accessories where sku = @skuAc";
                 cmd.Parameters.AddWithValue("@skuAc", sku);
             }
             else if (type == 3)
@@ -1272,7 +1284,7 @@ namespace SweetShop
                 }
                 else if (type == 2)
                 {
-                    desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
+                    desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + idu.modelType(Convert.ToInt32(reader["modelID"])).ToString() + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
                 }
                 else if (type == 3)
                 {

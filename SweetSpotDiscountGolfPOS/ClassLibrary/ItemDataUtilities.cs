@@ -74,7 +74,7 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("modelName", modelN);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
-            
+
             while (reader.Read())
             {
                 int m = Convert.ToInt32(reader["modelID"]);
@@ -86,6 +86,7 @@ namespace SweetSpotProShop
         //Return Brand Int created by Nathan and Tyler
         public int brandName(string brandN)
         {
+
 
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -170,6 +171,46 @@ namespace SweetSpotProShop
         }
 
 
+        //Return Club Type ID
+        public int getClubTypeID(string typeName)
+        {
+            int typeID = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select typeID from tbl_clubType where typeName = '" + typeName + "'";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                int tID = Convert.ToInt32(reader["typeID"]);
+                typeID = tID;
+            }
+            conn.Close();
+            return typeID;
+        }
+        //Return Club Type Name
+        public string getClubTypeName(int typeID)
+        {
+            string typeName = null;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select typeName from tbl_clubType where typeID = " + typeID;
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string tN = reader["typeName"].ToString();
+                typeName = tN;
+            }
+            conn.Close();
+
+            return typeName;
+        }
 
         //Adding items to the Cart class. Totally not stolen by Tickles
         public Cart addingToCart(Object o)
@@ -463,6 +504,26 @@ namespace SweetSpotProShop
             con.Close();
         }
 
+
+        //Reserve trade-in sku
+        public int reserveTradeInSKu(int loc)
+        {
+            int tradeInSkuDisplay = 0;
+            tradeInSkuDisplay = tradeInSku(loc);
+            int[] range = new int[2];
+            range = tradeInSkuRange(loc);
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Insert into tbl_tempTradeInCartSkus (sku, locationID) values (@sku, @locationID);";
+            cmd.Parameters.AddWithValue("sku", tradeInSkuDisplay);
+            cmd.Parameters.AddWithValue("locationID", loc);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+            return tradeInSkuDisplay;
+        }
+
         //Grabbing trade-in sku
         public int tradeInSku(int location)
         {
@@ -472,7 +533,7 @@ namespace SweetSpotProShop
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select max(sku) as sku from tbl_tempTradeInCartSkus where locationID = " + location.ToString();
+            cmd.CommandText = "Select max(sku) as maxsku from tbl_tempTradeInCartSkus where locationID = " + location.ToString();
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
@@ -480,11 +541,9 @@ namespace SweetSpotProShop
             int maxSku = 0;
             while (reader.Read())
             {
-                maxSku = (reader["sku"] as int?) ?? range[0]; //Setting it to 0
+                maxSku = (reader["maxsku"] as int?) ?? range[0]; //Setting it to 0
             }
             conn.Close();
-
-
 
             //If the maxSku returns as null, sets the sku as the min range
             if (maxSku.Equals(null))
@@ -545,15 +604,47 @@ namespace SweetSpotProShop
             {
                 used = 0;
             }
+            if(tradeInItem.itemlocation == 0)
+            {
+                tradeInItem.itemlocation = 1;
+            }
 
 
             cmd.Connection = conn;
-            cmd.CommandText = "insert into tbl_tempTradeInCartSkus values(" + tradeInItem.sku + ", " + tradeInItem.brandID + ", " +
-                tradeInItem.modelID + ", '" + tradeInItem.clubType + "', '" + tradeInItem.shaft + "', '" + tradeInItem.numberOfClubs + "', " +
-                tradeInItem.premium + ", " + tradeInItem.cost + ", " + tradeInItem.price + ", " + tradeInItem.quantity + ", '" +
-                tradeInItem.clubSpec + "', '" + tradeInItem.shaftSpec + "', '" + tradeInItem.shaftFlex + "', '" +
-                tradeInItem.dexterity + "', " + tradeInItem.typeID + ", " + tradeInItem.itemlocation + ", " +
-                used + ", '" + tradeInItem.comments + "');";
+            //cmd.CommandText = "insert into tbl_tempTradeInCartSkus values(" + tradeInItem.sku + ", " + tradeInItem.brandID + ", " +
+            //    tradeInItem.modelID + ", '" + tradeInItem.clubType + "', '" + tradeInItem.shaft + "', '" + tradeInItem.numberOfClubs + "', " +
+            //    tradeInItem.premium + ", " + tradeInItem.cost + ", " + tradeInItem.price + ", " + tradeInItem.quantity + ", '" +
+            //    tradeInItem.clubSpec + "', '" + tradeInItem.shaftSpec + "', '" + tradeInItem.shaftFlex + "', '" +
+            //    tradeInItem.dexterity + "', " + tradeInItem.typeID + ", " + tradeInItem.itemlocation + ", " +
+            //    used + ", '" + tradeInItem.comments + "');";
+
+            cmd.CommandText = "Update tbl_tempTradeInCartSkus set brandID = @brandID, modelID = @modelID, clubType = @clubType, shaft = @shaft," +
+                "numberOfClubs = @numberOfClubs, premium = @premium, cost = @cost, price = @price, quantity = @quantity, clubSpec = @clubSpec," +
+                "shaftSpec = @shaftSpec, shaftFlex = @shaftFlex, dexterity = @dexterity, typeID = @typeID, locationID = @locationID, used = @used," +
+                "comments = @comments where sku = @sku;";
+
+            cmd.Parameters.AddWithValue("sku", tradeInItem.sku);
+
+            cmd.Parameters.AddWithValue("brandID", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("modelID", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("clubType", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("shaft", tradeInItem.brandID);
+
+            cmd.Parameters.AddWithValue("numberOfClubs", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("premium", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("cost", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("price", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("quantity", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("clubSpec", tradeInItem.brandID);
+
+            cmd.Parameters.AddWithValue("shaftSpec", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("dexterity", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("typeID", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("locationID", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("used", tradeInItem.brandID);
+
+            cmd.Parameters.AddWithValue("comments", tradeInItem.brandID);
 
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
@@ -585,7 +676,7 @@ namespace SweetSpotProShop
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             //+ ", '" + date + "', '" + time + "', "
-            cmd.CommandText = 
+            cmd.CommandText =
                 "update tbl_invoice set " +
                 "invoiceSubNum = @invoiceSubNum, " +
                 "custID = @custID, " +
@@ -613,7 +704,7 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("provincialTax", ckm.dblPst);
             cmd.Parameters.AddWithValue("balanceDue", ckm.dblBalanceDue);
             cmd.Parameters.AddWithValue("transactionType", transactionType);
-            cmd.Parameters.AddWithValue("comments", comments);            
+            cmd.Parameters.AddWithValue("comments", comments);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -636,6 +727,7 @@ namespace SweetSpotProShop
                 }
                 string insert = "insert into tbl_invoiceItem values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", " + item.sku + ", " + item.quantity + ", " +
                     item.cost + ", " + item.price + ", " + item.discount + ", " + percentage + ");";
+
                 invoiceItem(insert);
             }
             //Step 6: Insert each MOP into the invoiceMOP table
@@ -662,6 +754,8 @@ namespace SweetSpotProShop
                 if (reader["invoiceNum"] == DBNull.Value)
                 {
                     nextInvoiceNum = 0;
+                    nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
+                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum);
                 }
                 else
                 {
@@ -711,7 +805,7 @@ namespace SweetSpotProShop
                 }
                 else
                 {
-                    invoiceSubNum = Convert.ToInt32(reader["invoiceSubNum"])+1;
+                    invoiceSubNum = Convert.ToInt32(reader["invoiceSubNum"]) + 1;
                 }
             }
             conn.Close();
@@ -724,7 +818,7 @@ namespace SweetSpotProShop
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             cmd.CommandText = insert;
-            conn.Open();                                                                                                                             
+            conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
@@ -763,7 +857,7 @@ namespace SweetSpotProShop
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select Max(sku) as largestSku from tbl_"+table+";";
+            cmd.CommandText = "Select Max(sku) as largestSku from tbl_" + table + ";";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -780,5 +874,220 @@ namespace SweetSpotProShop
             conn.Close();
             return maxSku;
         }
+
+        //************************Deleting invoices**********************************
+        public void deleteInvoice(int invoiceNum, int invoiceSubNum)
+        {
+            //Step 1: Re-add the removed items back into inventory
+            //Gathering items in the invoice
+            List<Items> itemsToAdd = getItemsToReAdd(invoiceNum, invoiceSubNum);
+            foreach(Items i in itemsToAdd)
+            {
+                //Checks what type of item the item from the invoice is
+                bool isClub = checkInClub(i.sku);
+                bool isClothing = checkInClothing(i.sku);
+                bool isAccessorie = checkInAccessories(i.sku);
+                int previousQuantity = 0;
+                if(isClub == true)
+                {
+                    //Gets the current quantity in the inventory
+                    previousQuantity = getQuantity(i.sku, "clubs");
+                    //Updates the current inventory's quantity by adding the previous quantity with the quantity in the invoice
+                    reAddingItems(i.sku, previousQuantity + i.quantity, "clubs");
+                }
+                else if(isClothing == true)
+                {
+                    previousQuantity = getQuantity(i.sku, "clothing");
+                    reAddingItems(i.sku, previousQuantity + i.quantity, "clothing");
+                }
+                else if(isAccessorie == true)
+                {
+                    previousQuantity = getQuantity(i.sku, "accessories");
+                    reAddingItems(i.sku, previousQuantity + i.quantity, "accessories");
+                }
+            }
+            //Step 2: Remove MOPS 
+            deleteInvoiceMOP(invoiceNum, invoiceSubNum);
+            //Step 3: Remove Items
+            deleteInvoiceItem(invoiceNum, invoiceSubNum);
+            //Step 4: Remove the overall Invoice
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "delete tbl_invoice where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+        }
+        public List<Items> getItemsToReAdd(int invoiceNum, int invoiceSubNum)
+        {
+            List<Items> items = new List<Items>();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "select sku, itemQuantity from tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                items.Add(new Items(
+                    Convert.ToInt32(reader["sku"]),
+                    Convert.ToInt32(reader["itemQuantity"])));
+            }
+            conn.Close();
+            return items;
+        }
+        public bool checkInClub(int sku)
+        {
+            bool isClub = false;
+            //New command
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "select count(*) from tbl_clubs where sku = " + sku;
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute search
+            cmd.ExecuteNonQuery();
+            int itemExists = (int)cmd.ExecuteScalar();
+
+            //If item exists
+            if (itemExists > 0)
+            {
+                isClub = true;
+            }
+            //If item doesn't exist
+            else
+            {
+                isClub = false;
+            }
+            //Closing
+            con.Close();
+            return isClub;
+        }
+        public bool checkInClothing(int sku)
+        {
+            bool isClothing = false;
+            //New command
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "select count(*) from tbl_clothing where sku = " + sku;
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute search
+            cmd.ExecuteNonQuery();
+            int itemExists = (int)cmd.ExecuteScalar();
+
+            //If item exists
+            if (itemExists > 0)
+            {
+                isClothing = true;
+            }
+            //If item doesn't exist
+            else
+            {
+                isClothing = false;
+            }
+            //Closing
+            con.Close();
+            return isClothing;
+        }
+        public bool checkInAccessories(int sku)
+        {
+            bool isAccessorie= false;
+            //New command
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "select count(*) from tbl_accessories where sku = " + sku;
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute search
+            cmd.ExecuteNonQuery();
+            int itemExists = (int)cmd.ExecuteScalar();
+
+            //If item exists
+            if (itemExists > 0)
+            {
+                isAccessorie = true;
+            }
+            //If item doesn't exist
+            else
+            {
+                isAccessorie = false;
+            }
+            //Closing
+            con.Close();
+            return isAccessorie;
+        }
+        public int getQuantity(int sku, string table)
+        {
+            int quantity = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select Max(quantity) as itemQuantity from tbl_"+table+" Where sku = @sku;";
+            cmd.Parameters.AddWithValue("sku", sku);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader["itemQuantity"] == DBNull.Value)
+                {
+                    quantity = 0;
+                }
+                else
+                {
+                    quantity = Convert.ToInt32(reader["itemQuantity"]);
+                }
+            }
+            conn.Close();
+            return quantity;
+        }
+        public void reAddingItems(int sku, int quantity, string table)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "update tbl_"+table+" set quantity = @quantity where sku = @sku;";
+            cmd.Parameters.AddWithValue("sku", sku);
+            cmd.Parameters.AddWithValue("quantity", quantity);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+        }
+        public void deleteInvoiceMOP(int invoiceNum, int invoiceSubNum)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "delete tbl_invoiceMOP where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+        }
+        public void deleteInvoiceItem(int invoiceNum, int invoiceSubNum)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "delete tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+
+
+        }
+
+
     }
 }

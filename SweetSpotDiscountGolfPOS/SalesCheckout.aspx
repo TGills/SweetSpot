@@ -33,18 +33,18 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <asp:Button ID="mopAmericanExpress" runat="server" Text="American Express" OnClick="mopAmericanExpress_Click" Width="163px" OnClientClick="return confirm('Confirm American Express');"/>
+                                    <asp:Button ID="mopAmericanExpress" runat="server" Text="American Express" OnClick="mopAmericanExpress_Click" Width="163px" OnClientClick="return confirm('Confirm American Express');" />
                                 </td>
                                 <td>
-                                    <asp:Button ID="mopCash" runat="server" Text="Cash" OnClick="mopCash_Click" Width="163px" OnClientClick="return confirm('Confirm Cash');"/>
+                                    <asp:Button ID="mopCash" runat="server" Text="Cash" OnClick="mopCash_Click" Width="163px" OnClientClick="return confirm('Confirm Cash');" />
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <asp:Button ID="mopMasterCard" runat="server" Text="MasterCard" OnClick="mopMasterCard_Click" Width="163px" OnClientClick="return confirm('Confirm MasterCard');"/>
+                                    <asp:Button ID="mopMasterCard" runat="server" Text="MasterCard" OnClick="mopMasterCard_Click" Width="163px" OnClientClick="return confirm('Confirm MasterCard');" />
                                 </td>
                                 <td>
-                                    <asp:Button ID="mopCheque" runat="server" Text="Cheque" OnClick="mopCheque_Click" Width="163px" OnClientClick="return confirm('Confirm Cheque');"/>
+                                    <asp:Button ID="mopCheque" runat="server" Text="Cheque" OnClick="mopCheque_Click" Width="163px" OnClientClick="return confirm('Confirm Cheque');" />
                                 </td>
                             </tr>
                             <tr>
@@ -52,7 +52,7 @@
                                     <asp:Button ID="mopVisa" runat="server" Text="Visa" OnClick="mopVisa_Click" Width="163px" OnClientClick="return confirm('Confirm Visa');" />
                                 </td>
                                 <td>
-                                    <asp:Button ID="mopDebit" runat="server" Text="Debit" OnClick="mopDebit_Click" Width="163px" OnClientClick="return confirm('Confirm Debit');"/>
+                                    <asp:Button ID="mopDebit" runat="server" Text="Debit" OnClick="mopDebit_Click" Width="163px" OnClientClick="return confirm('Confirm Debit');" />
                                 </td>
                             </tr>
                             <tr>
@@ -60,7 +60,7 @@
                                     <%--<asp:Button ID="mopOnAccount" runat="server" Text="Charge to Account" OnClick="mopOnAccount_Click" Width="163px" />--%>
                                 </td>
                                 <td>
-                                    <asp:Button ID="mopGiftCard" runat="server" Text="Gift Card" OnClick="mopGiftCard_Click" Width="163px" OnClientClick="return confirm('Confirm Gift Card');"/>
+                                    <asp:Button ID="mopGiftCard" runat="server" Text="Gift Card" OnClick="mopGiftCard_Click" Width="163px" OnClientClick="return confirm('Confirm Gift Card');" />
                                 </td>
                             </tr>
                             <tr>
@@ -70,10 +70,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <asp:Label ID="lblAmountPaid" runat="server" Text="Amount Paying:" Width="163px"></asp:Label>
+                                    <asp:Label ID="lblAmountPaid" runat="server" Text="Owing:" Width="163px"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:TextBox ID="txtAmountPaying" runat="server"  Width="159px"></asp:TextBox>
+                                    <asp:TextBox ID="txtAmountPaying" runat="server" Width="159px"></asp:TextBox>
                                 </td>
                             </tr>
                         </table>
@@ -152,19 +152,29 @@
                                 <asp:TableCell>
                                     <asp:Label ID="lblBalanceAmount" runat="server" Text=""></asp:Label>
                                 </asp:TableCell>
-                            </asp:TableRow>                            
+                            </asp:TableRow>
                         </asp:Table>
                     </td>
                 </tr>
 
-          
+
 
                 <tr>
                     <td colspan="4">
-                        <asp:GridView ID="gvCurrentMOPs" runat="server" AutoGenerateColumns="false" Width="100%">
+                        <asp:GridView ID="gvCurrentMOPs" runat="server" AutoGenerateColumns="false" Width="100%" OnRowDeleting="OnRowDeleting">
                             <Columns>
+                                <asp:TemplateField HeaderText="Remove">
+                                    <ItemTemplate>
+                                        <asp:LinkButton Text="Remove MOP" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to remove this Method of Payment?');" CausesValidation="false" />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
                                 <asp:BoundField DataField="methodOfPayment" ReadOnly="true" HeaderText="Payment Type" />
                                 <asp:BoundField DataField="amountPaid" ReadOnly="true" HeaderText="Amount Paid" DataFormatString="{0:0.00}" />
+                                <asp:TemplateField HeaderText="Table ID" Visible="false">
+                                    <ItemTemplate>
+                                        <asp:Label ID="lblTableID" Text='<%#Eval("tableID") %>' runat="server" />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
                             </Columns>
                         </asp:GridView>
                     </td>
@@ -172,7 +182,7 @@
                 <tr>
                     <td colspan="2">
                         <hr />
-                        <asp:Label ID="lblRemainingBalanceDue" runat="server" Text="Remaining Balanace Due"></asp:Label>
+                        <asp:Label ID="lblRemainingBalanceDue" runat="server" Text="Remaining Balance Due"></asp:Label>
                     </td>
                     <td colspan="2">
                         <hr />
@@ -209,4 +219,3 @@
         }
     </style>
 </asp:Content>
-

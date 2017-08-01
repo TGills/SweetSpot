@@ -67,13 +67,14 @@ namespace SweetSpotDiscountGolfPOS
             //Show that it is done
             MessageBox.ShowMessage("Importing Complete", this);
         }
-        protected void btnLoadEmployee_Click(object sender, EventArgs e)
+        protected void btnImportCustomers_Click(object sender, EventArgs e)
         {
-
-        }
-        protected void btnLoadCustomers_Click(object sender, EventArgs e)
-        {
-
+            if (fupCustomers.HasFile)
+            {
+                r.importCustomers(fupCustomers);
+            }
+            //Show that it is done
+            MessageBox.ShowMessage("Importing Complete", this);
         }
 
         //Exporting
@@ -97,5 +98,7 @@ namespace SweetSpotDiscountGolfPOS
             r.exportAccessories();
             MessageBox.ShowMessage("Export Complete", this);
         }
+
+       
     }
 }

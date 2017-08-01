@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.Configuration;
+using System.Web.UI.HtmlControls;
 
 namespace SweetSpotDiscountGolfPOS
 {
@@ -16,7 +17,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             txtPassword.Focus();
         }
-
+        //test
         protected void btnLogin_Click(object sender, EventArgs e)
         {
             SqlConnection con = new SqlConnection(WebConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString);
@@ -27,9 +28,7 @@ namespace SweetSpotDiscountGolfPOS
             sda.Fill(dt);
             con.Open();
             int i = cmd.ExecuteNonQuery();
-            con.Close();
-
-
+            con.Close();           
 
             //checking for admin and sales staff
 
