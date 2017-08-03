@@ -424,8 +424,8 @@ namespace SweetSpotProShop
             SqlDataReader readerAcc = cmd.ExecuteReader();
             while (readerAcc.Read())
             {
-
-                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) + " " + readerAcc["accessoryType"].ToString()
+                //+ " " + readerAcc["accessoryType"].ToString()
+                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) 
                     + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
                     Convert.ToInt32(readerAcc["quantity"]), Convert.ToDouble(readerAcc["price"]),
                     Convert.ToDouble(readerAcc["cost"]), lm.locationName(Convert.ToInt32(readerAcc["locationID"])));
@@ -634,7 +634,7 @@ namespace SweetSpotProShop
             return range;
         }
         //Adding tradein item 
-        public void addTradeInItem(Clubs tradeInItem)
+        public void addTradeInItem(Clubs tradeInItem, int sku)
         {
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -666,28 +666,28 @@ namespace SweetSpotProShop
                 "shaftSpec = @shaftSpec, shaftFlex = @shaftFlex, dexterity = @dexterity, typeID = @typeID, locationID = @locationID, used = @used," +
                 "comments = @comments where sku = @sku;";
 
-            cmd.Parameters.AddWithValue("sku", tradeInItem.sku);
+            cmd.Parameters.AddWithValue("sku", sku);
 
             cmd.Parameters.AddWithValue("brandID", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("modelID", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("clubType", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("shaft", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("modelID", tradeInItem.modelID);
+            cmd.Parameters.AddWithValue("clubType", tradeInItem.clubType);
+            cmd.Parameters.AddWithValue("shaft", tradeInItem.shaft);
 
-            cmd.Parameters.AddWithValue("numberOfClubs", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("premium", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("cost", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("price", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("quantity", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("clubSpec", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("numberOfClubs", tradeInItem.numberOfClubs);
+            cmd.Parameters.AddWithValue("premium", tradeInItem.premium);
+            cmd.Parameters.AddWithValue("cost", tradeInItem.cost);
+            cmd.Parameters.AddWithValue("price", tradeInItem.price);
+            cmd.Parameters.AddWithValue("quantity", tradeInItem.quantity);
+            cmd.Parameters.AddWithValue("clubSpec", tradeInItem.clubSpec);
 
-            cmd.Parameters.AddWithValue("shaftSpec", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("dexterity", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("typeID", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("locationID", tradeInItem.brandID);
-            cmd.Parameters.AddWithValue("used", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("shaftSpec", tradeInItem.shaftSpec);
+            cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.shaftFlex);
+            cmd.Parameters.AddWithValue("dexterity", tradeInItem.dexterity);
+            cmd.Parameters.AddWithValue("typeID", tradeInItem.typeID);
+            cmd.Parameters.AddWithValue("locationID", tradeInItem.itemlocation);
+            cmd.Parameters.AddWithValue("used", tradeInItem.used);
 
-            cmd.Parameters.AddWithValue("comments", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("comments", tradeInItem.comments);
 
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();

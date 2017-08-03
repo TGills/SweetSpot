@@ -21,6 +21,10 @@ namespace SweetSpotDiscountGolfPOS
         LocationManager lm = new LocationManager();
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
             if (Session["Admin"] == null)
             {
                 btnEditItem.Enabled = false;
@@ -63,15 +67,17 @@ namespace SweetSpotDiscountGolfPOS
                         lblPriceDisplay.Text = a.price.ToString();
                         lblQuantityDisplay.Text = a.quantity.ToString();
                         lblLocationDisplay.Text = lm.locationName(a.locID);
+                        lblNumberofClubs.Text = "Accessory Type: ";
+                        lblNumberofClubsDisplay.Text = a.accessoryType.ToString();
 
                         lblClubType.Text = "Size: ";
                         lblClubTypeDisplay.Text = a.size.ToString();
                         lblModel.Visible = true;
-                        lblModelDisplay.Text = idu.brandType(a.brandID);
+                        lblModelDisplay.Text = idu.modelType(a.modelID);
                         lblShaft.Text = "Colour: ";
-                        lblShaftDisplay.Text = a.colour.ToString();
-                        lblNumberofClubs.Visible = false;
-                        lblNumberofClubsDisplay.Visible = false;
+                        lblShaftDisplay.Text = a.colour.ToString();    
+                     
+
                         lblClubSpec.Visible = false;
                         lblClubSpecDisplay.Visible = false;
                         lblShaftSpec.Visible = false;
@@ -159,8 +165,8 @@ namespace SweetSpotDiscountGolfPOS
                     chkUsed.Visible = false;
                     lblModel.Visible = true;
                     ddlModel.Visible = true;
-                    lblNumberofClubs.Visible = false;
-                    txtNumberofClubs.Visible = false;
+                    lblNumberofClubs.Visible = true;
+                    txtNumberofClubs.Visible = true;
                     lblClubSpec.Visible = false;
                     lblShaftSpec.Visible = false;
                     txtShaftSpec.Visible = false;
@@ -268,6 +274,7 @@ namespace SweetSpotDiscountGolfPOS
                 a.typeID = Convert.ToInt32(ddlType.SelectedValue);
                 a.size = txtClubType.Text;
                 a.colour = txtShaft.Text;
+                a.accessoryType = txtNumberofClubs.Text;
                 o = a as Object;
             }
             else if (ddlType.SelectedIndex == 1)
@@ -352,6 +359,10 @@ namespace SweetSpotDiscountGolfPOS
             }
             else if (lblTypeDisplay.Text == "Accessories")
             {
+                ddlModel.SelectedValue = idu.modelName(lblModelDisplay.Text).ToString();
+                ddlModel.Visible = true;
+                lblModelDisplay.Visible = false;
+
                 txtClubType.Text = lblClubTypeDisplay.Text;
                 txtClubType.Visible = true;
                 lblClubTypeDisplay.Visible = false;
@@ -359,6 +370,10 @@ namespace SweetSpotDiscountGolfPOS
                 txtShaft.Text = lblShaftDisplay.Text;
                 txtShaft.Visible = true;
                 lblShaftDisplay.Visible = false;
+
+                txtNumberofClubs.Text = lblNumberofClubsDisplay.Text;
+                txtNumberofClubs.Visible = true;
+                lblNumberofClubsDisplay.Visible = false;
             }
             else if (lblTypeDisplay.Text == "Clothing")
             {
@@ -450,8 +465,16 @@ namespace SweetSpotDiscountGolfPOS
                 a.locID = Convert.ToInt32(ddlLocation.SelectedValue);
                 a.size = txtClubType.Text;
                 a.colour = txtShaft.Text;
+                a.accessoryType = txtNumberofClubs.Text;
+                a.modelID = Convert.ToInt32(ddlModel.SelectedValue);
+                a.comments = txtComments.Text;
                 ssm.updateAccessories(a);
 
+
+                ddlModel.Visible = false;
+                lblModelDisplay.Visible = true;
+                txtNumberofClubs.Visible = false;
+                lblNumberofClubsDisplay.Visible = true;
                 txtCost.Visible = false;
                 lblCostDisplay.Visible = true;
                 ddlBrand.Visible = false;

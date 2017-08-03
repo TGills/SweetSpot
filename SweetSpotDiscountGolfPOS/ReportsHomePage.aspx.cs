@@ -23,6 +23,11 @@ namespace SweetSpotDiscountGolfPOS
         //List<Invoice> invoice;
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
+
             if (Session["Admin"] == null)
             {
                 lblReport.Text = "You are not authorized to view reports";
@@ -79,6 +84,77 @@ namespace SweetSpotDiscountGolfPOS
         {
             r.exportAllSalesToExcel();
             MessageBox.ShowMessage("Report Completed. Check Downloads", this);
+
+
+            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string pathDownload = (pathUser + "\\Downloads\\");
+            FileInfo newFile = new FileInfo(pathDownload + "InvoiceReport.xlsx");
+            using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+            {
+                ExcelWorksheet invoiceMain = xlPackage.Workbook.Worksheets.Add("Invoice Main");
+                ExcelWorksheet invoiceItems = xlPackage.Workbook.Worksheets.Add("Invoice Items");
+                ExcelWorksheet invoiceMOPS = xlPackage.Workbook.Worksheets.Add("Invoice MOPS");
+                // write to sheet
+
+                //Initiating Everything              
+
+
+                System.Data.DataTable exportInvoiceTable =  r.initiateInvoiceTable(); 
+                System.Data.DataTable exportInvoiceItemTable = r.initiateInvoiceItemTable();
+                System.Data.DataTable exportInvoiceMOPTable = r.initiateInvoiceMOPTable();
+
+
+
+
+                //Export main invoice
+                for (int i = 1; i < exportInvoiceTable.Rows.Count + 2; i++)
+                {
+                    for (int j = 1; j < exportInvoiceTable.Columns.Count + 1; j++)
+                    {
+                        if (i == 1)
+                        {
+                            invoiceMain.Cells[i, j].Value = exportInvoiceTable.Rows[i - 2][j - 1].ToString();
+                        }
+                        else
+                            invoiceMain.Cells[i, j].Value = exportInvoiceTable.Rows[i - 2][j - 1].ToString();
+                    }
+                }
+                //Export item invoice
+                for (int i = 1; i < exportInvoiceItemTable.Rows.Count + 2; i++)
+                {
+                    for (int j = 1; j < exportInvoiceItemTable.Columns.Count + 1; j++)
+                    {
+                        if (i == 1)
+                        {
+                            invoiceItems.Cells[i, j].Value = exportInvoiceItemTable.Rows[i - 2][j - 1].ToString();
+                        }
+                        else
+                            invoiceItems.Cells[i, j].Value = exportInvoiceItemTable.Rows[i - 2][j - 1].ToString();
+                    }
+                }
+                //Export mop invoice
+                for (int i = 1; i < exportInvoiceMOPTable.Rows.Count + 2; i++)
+                {
+                    for (int j = 1; j < exportInvoiceMOPTable.Columns.Count + 1; j++)
+                    {
+                        if (i == 1)
+                        {
+                            invoiceMOPS.Cells[i, j].Value = exportInvoiceMOPTable.Rows[i - 2][j - 1].ToString();
+                        }
+                        else
+                            invoiceMOPS.Cells[i, j].Value = exportInvoiceMOPTable.Rows[i - 2][j - 1].ToString();
+                    }
+                }
+
+                Response.Clear();
+                Response.AddHeader("content-disposition", "attachment; filename=InvoiceReport.xlsx");
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.BinaryWrite(xlPackage.GetAsByteArray());
+                Response.End();
+            }
+
+
+
         }
 
 
@@ -86,7 +162,7 @@ namespace SweetSpotDiscountGolfPOS
 
 
         protected void btnTesting_Click(object sender, EventArgs e)
-        {            
+        {
             string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string pathDownload = (pathUser + "\\Downloads\\");
             FileInfo newFile = new FileInfo(pathDownload + "mynewfile.xlsx");

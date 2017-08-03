@@ -13,6 +13,10 @@ namespace SweetSpotDiscountGolfPOS
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
             if (Session["Admin"] == null)
             {
                 btnAddNewInventory.Enabled = false;

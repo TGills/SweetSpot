@@ -68,9 +68,12 @@ namespace SweetSpotDiscountGolfPOS
             }
             if (dt.Rows.Count > 0)
             {
+                Session["loggedIn"] = true;
                 Session["id"] = txtPassword.Text;
                 Response.Redirect("HomePage.aspx");
                 Session.RemoveAll();
+
+
             }
             else
             {                

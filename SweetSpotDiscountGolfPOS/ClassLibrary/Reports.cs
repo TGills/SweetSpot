@@ -267,7 +267,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************PRICE***************
                                 try
                                 {
-                                    if (Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
                                     {
                                         a.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
                                     }
@@ -283,7 +283,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************QUANTITY***************
                                 try
                                 {
-                                    if (Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
                                     {
                                         a.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
                                     }
@@ -1035,70 +1035,70 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             exportSales_MOP();
 
 
-            // Export Data into EXCEL Sheet
-            Application ExcelApp = new Application();
-            ExcelApp.Application.Workbooks.Add(Type.Missing);
-            Sheets worksheets = ExcelApp.Worksheets;
+            //// Export Data into EXCEL Sheet
+            //Application ExcelApp = new Application();
+            //ExcelApp.Application.Workbooks.Add(Type.Missing);
+            //Sheets worksheets = ExcelApp.Worksheets;
 
-            var xlInvoiceMain = (Worksheet)worksheets.Add(worksheets[1], Type.Missing, Type.Missing, Type.Missing);
-            xlInvoiceMain.Name = "InvoiceMain";
+            //var xlInvoiceMain = (Worksheet)worksheets.Add(worksheets[1], Type.Missing, Type.Missing, Type.Missing);
+            //xlInvoiceMain.Name = "InvoiceMain";
 
-            var xlInvoiceItem = (Worksheet)worksheets.Add(worksheets[1], Type.Missing, Type.Missing, Type.Missing);
-            xlInvoiceItem.Name = "InvoiceItems";
+            //var xlInvoiceItem = (Worksheet)worksheets.Add(worksheets[1], Type.Missing, Type.Missing, Type.Missing);
+            //xlInvoiceItem.Name = "InvoiceItems";
 
-            var xlInvoiceMOPS = (Worksheet)worksheets.Add(worksheets[1], Type.Missing, Type.Missing, Type.Missing);
-            xlInvoiceMOPS.Name = "InvoiceMOPS";
-
-
-            //Export mop invoice
-            for (int i = 1; i < exportInvoiceMOPTable.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < exportInvoiceMOPTable.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        xlInvoiceMOPS.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        xlInvoiceMOPS.Cells[i, j] = exportInvoiceMOPTable.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Export item invoice
-            for (int i = 1; i < exportInvoiceItemTable.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < exportInvoiceItemTable.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        xlInvoiceItem.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        xlInvoiceItem.Cells[i, j] = exportInvoiceItemTable.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Export main invoice
-            for (int i = 1; i < exportInvoiceTable.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < exportInvoiceTable.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        xlInvoiceMain.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        xlInvoiceMain.Cells[i, j] = exportInvoiceTable.Rows[i - 2][j - 1].ToString();
-                }
-            }
+            //var xlInvoiceMOPS = (Worksheet)worksheets.Add(worksheets[1], Type.Missing, Type.Missing, Type.Missing);
+            //xlInvoiceMOPS.Name = "InvoiceMOPS";
 
 
-            //Get users profile, downloads folder path, and save to workstation
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = Path.Combine(pathUser, "Downloads");
-            ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\AllSales-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
-            ExcelApp.ActiveWorkbook.Saved = true;
-            ExcelApp.Quit();
+            ////Export mop invoice
+            //for (int i = 1; i < exportInvoiceMOPTable.Rows.Count + 2; i++)
+            //{
+            //    for (int j = 1; j < exportInvoiceMOPTable.Columns.Count + 1; j++)
+            //    {
+            //        if (i == 1)
+            //        {
+            //            xlInvoiceMOPS.Cells[i, j] = dcCollection[j - 1].ToString();
+            //        }
+            //        else
+            //            xlInvoiceMOPS.Cells[i, j] = exportInvoiceMOPTable.Rows[i - 2][j - 1].ToString();
+            //    }
+            //}
+            ////Export item invoice
+            //for (int i = 1; i < exportInvoiceItemTable.Rows.Count + 2; i++)
+            //{
+            //    for (int j = 1; j < exportInvoiceItemTable.Columns.Count + 1; j++)
+            //    {
+            //        if (i == 1)
+            //        {
+            //            xlInvoiceItem.Cells[i, j] = dcCollection[j - 1].ToString();
+            //        }
+            //        else
+            //            xlInvoiceItem.Cells[i, j] = exportInvoiceItemTable.Rows[i - 2][j - 1].ToString();
+            //    }
+            //}
+            ////Export main invoice
+            //for (int i = 1; i < exportInvoiceTable.Rows.Count + 2; i++)
+            //{
+            //    for (int j = 1; j < exportInvoiceTable.Columns.Count + 1; j++)
+            //    {
+            //        if (i == 1)
+            //        {
+            //            xlInvoiceMain.Cells[i, j] = dcCollection[j - 1].ToString();
+            //        }
+            //        else
+            //            xlInvoiceMain.Cells[i, j] = exportInvoiceTable.Rows[i - 2][j - 1].ToString();
+            //    }
+            //}
+
+
+            ////Get users profile, downloads folder path, and save to workstation
+            //string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            //string pathDownload = Path.Combine(pathUser, "Downloads");
+            //ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\AllSales-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
+            //ExcelApp.ActiveWorkbook.Saved = true;
+            //ExcelApp.Quit();
         }
-        public void initiateInvoiceTable()
+        public System.Data.DataTable initiateInvoiceTable()
         {
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID,
             //locationID, subTotal, discountAmount, tradeinAmount, governmentTax,
@@ -1119,8 +1119,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             exportInvoiceTable.Columns.Add("balanceDue", typeof(string));
             exportInvoiceTable.Columns.Add("transactionType", typeof(string));
             exportInvoiceTable.Columns.Add("comments", typeof(string));
+            exportSales_Invoice();
+
+            return exportInvoiceTable;
         }
-        public void initiateInvoiceItemTable()
+        public System.Data.DataTable initiateInvoiceItemTable()
         {
             //invoiceNum, invoiceSubNum, sku, itemQuantity, itemCost,
             //itemPrice, itemDiscount, percentage
@@ -1133,8 +1136,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             exportInvoiceItemTable.Columns.Add("itemPrice", typeof(string));
             exportInvoiceItemTable.Columns.Add("itemDiscount", typeof(string));
             exportInvoiceItemTable.Columns.Add("percentage", typeof(string));
+            exportSales_Items();
+
+            return exportInvoiceItemTable;
         }
-        public void initiateInvoiceMOPTable()
+        public System.Data.DataTable initiateInvoiceMOPTable()
         {
             //ID, invoiceNum, invoiceSubNum, mopType, amountPaid
             exportInvoiceMOPTable = new System.Data.DataTable();
@@ -1143,6 +1149,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             exportInvoiceMOPTable.Columns.Add("invoiceSubNum", typeof(string));
             exportInvoiceMOPTable.Columns.Add("mopType", typeof(string));
             exportInvoiceMOPTable.Columns.Add("amountPaid", typeof(string));
+            exportSales_MOP();
+
+            return exportInvoiceMOPTable;
         }
         public void exportSales_Invoice()
         {

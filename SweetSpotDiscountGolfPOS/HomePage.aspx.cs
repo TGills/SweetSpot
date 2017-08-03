@@ -21,6 +21,10 @@ namespace SweetSpotDiscountGolfPOS
         List<Invoice> invoiceList = new List<Invoice>();
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
 
             if (!this.IsPostBack)
             {

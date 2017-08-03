@@ -17,12 +17,15 @@ namespace SweetSpotDiscountGolfPOS
         Clubs c = new Clubs();
         LocationManager lm = new LocationManager();
         ItemDataUtilities idu = new ItemDataUtilities();
+        public int tradeInSku;
         public int storeLocation;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
             storeLocation = lm.locationID(Convert.ToString(Session["Loc"]));
             lblSKUDisplay.Text = (idu.reserveTradeInSKu(storeLocation)).ToString();
+            tradeInSku = Convert.ToInt32(lblSKUDisplay.Text);
             //lblSKUDisplay.Text = idu.tradeInSku(storeLocation).ToString();
         }
         //Cancelling the trade-in item
@@ -60,7 +63,7 @@ namespace SweetSpotDiscountGolfPOS
                 shaft, numOfClubs, 0, 0, (cost*(-1)), quant, clubSpec, shaftSpec,
                 shaftFlex, dext, used, comments);
             //Adding the trade-in item to the trade-in storage
-            idu.addTradeInItem(tradeIN);
+            idu.addTradeInItem(tradeIN, tradeInSku);
             //Adding trade-in item to cart
             List<Cart> itemsInCart;
             itemsInCart = (List<Cart>)Session["ItemsInCart"];

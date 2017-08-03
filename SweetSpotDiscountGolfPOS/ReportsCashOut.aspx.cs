@@ -49,7 +49,10 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
 
 
             //Gathering the start and end dates

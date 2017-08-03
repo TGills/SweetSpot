@@ -30,12 +30,12 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             return Math.Round(totalDiscount, 2);
         }
-        public double returnTradeInAmount(List<Cart> itemsSold)
+        public double returnTradeInAmount(List<Cart> itemsSold, int loc)
         {
             double singleTradeInAmount = 0;
             double totalTradeinAmount = 0;
 
-            int[] range = idu.tradeInSkuRange(0);
+            int[] range = idu.tradeInSkuRange(loc);
             foreach (var cart in itemsSold)
             {
                 if (cart.sku <= range[1] && cart.sku >= range[0])
@@ -46,11 +46,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             return totalTradeinAmount;
         }
-        public double returnSubtotalAmount(List<Cart> itemsSold)
+        public double returnSubtotalAmount(List<Cart> itemsSold, int loc)
         {
             double totalSubtotalAmount = 0;
             double totalDiscountAmount = returnDiscount(itemsSold);
-            double totalTradeInAmount = returnTradeInAmount(itemsSold);
+            double totalTradeInAmount = returnTradeInAmount(itemsSold, loc);
             double totalTotalAmount = returnTotalAmount(itemsSold);
             totalSubtotalAmount = totalSubtotalAmount + totalTotalAmount;
             totalSubtotalAmount = totalSubtotalAmount - totalDiscountAmount;

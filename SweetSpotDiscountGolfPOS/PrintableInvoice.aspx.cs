@@ -20,6 +20,10 @@ namespace SweetSpotDiscountGolfPOS
         double dblAmountPaid;
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
             int custNum = (Convert.ToInt32(Session["key"].ToString()));
             Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
             lblCustomerName.Text = c.firstName.ToString() + " " + c.lastName.ToString();
@@ -62,7 +66,7 @@ namespace SweetSpotDiscountGolfPOS
                 tax = ckm.dblPst;
             }
             lblPSTDisplay.Text = "$ " + tax.ToString("#0.00");
-            lblSubtotalDisplay.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
+            lblSubtotalDisplay.Text = "$ " + ckm.dblSubTotal.ToString("#0.00");
             foreach (var mop in mopList)
             {
                 dblAmountPaid += mop.amountPaid;

@@ -36,6 +36,10 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
             if (!Page.IsPostBack)
             {
 
@@ -63,8 +67,9 @@ namespace SweetSpotDiscountGolfPOS
                     lblShippingAmount.Visible = false;
                     dblShippingAmount = 0;
                 }
+                int location = cm.returnLocationID(Convert.ToString(Session["Loc"]));
 
-                ckm = new CheckoutManager(cm.returnTotalAmount(cart), cm.returnDiscount(cart), cm.returnTradeInAmount(cart), dblShippingAmount, true, true, 0, 0, 0);
+                ckm = new CheckoutManager(cm.returnTotalAmount(cart), cm.returnDiscount(cart), cm.returnTradeInAmount(cart, location), dblShippingAmount, true, true, 0, 0, 0);
                 foreach (var T in t)
                 {
                     switch (T.taxName)
@@ -545,6 +550,11 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void btnFinalize_Click(object sender, EventArgs e)
         {//Transaction type 1
+            //if(ckm.dblRemainingBalance != 0)
+            //{
+            //    MessageBox.ShowMessage("Remaining Balance Does NOT Equal 0. Proceed?", this);
+            //}
+
 
             //Gathering needed information for the invoice
             //Cart

@@ -27,6 +27,10 @@ namespace SweetSpotDiscountGolfPOS
         Object o = new Object();
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
             lblInvalidQty.Visible = false;
             if (!Page.IsPostBack)
             {

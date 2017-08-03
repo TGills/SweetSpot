@@ -497,8 +497,11 @@ namespace SweetShop
                         model = idu.modelType(Convert.ToInt32(reader["modelID"]));
                     }
                     //create string for a club description
-                    description = brand + " " + model + " " + reader["clubType"].ToString() + " " + reader["shaft"].ToString() + " "
-                    + reader["numberOfClubs"].ToString() + " " + reader["dexterity"].ToString();
+                    //description = brand + " " + model + " " + reader["clubType"].ToString() + " " + reader["shaft"].ToString() + " "
+                    //+ reader["numberOfClubs"].ToString() + " " + reader["dexterity"].ToString();
+
+                    description = brand + " " + model + " " + reader["clubSpec"].ToString() + " " + reader["clubType"].ToString() +
+                        " " + reader["shaftSpec"].ToString() + " " + reader["shaftFlex"].ToString() + " " + reader["dexterity"].ToString();
                 }
                 //if search type is accessories create accessories description
                 else if (itemType == "Accessories")
@@ -508,7 +511,7 @@ namespace SweetShop
                     {
                         model = idu.modelType(Convert.ToInt32(reader["modelID"]));
                     }
-                    description = brand + " " + model + " " + reader["accessoryType"] + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
+                    description = brand + " " + model + " " + reader["accessoryType"].ToString() + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
                 }
                 //if search type is clothing create clothing description
                 else if (itemType == "Clothing")
@@ -1252,6 +1255,8 @@ namespace SweetShop
         }
         public string getDescription(int sku, int type)
         {
+            //Current: Brand Name, Model, Club Type, Shaft, Number of Clubs, Dexterity
+            //Needs to change to: Brand Name, Model, Club Spec, Club Type, Shaft Spec, Shaftflex, Dexterity
             string desc = "";
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -1260,7 +1265,8 @@ namespace SweetShop
 
             if (type == 1)
             {
-                cmd.CommandText = "Select brandID, modelID, clubType, shaft, numberOfClubs, dexterity from tbl_clubs where sku = @skuCl";
+                // cmd.CommandText = "Select brandID, modelID, clubType, shaft, numberOfClubs, dexterity from tbl_clubs where sku = @skuCl";
+                cmd.CommandText = "Select brandID, modelID, clubSpec, clubType, shaftSpec, shaftFlex, dexterity from tbl_clubs where sku = @skuCl";
                 cmd.Parameters.AddWithValue("@skuCl", sku);
             }
             else if (type == 2)
@@ -1281,8 +1287,8 @@ namespace SweetShop
                 if (type == 1)
                 {
                     desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + " " + idu.modelType(Convert.ToInt32(reader["modelID"])).ToString() + " "
-                        + reader["clubType"].ToString() + " " + reader["shaft"].ToString() + " "
-                        + reader["numberOfClubs"].ToString() + " " + reader["dexterity"].ToString();
+                        + reader["clubSpec"].ToString() + " " + reader["clubType"].ToString() + " "
+                        + reader["shaftSpec"].ToString() + " " + reader["shaftFlex"].ToString() + " " + reader["dexterity"].ToString();
                 }
                 else if (type == 2)
                 {

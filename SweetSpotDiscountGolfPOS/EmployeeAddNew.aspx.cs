@@ -15,8 +15,12 @@ namespace SweetSpotDiscountGolfPOS
         EmployeeManager empM = new EmployeeManager();
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            {
+                Response.Redirect("LoginPage.aspx");
+            }
 
-            if(Session["Admin"] == null)
+            if (Session["Admin"] == null)
             {
                 btnEditEmployee.Enabled = false;
             }
