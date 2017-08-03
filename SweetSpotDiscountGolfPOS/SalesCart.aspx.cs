@@ -349,6 +349,8 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     if (cart.sku == tempItemInCart.sku)
                     {
+                        //itemsInCart.Add(tempItemInCart);
+                        //idu.removeQTYfromInventoryWithSKU(cart.sku, cart.typeID, (remainingQTY + differenceInQTY));
                         if (tempItemInCart.quantity != 0)
                         {
                             itemsInCart.Add(tempItemInCart);

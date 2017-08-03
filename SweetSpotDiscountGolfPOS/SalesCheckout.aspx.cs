@@ -478,6 +478,7 @@ namespace SweetSpotDiscountGolfPOS
             ckm.dblRemainingBalance += taxAmount;
             lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
             txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
+
             Session["CheckOutTotals"] = ckm;
 
 
