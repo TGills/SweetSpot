@@ -60,6 +60,7 @@ namespace SweetSpotProShop
                 brand = b;
             }
             conn.Close();
+
             return brand;
         }
         //Return Model Int created by Nathan and Tyler
@@ -81,13 +82,17 @@ namespace SweetSpotProShop
                 model = m;
             }
             conn.Close();
+
+            if (model == 0)
+            {
+                model = insertModel(modelN);
+            }
+
             return model;
         }
         //Return Brand Int created by Nathan and Tyler
         public int brandName(string brandN)
         {
-
-
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
 
@@ -104,6 +109,13 @@ namespace SweetSpotProShop
                 brand = b;
             }
             conn.Close();
+
+
+            if (brand == 0)
+            {
+                brand = insertBrand(brandN);
+            }
+
             return brand;
         }
         //Return Model string created by Nathan and Tyler
@@ -128,6 +140,37 @@ namespace SweetSpotProShop
             conn.Close();
             return type;
         }
+
+        //Insert new brand name. Returns new brandID
+        public int insertBrand(string brandName)
+        {
+            int brandID = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "INSERT INTO tbl_brand (brandName) OUTPUT Inserted.brandID VALUES(@brandName); ";
+            cmd.Parameters.AddWithValue("brandName", brandName);
+            conn.Open();
+            brandID = (int)cmd.ExecuteScalar();
+            conn.Close();
+            return brandID;
+        }
+        //Insert new model name. return new modelID
+        public int insertModel(string modelName)
+        {
+            int modelID = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "INSERT INTO tbl_model (modelName) OUTPUT Inserted.modelID VALUES(@modelName); ";
+            cmd.Parameters.AddWithValue("modelName", modelName);
+            conn.Open();
+            modelID = (int)cmd.ExecuteScalar();
+            conn.Close();
+            return modelID;
+        }
+
+
 
         //Return Vendor ID
         public int getVendorID(string vendorName)
@@ -229,7 +272,7 @@ namespace SweetSpotProShop
             {
                 Accessories a = o as Accessories;
                 ca.sku = a.sku;
-                ca.description = brandType(a.brandID) + " " + a.size + " " + a.colour;
+                ca.description = brandType(a.brandID) + " " + a.accessoryType + " " + a.size + " " + a.colour;
                 ca.price = a.price;
                 ca.cost = a.cost;
                 ca.typeID = a.typeID;
@@ -310,7 +353,7 @@ namespace SweetSpotProShop
             cmd.Connection = conn;
             conn.Open();
             //Removed location because client did not want
-            cmd.CommandText = "Select sku, quantity, brandID, size, colour, price, cost From tbl_accessories Where SKU = @skuAcc";
+            cmd.CommandText = "Select sku, quantity, brandID, accessoryType, size, colour, price, cost From tbl_accessories Where SKU = @skuAcc";
             cmd.Parameters.AddWithValue("skuAcc", ItemNumber);
             //cmd.Parameters.AddWithValue("locationID", intLocation);
 
@@ -318,7 +361,7 @@ namespace SweetSpotProShop
             while (readerAcc.Read())
             {
 
-                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"]))
+                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) + " " + readerAcc["accessoryType"].ToString() 
                     + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
                     Convert.ToInt32(readerAcc["quantity"]), Convert.ToDouble(readerAcc["price"]),
                     Convert.ToDouble(readerAcc["cost"]));
@@ -375,14 +418,14 @@ namespace SweetSpotProShop
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             conn.Open();
-            cmd.CommandText = "Select sku, quantity, brandID, size, colour, price, cost, locationID From tbl_accessories Where SKU = @skuAcc";
+            cmd.CommandText = "Select sku, quantity, brandID, accessoryType size, colour, price, cost, locationID From tbl_accessories Where SKU = @skuAcc";
             cmd.Parameters.AddWithValue("skuAcc", ItemNumber);
 
             SqlDataReader readerAcc = cmd.ExecuteReader();
             while (readerAcc.Read())
             {
 
-                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"]))
+                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) + " " + readerAcc["accessoryType"].ToString()
                     + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
                     Convert.ToInt32(readerAcc["quantity"]), Convert.ToDouble(readerAcc["price"]),
                     Convert.ToDouble(readerAcc["cost"]), lm.locationName(Convert.ToInt32(readerAcc["locationID"])));

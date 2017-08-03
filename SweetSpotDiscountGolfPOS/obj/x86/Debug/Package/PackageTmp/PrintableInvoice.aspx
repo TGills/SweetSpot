@@ -2,7 +2,19 @@
 
 <%--<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>--%>
-<asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server">
+<asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server" >
+    <style media="print">
+		.noPrint {
+			display: none;
+			margin-left: 0;
+		}
+		.yesPrint {
+			display: inline-block !important;
+			/* margin-right:100px;
+           float: right;*/
+			margin-left: 10px !important;
+		}
+	</style>>
     <div id="menu_simple">
         <ul>
             <li><a>HOME</a></li>
@@ -14,11 +26,12 @@
         </ul>
     </div>
     <div id="image_simple">
-        <img src="Images/SweetSpotLogo.jpg" />
+        <img src="Images/combinedLogo.jpg" />
     </div>
     <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
 </asp:Content>
-<asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server">
+<asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server" >
+
     <script>
         function printReport(printable) {
             window.print();
@@ -101,7 +114,7 @@
                             <asp:Label ID="retail" Text='<%#Eval("price","{0:.00}")%>' runat="server"></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Discounts Applied">
+                    <asp:TemplateField HeaderText="Discounts/Bonus Applied">
                         <ItemTemplate>
                             <%# Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToInt32(Eval("price"))).ToString("#0.00") %>
                         </ItemTemplate>
@@ -186,14 +199,18 @@
             </p>
             <br />
             <div class="noPrint">
-                <asp:Button ID="btnPrint" runat="server" Text="Print" Width="100px" OnClientClick="printReport()" />
+                <%--added a cssclass here for testing--%>
+                <asp:Button ID="btnPrint" CssClass="noPrint" runat="server" Text="Print" Width="100px" OnClientClick="printReport()" />
                 <br />
                 <asp:Button ID="btnHome" runat="server" Text="Home" Width="100px" OnClick="btnHome_Click" />
                 <br />
-                <p><b>PLEASE NOTE: </b>All used equipment is sold as is and it is understood that its' condition</p>
+                <%--<p><b>PLEASE NOTE: </b>All used equipment is sold as is and it is understood that its' condition</p>
+                <p>and usability may reflect prior use. The Sweet Spot Discount Golf assumes no responsibility</p>
+                <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>--%>
+            </div>
+            <p><b>PLEASE NOTE: </b>All used equipment is sold as is and it is understood that its' condition</p>
                 <p>and usability may reflect prior use. The Sweet Spot Discount Golf assumes no responsibility</p>
                 <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>
-            </div>
         </div>
     </div>
 

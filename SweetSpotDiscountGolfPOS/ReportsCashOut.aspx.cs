@@ -49,6 +49,9 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            
+
+
             //Gathering the start and end dates
             DateTime[] reportDates = (DateTime[])Session["reportDates"];
             startDate = reportDates[0];
@@ -107,8 +110,7 @@ namespace SweetSpotDiscountGolfPOS
                 }
 
             }
-            tradeinTotal = tradeinTotal * -1;
-            
+            tradeinTotal = tradeinTotal * -1;          
 
             Cashout cas = new Cashout(tradeinTotal, giftCertTotal, cashTotal,
                 chequeTotal, debitTotal, mcTotal, visaTotal, amexTotal);
@@ -219,7 +221,6 @@ namespace SweetSpotDiscountGolfPOS
 
             Session["saleCashout"] = null;
             Session["receiptCashout"] = null;
-
         }
     }
 }

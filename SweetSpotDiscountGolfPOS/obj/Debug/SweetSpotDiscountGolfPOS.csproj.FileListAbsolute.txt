@@ -163,3 +163,4 @@ C:\Users\Carlo Berardi\Desktop\Production - 4.5\SweetSpotDiscountGolfPOS\SweetSp
 C:\Users\tyler\Desktop\Production - 4.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\bin\EPPlus.dll
 C:\Users\tyler\Desktop\Production - 4.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\bin\EPPlus.xml
 C:\Users\tyler\Desktop\Production - 4.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\Debug\SweetSpotDiscountGolfPOS.csprojResolveAssemblyReference.cache
+C:\Users\Carlo Berardi\Desktop\Production - 4.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\Debug\SweetSpotDiscountGolfPOS.csprojResolveAssemblyReference.cache

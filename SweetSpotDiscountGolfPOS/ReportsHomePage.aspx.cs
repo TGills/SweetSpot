@@ -7,7 +7,9 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using OfficeOpenXml;
+using System.IO;
+using OfficeOpenXml.FormulaParsing;
 
 namespace SweetSpotDiscountGolfPOS
 {
@@ -16,6 +18,8 @@ namespace SweetSpotDiscountGolfPOS
 
         SweetShopManager ssm = new SweetShopManager();
         Reports r = new Reports();
+
+
         //List<Invoice> invoice;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -76,5 +80,30 @@ namespace SweetSpotDiscountGolfPOS
             r.exportAllSalesToExcel();
             MessageBox.ShowMessage("Report Completed. Check Downloads", this);
         }
+
+
+
+
+
+        protected void btnTesting_Click(object sender, EventArgs e)
+        {            
+            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string pathDownload = (pathUser + "\\Downloads\\");
+            FileInfo newFile = new FileInfo(pathDownload + "mynewfile.xlsx");
+            using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+            {
+                ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Test Sheet");
+                // write to sheet
+                worksheet.Cells[1, 1].Value = "Test";
+                //xlPackage.SaveAs(aFile);
+
+                Response.Clear();
+                Response.AddHeader("content-disposition", "attachment; filename=test.xlsx");
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.BinaryWrite(xlPackage.GetAsByteArray());
+                Response.End();
+            }
+        }
+
     }
 }

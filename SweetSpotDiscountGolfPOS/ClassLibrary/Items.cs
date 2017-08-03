@@ -23,6 +23,7 @@ namespace SweetShop
         public double price { get; set; }
         public double cost { get; set; }
         public string location { get; set; }
+        public string accessoryType { get; set; }
 
         public Items() { }
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -61,7 +62,7 @@ namespace SweetSpotDiscountGolfPOS
         protected void btnLoadItems_Click(object sender, EventArgs e)
         {
             if (fupItemSheet.HasFile)
-            {
+            {                                
                 r.importItems(fupItemSheet);
             }
             //Show that it is done

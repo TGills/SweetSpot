@@ -57,6 +57,7 @@
             <hr />
             <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
             <asp:Button ID="btnExportInvoices" runat="server" Text="Invoice Report" Width="200px" OnClick="btnExportInvoices_Click" />
+            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClick="btnTesting_Click" />
         </asp:Panel>
     </div>
 </asp:Content>

@@ -267,7 +267,8 @@ namespace SweetSpotDiscountGolfPOS
                 //    }
                 //    dblRemaining += ckm.dblTotal + ckm.dblShipping - (ckm.dblDiscounts + ckm.dblTradeIn);
                 //    lblRemainingBalanceDueDisplay.Text = "$ " + (dblRemaining - dblAmountPaid).ToString("#0.00");
-            }
+            }          
+
         }
 
         //American Express

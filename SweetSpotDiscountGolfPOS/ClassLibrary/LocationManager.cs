@@ -141,11 +141,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlCommand cmd = new SqlCommand();
 
             cmd.Connection = conn;
-            cmd.CommandText = "Select locationID from tbl_location where locationName = '" + locationName + "'";
+            cmd.CommandText = $"Select locationID from tbl_location where locationName like '{locationName}'";
 
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
-            int locID = 0;
+            int locID = 1;
             while (reader.Read())
             {
                 int n = Convert.ToInt32(reader["locationID"]);

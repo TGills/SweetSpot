@@ -41,7 +41,7 @@
            <%-- <div id="calEnd" style="width:1210px;margin-top:auto;">--%>
                 <asp:TextBox ID="txtEndDate" ReadOnly="true" Width="195px" placeholder="Please select a ending date." Text="" runat="server"></asp:TextBox>
                 <hr />
-             <div style ="width=30px; margin: 0 auto">
+             <div style ="width:30px; margin: 0 auto">
                 <asp:Calendar ID="calEndDate" runat="server" BackColor="White" BorderColor="#999999" CellPadding="4" DayNameFormat="Shortest" Font-Names="Verdana" Font-Size="8pt" ForeColor="Black" Height="182px" Width="200px" OnSelectionChanged="calEnd_SelectionChanged">
                     <DayHeaderStyle BackColor="#5FD367" Font-Bold="True" Font-Size="7pt" />
                     <NextPrevStyle VerticalAlign="Bottom" />
@@ -56,6 +56,8 @@
             </div>
             <hr />
             <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
+            <asp:Button ID="btnExportInvoices" runat="server" Text="Invoice Report" Width="200px" OnClick="btnExportInvoices_Click" />
+            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClick="btnTesting_Click" />
         </asp:Panel>
     </div>
 </asp:Content>

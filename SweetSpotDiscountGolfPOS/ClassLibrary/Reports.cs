@@ -14,6 +14,7 @@ using SweetSpotProShop;
 using System.Threading;
 using System.Diagnostics;
 using System.Text;
+using OfficeOpenXml;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
@@ -150,291 +151,553 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             List<Clubs> listClub = new List<Clubs>();
             List<Clothing> listClothing = new List<Clothing>();
             List<Accessories> listAccessories = new List<Accessories>();
-            //try
-            //{
-            Excel.Application xlApp = new Excel.Application();
-            //string path = fup.PostedFile.FileName;
-            //System.Web.HttpContext.Current.Server.MapPath(fup.FileName)
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string path = Path.Combine(pathUser, "Downloads\\");
-            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(path + fup.FileName);
-            Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
-            Excel.Range xlRange = xlWorksheet.UsedRange;
 
-            int rowCount = xlRange.Rows.Count;
-            int colCount = xlRange.Columns.Count;
-
-            for (int i = 2; i <= rowCount; i++)
+            //check if there is actually a file being uploaded
+            if (fup.HasFile)
             {
-                string itemType = (string)((xlRange.Cells[i, 5] as Range).Value2);
+                //load the uploaded file into the memorystream
+                using (MemoryStream stream = new MemoryStream(fup.FileBytes))
 
 
-                //Write the value to the console, and start gathering item info for insert
-                if (xlRange.Cells[i] != null && xlRange.Cells[i].Value2 != null)
+                using (ExcelPackage xlPackage = new ExcelPackage(stream))
                 {
-                    Console.Write(xlRange.Cells[i].Value2.ToString() + "\t");
-                    //UPDATE ALL WITH PROPER VALUES/POSITIONS
-                    if (itemType == null) { }
-                    else if (itemType.Equals("")) { }
-                    else if (itemType.Equals("Accessories") || itemType.Equals("accessories") || itemType.Equals("Balls") ||
-                        itemType.Equals("balls") || itemType.Equals("Grips") || itemType.Equals("grips"))
+
+                    // get the first worksheet in the workbook
+                    ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
+                    var rowCnt = worksheet.Dimension.End.Row;
+                    var colCnt = worksheet.Dimension.End.Column;
+
+
+                    //Beginning the loop for data gathering
+                    for (int i = 2; i < rowCnt; i++)
                     {
-                        if (Convert.ToInt32((xlRange.Cells[i, 3] as Range).Value2) != null)
-                            a.sku = Convert.ToInt32((xlRange.Cells[i, 3] as Range).Value2);
-                        else
-                            a.sku = 0;
-
-                        int bName = idu.brandName((xlWorksheet.Cells[i, 5] as Range).Value2);
-                        if (!bName.Equals(null))
-                            a.brandID = bName;
-                        else
-                            a.brandID = 1;
-
-                        string mName;
+                        string itemType;
                         try
                         {
-                            mName = ((xlRange.Cells[i, 6] as Range).Value2).ToString();
-                            if (mName == null)
+                            itemType = (worksheet.Cells[i, 5].Value).ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            itemType = "";
+                        }
+
+
+                        if (worksheet.Row(i) != null && worksheet.Cells[i, 5].Value != null)
+                        {
+                            if (itemType == null) { }
+                            else if (itemType.Equals("")) { }
+                            //***************ACCESSORIES*********
+                            else if (itemType.Equals("Accessories") || itemType.Equals("accessories"))
                             {
-                                a.modelID = 1;
+                                //***************SKU***************
+                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null))
+                                {
+                                    a.sku = Convert.ToInt32(worksheet.Cells[i, 3].Value);
+                                }
+                                else
+                                {
+                                    a.sku = 0;
+                                }
+                                //***************BRAND ID***************
+                                int bName = idu.brandName(itemType.ToString());
+                                if (!bName.Equals(null))
+                                {
+                                    a.brandID = bName;
+                                }
+                                else
+                                {
+                                    a.brandID = 1;
+                                }
+                                //***************MODEL ID***************                                
+                                try
+                                {
+                                    string mName;
+                                    mName = (worksheet.Cells[i, 6].Value).ToString();
+                                    if (mName == null)
+                                    {
+                                        a.modelID = 1;
+                                    }
+                                    else
+                                    {
+                                        int mID = idu.modelName(mName);
+                                        if (!mID.Equals(null))
+                                            if (mName == "360") { a.modelID = 17; }
+                                            else { a.modelID = mID; }
+
+                                        else
+                                            a.modelID = 1;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    a.modelID = 1427;
+                                }
+                                //***************ACCESSORY TYPE***************
+                                try
+                                {
+                                    if ((string)(worksheet.Cells[i, 7].Value) != null)
+                                    {
+                                        a.accessoryType = (string)(worksheet.Cells[i, 7].Value);
+                                    }
+                                    else
+                                    {
+                                        a.accessoryType = "";
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    a.accessoryType = "";
+                                }
+                                //***************COST***************
+                                try
+                                {
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null))
+                                    {
+                                        a.cost = Convert.ToDouble(worksheet.Cells[i, 12].Value);
+                                    }
+                                    else
+                                    {
+                                        a.cost = 0;
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    a.cost = 0;
+                                }
+                                //***************PRICE***************
+                                try
+                                {
+                                    if (Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    {
+                                        a.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
+                                    }
+                                    else
+                                    {
+                                        a.price = 0;
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    a.price = 0;
+                                }
+                                //***************QUANTITY***************
+                                try
+                                {
+                                    if (Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    {
+                                        a.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
+                                    }
+                                    else
+                                    {
+                                        a.quantity = 0;
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    a.quantity = 0;
+                                }
+                                //***************COMMENTS***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 16].Value).Equals(null))
+                                    {
+                                        a.comments = (string)(worksheet.Cells[i, 16].Value);
+                                    }
+                                    else
+                                    {
+                                        a.comments = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    a.comments = "";
+                                }
+
+                                a.locID = 1;//
+                                a.typeID = 2;
+                                a.size = "";
+                                a.colour = "";
+
+                                listAccessories.Add(a);
+                                o = a as Object;
                             }
+                            //***************APPAREL*************
+                            else if (itemType.Equals("Apparel") || itemType.Equals("apparel"))
+                            {
+                                //***************SKU***************
+                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null))
+                                {
+                                    cl.sku = Convert.ToInt32(worksheet.Cells[i, 3].Value);
+                                }
+                                else
+                                {
+                                    cl.sku = 0;
+                                }
+                                //***************BRAND ID***************                                
+                                int bName = idu.brandName(itemType.ToString());
+                                if (!bName.Equals(null))
+                                {
+                                    cl.brandID = bName;
+                                }
+                                else
+                                {
+                                    cl.brandID = 1;
+                                }
+                                //***************COST***************
+                                try
+                                {
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null))
+                                    {
+                                        cl.cost = Convert.ToDouble(worksheet.Cells[i, 12].Value);
+                                    }
+                                    else
+                                    {
+                                        cl.cost = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.cost = 0;
+                                }
+                                //***************PRICE***************
+                                try
+                                {
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    {
+                                        cl.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
+                                    }
+                                    else
+                                    {
+                                        cl.price = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.price = 0;
+                                }
+                                //***************QUANTITY***************
+                                try
+                                {
+                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    {
+                                        cl.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
+                                    }
+                                    else
+                                    {
+                                        cl.quantity = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.quantity = 0;
+                                }
+                                //***************GENDER***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 6].Value).Equals(null))
+                                    {
+                                        cl.gender = (string)(worksheet.Cells[i, 6].Value);
+                                    }
+                                    else
+                                    {
+                                        cl.gender = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.gender = "";
+                                }
+                                //***************STYLE***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 7].Value).Equals(null))
+                                    {
+                                        cl.style = (string)(worksheet.Cells[i, 7].Value);
+                                    }
+                                    else
+                                    {
+                                        cl.style = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.style = "";
+                                }
+                                //***************COMMENTS***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 16].Value).Equals(null))
+                                    {
+                                        cl.comments = (string)(worksheet.Cells[i, 16].Value);
+                                    }
+                                    else
+                                    {
+                                        cl.comments = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.comments = "";
+                                }
+
+                                cl.locID = 1;//
+                                cl.typeID = 3; //Type can be directly assigned
+                                cl.size = "";
+                                cl.colour = "";
+
+                                o = cl as Object;
+                            }
+                            //***************CLUBS***************
                             else
                             {
-                                int mID = idu.modelName(mName);
-                                if (!mID.Equals(null))
-                                    if (mName == "360") { a.modelID = 17; }
-                                    else { a.modelID = mID; }
-
+                                //***************SKU***************
+                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null))
+                                {
+                                    c.sku = Convert.ToInt32(worksheet.Cells[i, 3].Value);
+                                }
                                 else
-                                    a.modelID = 1;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            a.modelID = 1427;
-                        }
-
-                        if (Convert.ToDouble((xlWorksheet.Cells[i, 12] as Range).Value2) != null)
-                            a.cost = Convert.ToDouble((xlWorksheet.Cells[i, 12] as Range).Value2);
-                        else
-                            a.cost = 0;
-
-                        if (Convert.ToDouble((xlRange.Cells[i, 15] as Range).Value2) != null)
-                            a.price = Convert.ToDouble((xlRange.Cells[i, 15] as Range).Value2);
-                        else
-                            a.price = 0;
-
-                        if (Convert.ToInt32((xlRange.Cells[i, 13] as Range).Value2) != null)
-                            a.quantity = Convert.ToInt32((xlRange.Cells[i, 13] as Range).Value2);
-                        else
-                            a.quantity = 0;
-
-                        if ((string)((xlRange.Cells[i, 19] as Range).Value2) != null)
-                            a.comments = (string)((xlRange.Cells[i, 19] as Range).Value2);
-                        else
-                            a.comments = "";
-
-                        a.locID = 1;//
-                        a.typeID = 2;
-                        a.size = "";
-                        a.colour = "";
-
-                        listAccessories.Add(a);
-                        o = a as Object;
-                    }
-                    else if (itemType.Equals("Apparel") || itemType.Equals("apparel") || itemType.Equals("Shoes") || itemType.Equals("shoes"))
-                    {
-                        if (Convert.ToInt32((xlRange.Cells[i, 3] as Range).Value2) != null)
-                            cl.sku = Convert.ToInt32((xlRange.Cells[i, 3] as Range).Value2);
-                        else
-                            cl.sku = 0;
-
-                        int bName = idu.brandName(itemType.ToString());
-                        if (!bName.Equals(null))
-                            cl.brandID = bName;
-                        else
-                            cl.brandID = 1;
-
-                        if (Convert.ToDouble((xlWorksheet.Cells[i, 12] as Range).Value2) != null)
-                            cl.cost = Convert.ToDouble((xlWorksheet.Cells[i, 12] as Range).Value2);
-                        else
-                            cl.cost = 0;
-
-                        if (Convert.ToDouble((xlRange.Cells[i, 15] as Range).Value2) != null)
-                            cl.price = Convert.ToDouble((xlRange.Cells[i, 15] as Range).Value2);
-                        else
-                            cl.price = 0;
-
-                        if (Convert.ToInt32((xlRange.Cells[i, 13] as Range).Value2) != null)
-                            cl.quantity = Convert.ToInt32((xlRange.Cells[i, 13] as Range).Value2);
-                        else
-                            cl.quantity = 0;
-
-                        if ((string)((xlRange.Cells[i, 6] as Range).Value2) != null)
-                            cl.gender = (string)((xlRange.Cells[i, 6] as Range).Value2);
-                        else
-                            cl.gender = "";
-
-                        if ((string)((xlRange.Cells[i, 7] as Range).Value2) != null)
-                            cl.style = (string)((xlRange.Cells[i, 7] as Range).Value2);
-                        else
-                            cl.style = "";
-
-                        if ((string)((xlRange.Cells[i, 19] as Range).Value2) != null)
-                            cl.comments = (string)((xlRange.Cells[i, 19] as Range).Value2);
-                        else
-                            cl.comments = "";
-
-                        cl.locID = 1;//
-                        cl.typeID = 3; //Type can be directly assigned
-                        cl.size = "";
-                        cl.colour = "";
-
-
-
-
-                        o = cl as Object;
-                    }
-                    else if (itemType.CompareTo("Miscellaneous") != 0)
-                    {
-                        if (Convert.ToInt32((xlRange.Cells[i, 3] as Range).Value2) != null)
-                            c.sku = Convert.ToInt32((xlRange.Cells[i, 3] as Range).Value2);
-                        else
-                            c.sku = 1;
-
-                        if (Convert.ToDouble((xlRange.Cells[i, 12] as Range).Value2) != null)
-                            c.cost = Convert.ToDouble((xlRange.Cells[i, 12] as Range).Value2);
-                        else
-                            c.cost = 0;
-
-
-                        int bName = idu.brandName((xlWorksheet.Cells[i, 5] as Range).Value2);
-                        string test = ((xlWorksheet.Cells[i, 5] as Range).Value2);
-                        if (!bName.Equals(null))
-                        {
-                            c.brandID = bName;
-                            if (c.brandID == 0) { c.brandID = 1; }
-                        }
-                        else
-                            c.brandID = 1;
-
-                        if (Convert.ToDouble((xlRange.Cells[i, 15] as Range).Value2) != null)
-                            c.price = Convert.ToDouble((xlRange.Cells[i, 15] as Range).Value2);
-                        else
-                            c.price = 0;
-
-                        if (Convert.ToDouble((xlRange.Cells[i, 11] as Range).Value2) != null)
-                            c.premium = Convert.ToDouble((xlRange.Cells[i, 11] as Range).Value2);
-                        else
-                            c.premium = 0;
-
-                        if (Convert.ToInt32((xlRange.Cells[i, 13] as Range).Value2) != null)
-                            c.quantity = Convert.ToInt32((xlRange.Cells[i, 13] as Range).Value2);
-                        else
-                            c.quantity = 0;
-
-                        if ((string)((xlRange.Cells[i, 7] as Range).Value2) != null)
-                            c.clubType = (string)((xlRange.Cells[i, 7] as Range).Value2);
-                        else
-                            c.clubType = "";
-
-
-                        string mName;
-                        try
-                        {
-                            mName = ((xlRange.Cells[i, 6] as Range).Value2).ToString();
-                            if (mName == null)
-                            {
-                                c.modelID = 1;
-                            }
-                            else
-                            {
-                                int mID = idu.modelName(mName);
-                                if (!mID.Equals(null))
-                                    if (mName == "360") { c.modelID = 17; }
-                                    else { c.modelID = mID; }
-
+                                {
+                                    c.sku = 0;
+                                }
+                                //***************BRAND ID***************
+                                int bName = idu.brandName(itemType.ToString());
+                                if (!bName.Equals(null))
+                                {
+                                    c.brandID = bName;
+                                }
                                 else
-                                    c.modelID = 1;
+                                {
+                                    c.brandID = 1;
+                                }
+                                //***************MODEL ID***************                                
+                                try
+                                {
+                                    string mName;
+                                    mName = (worksheet.Cells[i, 6].Value).ToString();
+                                    if (mName == null)
+                                    {
+                                        c.modelID = 1;
+                                    }
+                                    else
+                                    {
+                                        int mID = idu.modelName(mName);
+                                        if (!mID.Equals(null))
+                                            if (mName == "360") { c.modelID = 17; }
+                                            else { c.modelID = mID; }
+
+                                        else
+                                            c.modelID = 1;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    c.modelID = 1427;
+                                }
+                                //***************COST***************
+                                try
+                                {
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null))
+                                    {
+                                        c.cost = Convert.ToDouble(worksheet.Cells[i, 12].Value);
+                                    }
+                                    else
+                                    {
+                                        c.cost = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.cost = 0;
+                                }
+                                //***************PRICE***************
+                                try
+                                {
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    {
+                                        c.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
+                                    }
+                                    else
+                                    {
+                                        c.price = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.price = 0;
+                                }
+                                //***************QUANTITY***************
+                                try
+                                {
+                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    {
+                                        c.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
+                                    }
+                                    else
+                                    {
+                                        c.quantity = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.quantity = 0;
+                                }
+                                //***************COMMENTS***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 16].Value).Equals(null))
+                                    {
+                                        c.comments = (string)(worksheet.Cells[i, 16].Value);
+                                    }
+                                    else
+                                    {
+                                        c.comments = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.comments = "";
+                                }
+                                //***************PREMIUM***************
+                                try
+                                {
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 11].Value).Equals(null))
+                                    {
+                                        c.premium = Convert.ToDouble(worksheet.Cells[i, 11].Value);
+                                    }
+                                    else
+                                    {
+                                        c.premium = 0;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.premium = 0;
+                                }
+                                //***************CLUB TYPE***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 7].Value).Equals(null))
+                                    {
+                                        c.clubType = (string)(worksheet.Cells[i, 7].Value);
+                                    }
+                                    else
+                                    {
+                                        c.clubType = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.clubType = "";
+                                }
+                                //***************SHAFT***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 8].Value).Equals(null))
+                                    {
+                                        c.shaft = (string)(worksheet.Cells[i, 8].Value);
+                                    }
+                                    else
+                                    {
+                                        c.shaft = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.shaft = "";
+                                }
+                                //***************NUMBER OF CLUBS***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 9].Value).Equals(null))
+                                    {
+                                        c.numberOfClubs = (string)(worksheet.Cells[i, 9].Value);
+                                    }
+                                    else
+                                    {
+                                        c.numberOfClubs = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.numberOfClubs = "";
+                                }
+                                //***************CLUB SPEC***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 18].Value).Equals(null))
+                                    {
+                                        c.clubSpec = (string)(worksheet.Cells[i, 18].Value);
+                                    }
+                                    else
+                                    {
+                                        c.clubSpec = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.clubSpec = "";
+                                }
+                                //***************SHAFT SPEC***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 19].Value).Equals(null))
+                                    {
+                                        c.shaftSpec = (string)(worksheet.Cells[i, 19].Value);
+                                    }
+                                    else
+                                    {
+                                        c.shaftSpec = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.shaftSpec = "";
+                                }
+                                //***************SHAFT FLEX***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 20].Value).Equals(null))
+                                    {
+                                        c.shaftFlex = (string)(worksheet.Cells[i, 20].Value);
+                                    }
+                                    else
+                                    {
+                                        c.shaftFlex = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.shaftFlex = "";
+                                }
+                                //***************DEXTERITY***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 21].Value).Equals(null))
+                                    {
+                                        c.dexterity = (string)(worksheet.Cells[i, 21].Value);
+                                    }
+                                    else
+                                    {
+                                        c.dexterity = "";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.dexterity = "";
+                                }
+
+                                c.typeID = 1;
+                                c.itemlocation = 1;//
+                                c.used = false;//
+
+                                listClub.Add(c);
+                                o = c as Object;
                             }
+                            ssm.checkForItem(o);
                         }
-                        catch (Exception e)
-                        {
-                            c.modelID = 1427;
-                        }
-
-
-
-                        if ((string)((xlRange.Cells[i, 8] as Range).Value2) != null)
-                            c.shaft = (string)((xlRange.Cells[i, 8] as Range).Value2);
-                        else
-                            c.shaft = "";
-
-                        if ((string)((xlRange.Cells[i, 9] as Range).Value2) != null)
-                            c.numberOfClubs = (string)((xlRange.Cells[i, 9] as Range).Value2);
-                        else
-                            c.numberOfClubs = "";
-
-                        if ((string)((xlRange.Cells[i, 18] as Range).Value2) != null)
-                            c.clubSpec = (string)((xlRange.Cells[i, 18] as Range).Value2);
-                        else
-                            c.clubSpec = "";
-
-                        if ((string)((xlRange.Cells[i, 19] as Range).Value2) != null)
-                            c.shaftSpec = (string)((xlRange.Cells[i, 19] as Range).Value2);
-                        else
-                            c.shaftSpec = "";
-
-                        if ((string)((xlRange.Cells[i, 20] as Range).Value2) != null)
-                            c.shaftFlex = (string)((xlRange.Cells[i, 20] as Range).Value2);
-                        else
-                            c.shaftFlex = "";
-
-                        if ((string)((xlRange.Cells[i, 21] as Range).Value2) != null)
-                            c.dexterity = (string)((xlRange.Cells[i, 21] as Range).Value2);
-                        else
-                            c.dexterity = "";
-
-                        if ((string)((xlRange.Cells[i, 19] as Range).Value2) != null)
-                            c.comments = (string)((xlRange.Cells[i, 19] as Range).Value2);
-                        else
-                            c.comments = "";
-
-                        c.typeID = 1;
-                        c.itemlocation = 1;//
-                        c.used = false;//
-
-                        listClub.Add(c);
-                        o = c as Object;
                     }
-                    ssm.checkForItem(o);
                 }
-
             }
-
-
-            //cleanup
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            //release com objects to fully kill excel process from running in the background
-            Marshal.ReleaseComObject(xlRange);
-            Marshal.ReleaseComObject(xlWorksheet);
-
-            //close and release
-            xlWorkbook.Close();
-            Marshal.ReleaseComObject(xlWorkbook);
-
-            //quit and release
-            xlApp.Quit();
-            Marshal.ReleaseComObject(xlApp);
-
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex);
-            //}
 
         }
         public void importCustomers(FileUpload fup)
@@ -745,7 +1008,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             conn.Close();
         }
 
-        //Export sales to excel
+        //Export sales/invoices to excel
         public void exportAllSalesToExcel()
         {
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID,
@@ -826,8 +1089,8 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                         xlInvoiceMain.Cells[i, j] = exportInvoiceTable.Rows[i - 2][j - 1].ToString();
                 }
             }
-            
-            
+
+
             //Get users profile, downloads folder path, and save to workstation
             string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string pathDownload = Path.Combine(pathUser, "Downloads");

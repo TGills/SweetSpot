@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using SweetSpotProShop;
 using System.Data;
 using System.Threading.Tasks;
+using SweetSpotDiscountGolfPOS.ClassLibrary;
 
 namespace SweetSpotDiscountGolfPOS
 {
@@ -21,6 +22,7 @@ namespace SweetSpotDiscountGolfPOS
         List<Items> invoiceItems = new List<Items>();
         List<Cart> itemsInCart = new List<Cart>();
         List<Cart> returnedCart = new List<Cart>();
+        LocationManager lm = new LocationManager();
         Cart tempItemInCart;
         Object o = new Object();
         protected void Page_Load(object sender, EventArgs e)
@@ -435,14 +437,13 @@ namespace SweetSpotDiscountGolfPOS
                 }
 
                 //int locationID = Convert.ToInt32(lblLocationID.Text);
-                int locationID = 1;
+                int locationID = lm.locationID(Convert.ToString(Session["Loc"]));
                 //Finding the min and max range for trade ins
                 int[] range = idu.tradeInSkuRange(locationID);
 
                 //If the itemKey is between or equal to the ranges, do trade in
                 if (itemKey >= range[0] && itemKey < range[1])
-                {
-                    
+                {                    
                     //Trade In Sku to add in SK
                     string redirect = "<script>window.open('TradeINEntry.aspx');</script>";
                     Response.Write(redirect);
