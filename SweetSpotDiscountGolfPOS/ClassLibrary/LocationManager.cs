@@ -12,7 +12,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         string connectionString;
         public LocationManager()
         {
-            connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
+           connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
         }
         //Provinve/State Name based on Province/State ID
         public string provinceName(int provID)
@@ -192,6 +192,24 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             conn.Close();
             return locationN;
         }
+        //Gets city based on location id
+        public string locationCity(int locID)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
 
+            cmd.Connection = conn;
+            cmd.CommandText = "Select city from tbl_location where locationID  = "  + locID.ToString();
+            string cityName = "";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();            
+            while (reader.Read())
+            {
+
+                cityName = reader["city"].ToString();
+            }
+            conn.Close();
+            return cityName;
+        }
     }
 }

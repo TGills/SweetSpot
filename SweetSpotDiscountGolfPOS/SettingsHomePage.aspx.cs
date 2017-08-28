@@ -1,4 +1,5 @@
-﻿using SweetShop;
+﻿using OfficeOpenXml;
+using SweetShop;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
 using SweetSpotProShop;
 using System;
@@ -85,8 +86,45 @@ namespace SweetSpotDiscountGolfPOS
         //Exporting
         protected void btnExportAll_Click(object sender, EventArgs e)
         {
-            r.exportAllItems();
-            MessageBox.ShowMessage("Export Complete", this);
+            //r.exportAllItems();
+            //MessageBox.ShowMessage("Export Complete", this);
+
+
+
+            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string pathDownload = (pathUser + "\\Downloads\\");
+            FileInfo newFile = new FileInfo(pathDownload + "TotalInventory.xlsx");
+            using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+            {
+                ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Inventory");
+                // write to sheet
+                DataTable exportTable = r.exportAllItems();
+
+                DataColumnCollection dcCollection = exportTable.Columns;               
+                
+
+                for (int i = 1; i < exportTable.Rows.Count + 2; i++)
+                {
+                    for (int j = 1; j < exportTable.Columns.Count + 1; j++)
+                    {
+                        if (i == 1)
+                        {
+                            worksheet.Cells[i, j].Value = dcCollection[j - 1].ToString();
+                        }
+                        else
+                            worksheet.Cells[i, j].Value = exportTable.Rows[i - 2][j - 1].ToString();
+                    }
+                }
+
+
+
+                Response.Clear();
+                Response.AddHeader("content-disposition", "attachment; filename=TotalInventory.xlsx");
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.BinaryWrite(xlPackage.GetAsByteArray());
+                Response.End();
+            }
+
         }
         protected void btnExportClubs_Click(object sender, EventArgs e)
         {

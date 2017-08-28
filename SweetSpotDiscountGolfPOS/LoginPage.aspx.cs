@@ -15,7 +15,7 @@ namespace SweetSpotDiscountGolfPOS
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            txtPassword.Focus();
+           txtPassword.Focus();
         }
         //test
         protected void btnLogin_Click(object sender, EventArgs e)
@@ -64,6 +64,7 @@ namespace SweetSpotDiscountGolfPOS
 
                 DataRow locDR = dt2.Rows[0];
                 Session["Loc"] = locDR.ItemArray[1];
+                Session["locationID"] = locDR.ItemArray[0];
                 //}
             }
             if (dt.Rows.Count > 0)

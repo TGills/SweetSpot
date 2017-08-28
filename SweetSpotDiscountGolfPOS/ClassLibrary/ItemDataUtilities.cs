@@ -263,7 +263,8 @@ namespace SweetSpotProShop
             {
                 Clubs c = o as Clubs;
                 ca.sku = c.sku;
-                ca.description = brandType(c.brandID) + " " + modelType(c.modelID) + " " + c.clubType + " " + c.shaft + " " + c.numberOfClubs + " " + c.dexterity;
+                ca.description = brandType(c.brandID) + " " + modelType(c.modelID) + " " + 
+                    c.clubSpec + " " + c.clubType + " " + c.shaftSpec + " " + c.shaftFlex + " " + c.dexterity;
                 ca.price = c.price;
                 ca.cost = c.cost;
                 ca.typeID = c.typeID;
@@ -370,17 +371,22 @@ namespace SweetSpotProShop
             if (!readerAcc.HasRows)
             {
                 readerAcc.Close();
-                cmd.CommandText = "Select sku, brandID, modelID, clubType, shaft, numberOfClubs, dexterity, quantity, price, cost From tbl_clubs Where SKU = @skuClubs";
+                cmd.CommandText = "Select sku, brandID, modelID, clubType, clubSpec, shaftSpec, shaftFlex," +
+                    " numberOfClubs, dexterity, quantity, price, cost From tbl_clubs Where SKU = @skuClubs";
                 cmd.Parameters.AddWithValue("skuClubs", ItemNumber);
                 //cmd.Parameters.AddWithValue("locationIDclubs", intLocation);
                 SqlDataReader readerClubs = cmd.ExecuteReader();
                 while (readerClubs.Read())
                 {
-                    i = new Items(Convert.ToInt32(readerClubs["sku"]), brandType(Convert.ToInt32(readerClubs["brandID"]))
-                        + " " + modelType(Convert.ToInt32(readerClubs["modelID"])) + " " + readerClubs["clubType"].ToString()
-                        + " " + readerClubs["shaft"].ToString() + " " + readerClubs["numberOfClubs"].ToString() + " "
-                        + readerClubs["dexterity"].ToString(), Convert.ToInt32(readerClubs["quantity"]),
-                        Convert.ToDouble(readerClubs["price"]), Convert.ToDouble(readerClubs["cost"]));
+                    i = new Items(Convert.ToInt32(readerClubs["sku"]),
+                        
+                        brandType(Convert.ToInt32(readerClubs["brandID"]))
+                        + " " + modelType(Convert.ToInt32(readerClubs["modelID"])) + " " + readerClubs["clubSpec"].ToString()
+                        + " " + readerClubs["clubType"].ToString() + " " + readerClubs["shaftSpec"].ToString() + " "
+                        + readerClubs["shaftFlex"].ToString() + " " + readerClubs["dexterity"],
+
+                        Convert.ToInt32(readerClubs["quantity"]), Convert.ToDouble(readerClubs["price"]),
+                        Convert.ToDouble(readerClubs["cost"]));
 
                 }
                 if (!readerClubs.HasRows)
@@ -576,7 +582,10 @@ namespace SweetSpotProShop
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select max(sku) as maxsku from tbl_tempTradeInCartSkus where locationID = " + location.ToString();
+            cmd.CommandText = "Select max(sku) as maxsku from tbl_tempTradeInCartSkus where locationID = @locationID";
+            cmd.Parameters.AddWithValue("locationID", location.ToString());
+            //cmd.Parameters.AddWithValue("lowerRange", range[0]);
+            //cmd.Parameters.AddWithValue("upperRange", range[1]);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
@@ -634,7 +643,7 @@ namespace SweetSpotProShop
             return range;
         }
         //Adding tradein item 
-        public void addTradeInItem(Clubs tradeInItem, int sku)
+        public void addTradeInItem(Clubs tradeInItem, int sku, int loc)
         {
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -684,7 +693,7 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.shaftFlex);
             cmd.Parameters.AddWithValue("dexterity", tradeInItem.dexterity);
             cmd.Parameters.AddWithValue("typeID", tradeInItem.typeID);
-            cmd.Parameters.AddWithValue("locationID", tradeInItem.itemlocation);
+            cmd.Parameters.AddWithValue("locationID", loc);
             cmd.Parameters.AddWithValue("used", tradeInItem.used);
 
             cmd.Parameters.AddWithValue("comments", tradeInItem.comments);
@@ -726,6 +735,7 @@ namespace SweetSpotProShop
                 "empID = @empID, " +
                 "locationID = @locationID, " +
                 "subTotal = @subtotal, " +
+                "shippingAmount = @shippingAmount, " +
                 "discountAmount = @discountAmount, " +
                 "tradeinAmount = @tradeinAmount, " +
                 "governmentTax = @governmentTax, " +
@@ -741,6 +751,7 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("empID", e.employeeID);
             cmd.Parameters.AddWithValue("locationID", e.locationID);
             cmd.Parameters.AddWithValue("subTotal", ckm.dblSubTotal);
+            cmd.Parameters.AddWithValue("shippingAmount", ckm.dblShipping);
             cmd.Parameters.AddWithValue("discountAmount", ckm.dblDiscounts);
             cmd.Parameters.AddWithValue("tradeinAmount", ckm.dblTradeIn);
             cmd.Parameters.AddWithValue("governmentTax", ckm.dblGst);
@@ -782,7 +793,7 @@ namespace SweetSpotProShop
             }
         }
         //Returns the max invoice num + 1
-        public int getNextInvoiceNum()
+        public int getNextInvoiceNum(int empID)
         {
             int nextInvoiceNum = 0;
             int nextInvoiceSubNum = 0;
@@ -798,20 +809,20 @@ namespace SweetSpotProShop
                 {
                     nextInvoiceNum = 0;
                     nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
-                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum);
+                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum, empID);
                 }
                 else
                 {
                     nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
                     nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
-                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum);
+                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum, empID);
                 }
             }
             conn.Close();
             return nextInvoiceNum;
         }
         //Create  the newly found invoice number
-        public void createInvoiceNum(int invNum, int subNum)
+        public void createInvoiceNum(int invNum, int subNum, int empID)
         {
             string date = DateTime.Now.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH:mm:ss");
@@ -821,11 +832,15 @@ namespace SweetSpotProShop
             cmd.Connection = conn;
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, tradeinAmount
             //governmentTax, provincialTax, balanceDue, transactionType, comments
-            cmd.CommandText = "Insert into tbl_invoice(invoiceNum, invoiceSubNum, invoiceDate, invoiceTime) values(@invNum, @invSubNum, @date, @time);";
+            cmd.CommandText = "Insert into tbl_invoice(invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, " +
+                "empID, locationID, subTotal, shippingAmount, discountAmount, tradeinAmount, " +
+                "governmentTax, provincialTax, balanceDue, transactionType, comments) values(@invNum, @invSubNum, @date, @time" +
+                ", 1, @empID, 1, 0, 0, 0, 0, 0, 0, 0, 1, '');";
             cmd.Parameters.AddWithValue("invNum", invNum);
             cmd.Parameters.AddWithValue("invSubNum", subNum);
             cmd.Parameters.AddWithValue("date", date);
-            cmd.Parameters.AddWithValue("time", time);
+            cmd.Parameters.AddWithValue("time", time);            
+            cmd.Parameters.AddWithValue("@empID", empID);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();

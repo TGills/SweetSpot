@@ -236,6 +236,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnStartSale_Click(object sender, EventArgs e)
         {
+            Session["returnedFromCart"] = false;
             Session["TranType"] = 1;
             Response.Redirect("SalesCart.aspx");
         }

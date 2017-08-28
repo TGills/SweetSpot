@@ -75,8 +75,11 @@ namespace SweetSpotDiscountGolfPOS
                         lblModel.Visible = true;
                         lblModelDisplay.Text = idu.modelType(a.modelID);
                         lblShaft.Text = "Colour: ";
-                        lblShaftDisplay.Text = a.colour.ToString();    
-                     
+                        lblShaftDisplay.Text = a.colour.ToString();
+
+                        lblCommentsDisplay.Text = a.comments.ToString();
+
+
 
                         lblClubSpec.Visible = false;
                         lblClubSpecDisplay.Visible = false;
@@ -100,6 +103,8 @@ namespace SweetSpotDiscountGolfPOS
                         lblPriceDisplay.Text = cl.price.ToString();
                         lblQuantityDisplay.Text = cl.quantity.ToString();
                         lblLocationDisplay.Text = lm.locationName(cl.locID);
+                        lblCommentsDisplay.Text = cl.comments.ToString();
+
 
                         lblClubType.Text = "Size: ";
                         lblClubTypeDisplay.Text = cl.size.ToString();
@@ -117,8 +122,8 @@ namespace SweetSpotDiscountGolfPOS
                         lblShaftSpecDisplay.Visible = false;
                         lblDexterity.Visible = false;
                         lblDexterityDisplay.Visible = false;
-                        lblComments.Visible = false;
-                        lblCommentsDisplay.Visible = false;
+                        lblComments.Visible = true;
+                        lblCommentsDisplay.Visible = true;
                         chkUsed.Visible = false;
                     }
                 }
@@ -225,7 +230,7 @@ namespace SweetSpotDiscountGolfPOS
                     lblModel.Visible = false;
                     lblNumberofClubs.Visible = false;
                     lblDexterity.Visible = false;
-                    lblComments.Visible = false;
+                    lblComments.Visible = true;
 
                 }
 
@@ -374,6 +379,10 @@ namespace SweetSpotDiscountGolfPOS
                 txtNumberofClubs.Text = lblNumberofClubsDisplay.Text;
                 txtNumberofClubs.Visible = true;
                 lblNumberofClubsDisplay.Visible = false;
+
+                txtComments.Text = lblCommentsDisplay.Text;
+                txtComments.Visible = true;
+                lblCommentsDisplay.Visible = false;
             }
             else if (lblTypeDisplay.Text == "Clothing")
             {
@@ -392,6 +401,10 @@ namespace SweetSpotDiscountGolfPOS
                 txtShaftFlex.Text = lblShaftFlexDisplay.Text;
                 txtShaftFlex.Visible = true;
                 lblShaftFlexDisplay.Visible = false;
+
+                txtComments.Text = lblCommentsDisplay.Text;
+                txtComments.Visible = true;
+                lblCommentsDisplay.Visible = false;
             }
             btnSaveItem.Visible = true;
             pnlDefaultButton.DefaultButton = "btnSaveItem";
@@ -489,6 +502,8 @@ namespace SweetSpotDiscountGolfPOS
                 lblClubTypeDisplay.Visible = true;
                 txtShaft.Visible = false;
                 lblShaftDisplay.Visible = true;
+                txtComments.Visible = false;
+                lblCommentsDisplay.Visible = true;
             }
             else if (lblTypeDisplay.Text == "Clothing")
             {
@@ -502,6 +517,7 @@ namespace SweetSpotDiscountGolfPOS
                 cl.colour = txtShaft.Text;
                 cl.gender = txtClubSpec.Text;
                 cl.style = txtShaftFlex.Text;
+                cl.comments = txtComments.Text;
                 ssm.updateClothing(cl);
 
                 txtCost.Visible = false;
@@ -522,6 +538,8 @@ namespace SweetSpotDiscountGolfPOS
                 lblClubSpecDisplay.Visible = true;
                 txtShaftFlex.Visible = false;
                 lblShaftFlexDisplay.Visible = true;
+                txtComments.Visible = false;
+                lblCommentsDisplay.Visible = true;
             }
 
             btnSaveItem.Visible = false;

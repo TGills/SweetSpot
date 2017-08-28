@@ -14,8 +14,8 @@
            float: right;*/
 			margin-left: 10px !important;
 		}
-	</style>>
-    <div id="menu_simple">
+	</style>
+    <div id="menu_simple" class="noPrint">
         <ul>
             <li><a>HOME</a></li>
             <li><a>CUSTOMERS</a></li>
@@ -116,12 +116,12 @@
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Discounts/Bonus Applied">
                         <ItemTemplate>
-                            <%# Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToInt32(Eval("price"))).ToString("#0.00") %>
+                            <%# Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))).ToString("#0.00") %>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Extended Price">
                         <ItemTemplate>
-                            <%# Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToInt32(Eval("price")))-(Convert.ToInt32(Eval("discount")))).ToString("#0.00") : ((Convert.ToInt32(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToInt32(Eval("price"))))).ToString("#0.00") %>
+                            <%# Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00") %>
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>

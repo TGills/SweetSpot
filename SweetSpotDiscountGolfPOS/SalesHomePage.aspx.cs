@@ -27,10 +27,15 @@ namespace SweetSpotDiscountGolfPOS
             {
                 Response.Redirect("LoginPage.aspx");
             }
+
+
+           
+
         }
 
         protected void btnQuickSale_Click(object sender, EventArgs e)
         {
+            Session["returnedFromCart"] = false;
             Session["TranType"] = 1;
             int custId = 1;
             Session["key"] = custId;
@@ -98,5 +103,8 @@ namespace SweetSpotDiscountGolfPOS
                 Response.Redirect("SalesCart.aspx");
             }
         }
+
+        
+
     }
 }

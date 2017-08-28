@@ -58,15 +58,6 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.Label lblCashS;
         
         /// <summary>
-        /// lblChequeS control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblChequeS;
-        
-        /// <summary>
         /// lblDebitS control.
         /// </summary>
         /// <remarks>
@@ -94,13 +85,31 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.Label lblVisaS;
         
         /// <summary>
-        /// lblAmexS control.
+        /// lblPreTaxS control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAmexS;
+        protected global::System.Web.UI.WebControls.Label lblPreTaxS;
+        
+        /// <summary>
+        /// lblGSTS control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblGSTS;
+        
+        /// <summary>
+        /// lblPSTS control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPSTS;
         
         /// <summary>
         /// lblTotalS control.
@@ -139,15 +148,6 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.Label lblCashDisplay;
         
         /// <summary>
-        /// lblChequeDisplay control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblChequeDisplay;
-        
-        /// <summary>
         /// lblDebitDisplay control.
         /// </summary>
         /// <remarks>
@@ -175,13 +175,31 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.Label lblVisaDisplay;
         
         /// <summary>
-        /// lblAmexDisplay control.
+        /// lblPreTaxDisplay control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAmexDisplay;
+        protected global::System.Web.UI.WebControls.Label lblPreTaxDisplay;
+        
+        /// <summary>
+        /// lblGSTDisplay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblGSTDisplay;
+        
+        /// <summary>
+        /// lblPSTDisplay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPSTDisplay;
         
         /// <summary>
         /// lblTotalDisplay control.
@@ -229,15 +247,6 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.Label lblCashR;
         
         /// <summary>
-        /// lblChequeR control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblChequeR;
-        
-        /// <summary>
         /// lblDebitR control.
         /// </summary>
         /// <remarks>
@@ -263,15 +272,6 @@ namespace SweetSpotDiscountGolfPOS {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblVisaR;
-        
-        /// <summary>
-        /// lblAmexR control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAmexR;
         
         /// <summary>
         /// txtTradeIn control.
@@ -301,15 +301,6 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.TextBox txtCash;
         
         /// <summary>
-        /// txtCheque control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtCheque;
-        
-        /// <summary>
         /// txtDebit control.
         /// </summary>
         /// <remarks>
@@ -335,15 +326,6 @@ namespace SweetSpotDiscountGolfPOS {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtVisa;
-        
-        /// <summary>
-        /// txtAmex control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAmex;
         
         /// <summary>
         /// btnCalculate control.

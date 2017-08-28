@@ -37,5 +37,24 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             dblBalanceDue = dblSubTotal + S + dblGst + dblPst;
 
         }
+
+
+
+        public CheckoutManager(double D, double TI, double S, bool bG, bool bP, double dG, double dP, double AP, double st)
+        {
+            
+            dblDiscounts = D;
+            dblTradeIn = TI;
+            dblShipping = S;
+            blGst = bG;
+            blPst = bP;
+            dblGst = dG;
+            dblPst = dP;
+            dblAmountPaid = AP;
+            dblSubTotal = st;
+            dblRemainingBalance = dblSubTotal + S;
+            dblBalanceDue = dblSubTotal + S + dblGst + dblPst;
+
+        }
     }
 }

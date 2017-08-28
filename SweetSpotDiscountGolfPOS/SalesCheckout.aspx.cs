@@ -67,9 +67,9 @@ namespace SweetSpotDiscountGolfPOS
                     lblShippingAmount.Visible = false;
                     dblShippingAmount = 0;
                 }
-                int location = cm.returnLocationID(Convert.ToString(Session["Loc"]));
+                int location = Convert.ToInt32(Session["locationID"]);
 
-                ckm = new CheckoutManager(cm.returnTotalAmount(cart), cm.returnDiscount(cart), cm.returnTradeInAmount(cart, location), dblShippingAmount, true, true, 0, 0, 0);
+                ckm = new CheckoutManager(cm.returnTotalAmount(cart, location), cm.returnDiscount(cart), cm.returnTradeInAmount(cart, location), dblShippingAmount, true, true, 0, 0, 0);
                 foreach (var T in t)
                 {
                     switch (T.taxName)
@@ -277,19 +277,19 @@ namespace SweetSpotDiscountGolfPOS
         }
 
         //American Express
-        protected void mopAmericanExpress_Click(object sender, EventArgs e)
-        {
-            ckm = (CheckoutManager)Session["CheckOutTotals"];
-            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
-            string boxResult = txtAmountPaying.Text;
-            if (boxResult != "")
-            {
-                amountPaid = Convert.ToDouble(boxResult);
-                string methodOfPayment = "American Express";
-                populateGridviewMOP(amountPaid, methodOfPayment);
-            }
+        //protected void mopAmericanExpress_Click(object sender, EventArgs e)
+        //{
+        //    ckm = (CheckoutManager)Session["CheckOutTotals"];
+        //    //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+        //    string boxResult = txtAmountPaying.Text;
+        //    if (boxResult != "")
+        //    {
+        //        amountPaid = Convert.ToDouble(boxResult);
+        //        string methodOfPayment = "American Express";
+        //        populateGridviewMOP(amountPaid, methodOfPayment);
+        //    }
             
-        }
+        //}
         //Cash
         protected void mopCash_Click(object sender, EventArgs e)
         {
@@ -313,18 +313,18 @@ namespace SweetSpotDiscountGolfPOS
         //}
 
         //Cheque
-        protected void mopCheque_Click(object sender, EventArgs e)
-        {
-            ckm = (CheckoutManager)Session["CheckOutTotals"];
-            //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
-            string boxResult = txtAmountPaying.Text;
-            if (boxResult != "")
-            {
-                amountPaid = Convert.ToDouble(boxResult);
-                string methodOfPayment = "Cheque";
-                populateGridviewMOP(amountPaid, methodOfPayment);
-            }
-        }
+        //protected void mopCheque_Click(object sender, EventArgs e)
+        //{
+        //    ckm = (CheckoutManager)Session["CheckOutTotals"];
+        //    //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+        //    string boxResult = txtAmountPaying.Text;
+        //    if (boxResult != "")
+        //    {
+        //        amountPaid = Convert.ToDouble(boxResult);
+        //        string methodOfPayment = "Cheque";
+        //        populateGridviewMOP(amountPaid, methodOfPayment);
+        //    }
+        //}
         //MasterCard
         protected void mopMasterCard_Click(object sender, EventArgs e)
         {
@@ -543,6 +543,7 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void btnReturnToCart_Click(object sender, EventArgs e)
         {
+            Session["returnedToCart"] = true;
             Response.Redirect("SalesCart.aspx");
         }
 
@@ -553,38 +554,42 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void btnFinalize_Click(object sender, EventArgs e)
         {//Transaction type 1
-            //if(ckm.dblRemainingBalance != 0)
-            //{
-            //    MessageBox.ShowMessage("Remaining Balance Does NOT Equal 0. Proceed?", this);
-            //}
 
+            if (!txtAmountPaying.Text.Equals("0.00") && chbxDoesNotEqualZero.Checked == false)
+            {
+                MessageBox.ShowMessage("Remaining Balance Does NOT Equal 0. Check box to proceed", this);
+            }
+            else 
+            {
+                //Gathering needed information for the invoice
+                //Cart
+                List<Cart> cart = (List<Cart>)Session["ItemsInCart"];
+                //Customer
+                int custNum = Convert.ToInt32(Session["key"]);
+                Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
+                //Employee
+                //******Need to get the employee somehow
+                EmployeeManager em = new EmployeeManager();
+                int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
+                Employee emp = em.getEmployeeByID(empNum);
+                //CheckoutTotals
+                ckm = (CheckoutManager)Session["CheckOutTotals"];
+                //MOP
+                mopList = (List<Checkout>)Session["MethodsofPayment"];
+                tranType = Convert.ToInt32(Session["TranType"]);
 
-            //Gathering needed information for the invoice
-            //Cart
-            List<Cart> cart = (List<Cart>)Session["ItemsInCart"];
-            //Customer
-            int custNum = Convert.ToInt32(Session["key"]);
-            Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
-            //Employee
-            //******Need to get the employee somehow
-            EmployeeManager em = new EmployeeManager();
-            int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
-            Employee emp = em.getEmployeeByID(empNum);
-            //CheckoutTotals
-            ckm = (CheckoutManager)Session["CheckOutTotals"];
-            //MOP
-            mopList = (List<Checkout>)Session["MethodsofPayment"];
-            tranType = Convert.ToInt32(Session["TranType"]);
+                //CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
+                idu.mainInvoice(ckm, cart, mopList, c, emp, tranType, (Session["Invoice"]).ToString(), txtComments.Text);
 
-            //CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
-            idu.mainInvoice(ckm, cart, mopList, c, emp, tranType, (Session["Invoice"]).ToString(), txtComments.Text);
-
-            //ssm.transferTradeInStart((List<Cart>)Session["ItemsInCart"]);
-            Session["shipping"] = null;
-            Session["Grid"] = null;
-            Session["SKU"] = null;
-            Session["Items"] = null;
-            Response.Redirect("PrintableInvoice.aspx");
+                //ssm.transferTradeInStart((List<Cart>)Session["ItemsInCart"]);
+                Session["useInvoice"] = false;
+                Session["returnedToCart"] = null;
+                Session["shipping"] = null;
+                Session["Grid"] = null;
+                Session["SKU"] = null;
+                Session["Items"] = null;
+                Response.Redirect("PrintableInvoice.aspx");
+            }
         }
     }
 }

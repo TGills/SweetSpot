@@ -128,6 +128,7 @@
     <Compile Include="ClassLibrary\Customer.cs" />
     <Compile Include="ClassLibrary\Employee.cs" />
     <Compile Include="ClassLibrary\EmployeeManager.cs" />
+    <Compile Include="ClassLibrary\ErrorReporting.cs" />
     <Compile Include="ClassLibrary\Invoice.cs" />
     <Compile Include="ClassLibrary\InvSale.cs" />
     <Compile Include="ClassLibrary\ItemDataUtilities.cs" />

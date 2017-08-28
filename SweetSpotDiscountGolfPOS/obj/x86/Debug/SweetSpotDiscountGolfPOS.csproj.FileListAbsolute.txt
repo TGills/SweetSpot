@@ -60,6 +60,7 @@ C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDisc
 C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
 C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\bin\EPPlus.xml
 C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\x86\Debug\SweetSpotDiscountGolfPOS.csprojResolveAssemblyReference.cache
+C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\x86\Debug\SweetSpotDiscountGolfPOS.csproj.CoreCompileInputs.cache
 C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\x86\Debug\SweetSpotDiscountGolfPOS.dll
 C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\x86\Debug\SweetSpotDiscountGolfPOS.pdb
+C:\Users\tyler\Desktop\Production - 4.5.5\SweetSpotDiscountGolfPOS\SweetSpotDiscountGolfPOS\obj\x86\Debug\SweetSpotDiscountGolfPOS.csprojResolveAssemblyReference.cache

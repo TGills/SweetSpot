@@ -32,7 +32,7 @@
                         <asp:Label ID="lblSearchDate" runat="server" Text="Enter Date to Search(leave blank if not known): "></asp:Label>
                         <br />
                         <asp:TextBox ID="txtSearchDate" runat="server"></asp:TextBox>
-                        <asp:CompareValidator ID="cvSearchDate" ControlToValidate="txtSearchDate" Operator="DataTypeCheck" Type="Date" Text="MM/DD/YY" runat="server" ></asp:CompareValidator>
+                        <asp:CompareValidator ID="cvSearchDate" ControlToValidate="txtSearchDate" Operator="DataTypeCheck" Type="Date" Text="MM/DD/YY" runat="server"></asp:CompareValidator>
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:Button ID="btnSearch" runat="server" Width="150" Text="Search" OnClick="btnSearch_Click" />
@@ -40,36 +40,54 @@
                 </asp:TableRow>
             </asp:Table>
             <hr />
+            <div>
+                <asp:GridView ID="grdInvoiceSelection" runat="server" AutoGenerateColumns="false" Width="100%" OnRowCommand="grdInvoiceSelection_RowCommand">
+                    <Columns>
+                        <asp:TemplateField HeaderText="Invoice Number">
+                            <ItemTemplate>
+                                <asp:LinkButton ID="lkbInvoiceNum" runat="server" CommandName="returnInvoice" CommandArgument='<%#Eval("invoiceNum")%>' Text='<%#Eval("invoiceNum") + "-" + Eval("invoiceSub") %>'></asp:LinkButton>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Invoice Date">
+                            <ItemTemplate>
+                                <asp:Label ID="lblInvoiceDate" runat="server" Text='<%#Eval("invoiceDate","{0: MM/dd/yy}") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Customer Name">
+                            <ItemTemplate>
+                                <asp:Label ID="lblCustomerName" runat="server" Text='<%#Eval("customerName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Total">
+                            <ItemTemplate>
+                                <asp:Label ID="lblAmountPaid" runat="server" Text='<%#Eval("balanceDue","{0:#0.00}") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Store">
+                            <ItemTemplate>
+                                <asp:Label ID="lblLocation" runat="server" Text='<%#Eval("locationName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                </asp:GridView>
+            </div>
 
-            <asp:GridView ID ="grdInvoiceSelection" runat="server" AutoGenerateColumns="false" Width="100%" OnRowCommand="grdInvoiceSelection_RowCommand">
-                <Columns>
-                    <asp:TemplateField HeaderText ="Invoice Number">
-                        <ItemTemplate>
-                            <asp:LinkButton ID="lkbInvoiceNum" runat="server" CommandName="returnInvoice" CommandArgument='<%#Eval("invoiceNum")%>' Text='<%#Eval("invoiceNum") + "-" + Eval("invoiceSub") %>'></asp:LinkButton>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText ="Invoice Date">
-                        <ItemTemplate>
-                            <asp:Label ID="lblInvoiceDate" runat="server" Text='<%#Eval("invoiceDate","{0: MM/dd/yy}") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText ="Customer Name">
-                        <ItemTemplate>
-                            <asp:Label ID="lblCustomerName" runat="server" Text='<%#Eval("customerName") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText ="Total">
-                        <ItemTemplate>
-                            <asp:Label ID="lblAmountPaid" runat="server" Text='<%#Eval("balanceDue","{0:#0.00}") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText ="Store">
-                        <ItemTemplate>
-                            <asp:Label ID="lblLocation" runat="server" Text='<%#Eval("locationName") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                </Columns>
-            </asp:GridView>
+
+            <hr />
+            
+
+
         </asp:Panel>
     </div>
+</asp:Content>
+<asp:Content ID="Content1" runat="server" contentplaceholderid="head">
+    <style type="text/css">
+        .auto-style1 {
+            position: relative;
+            left: 300px;
+            top: -10px;
+            width: 207px;
+            height: 228px;
+        }
+        </style>
 </asp:Content>

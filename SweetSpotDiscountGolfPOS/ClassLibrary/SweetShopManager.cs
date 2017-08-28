@@ -365,8 +365,8 @@ namespace SweetShop
                         model = idu.modelType(Convert.ToInt32(reader["modelID"]));
                     }
                     //create string for a club description
-                    description = brand + " " + model + " " + reader["clubType"].ToString() + " " + reader["shaft"].ToString() + " "
-                    + reader["numberOfClubs"].ToString() + " " + reader["dexterity"].ToString();
+                    description = brand + " " + model + " " + reader["clubSpec"].ToString() + " " + reader["clubType"].ToString() + " "
+                    + reader["shaftSpec"].ToString() + " " + reader["shaftFlex"].ToString() + " " + reader["dexterity"].ToString();
                 }
                 //if search type is accessories create accessories description
                 else if (itemType == "Accessories")
@@ -801,7 +801,7 @@ namespace SweetShop
                 cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, modelID, accessoryType, quantity, typeID, locationID, comments)"
             + " Values (" + nextSku + ", @size, @colour, @price, @cost, @brandID, @modelID, @accessoryType, @quantity, @typeID, @locationID, @comments)";
             }
-                        
+
             cmd.Parameters.AddWithValue("size", a.size);
             cmd.Parameters.AddWithValue("colour", a.colour);
             cmd.Parameters.AddWithValue("price", a.price);
@@ -836,7 +836,7 @@ namespace SweetShop
                 int nextSku = idu.maxSku(c.sku, "clothing");
                 cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID, comments)"
                 + " Values (" + nextSku + ",, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID, @comments)";
-            }            
+            }
             cmd.Parameters.AddWithValue("size", c.size);
             cmd.Parameters.AddWithValue("colour", c.colour);
             cmd.Parameters.AddWithValue("gender", c.gender);
@@ -855,6 +855,119 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
+
+        //Get item type
+        public int getItemType(int sku)
+        {
+            bool isClub = checkClubForItem(sku);
+            bool isAccessory = checkAccessoryForItem(sku);
+            bool isClothing = checkClothingForItem(sku);
+
+            if(isClub == true)
+            {
+                return 1;
+            }
+            else if(isAccessory == true)
+            {
+                return 2;
+            }
+            else if(isClothing == true)
+            {
+                return 3;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        public bool checkClubForItem(int sku)
+        {
+            bool isClub = false;
+            //New command
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "select count(*) from tbl_clubs where sku = " + sku;
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute search
+            cmd.ExecuteNonQuery();
+            int itemExists = (int)cmd.ExecuteScalar();
+
+            //If item exists
+            if (itemExists > 0)
+            {
+                isClub = true;
+            }
+            //If item doesn't exist
+            else
+            {
+                isClub = false;
+            }
+            //Closing
+            con.Close();
+
+            return isClub;
+        }
+        public bool checkAccessoryForItem(int sku)
+        {
+            bool isAccessory = false;
+            //New command
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "select count(*) from tbl_accessories where sku = " + sku;
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute search
+            cmd.ExecuteNonQuery();
+            int itemExists = (int)cmd.ExecuteScalar();
+
+            //If item exists
+            if (itemExists > 0)
+            {
+                isAccessory = true;
+            }
+            //If item doesn't exist
+            else
+            {
+                isAccessory = false;
+            }
+            //Closing
+            con.Close();
+
+            return isAccessory;
+        }
+        public bool checkClothingForItem(int sku)
+        {
+            bool isClothing = false;
+            //New command
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "select count(*) from tbl_clothing where sku = " + sku;
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute search
+            cmd.ExecuteNonQuery();
+            int itemExists = (int)cmd.ExecuteScalar();
+
+            //If item exists
+            if (itemExists > 0)
+            {
+                isClothing = true;
+            }
+            //If item doesn't exist
+            else
+            {
+                isClothing = false;
+            }
+            //Closing
+            con.Close();
+
+            return isClothing;
+        }
+
 
         //The check methods check if an item already exists or does not exist. It will update if it exists, and add if not.
         public void checkClub(Clubs c)
@@ -968,7 +1081,7 @@ namespace SweetShop
             //New Command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "Select sku, brandID, modelID, accessoryType, size, colour, price, cost, quantity, typeID, locationID From tbl_accessories Where sku = @sku";
+            cmd.CommandText = "Select sku, brandID, modelID, accessoryType, size, colour, price, cost, quantity, typeID, locationID, comments From tbl_accessories Where sku = @sku";
             cmd.Parameters.AddWithValue("sku", sku);
 
             //Open Database Connection
@@ -992,6 +1105,7 @@ namespace SweetShop
                 a.quantity = Convert.ToInt32(reader["quantity"]);
                 a.typeID = Convert.ToInt32(reader["typeID"]);
                 a.locID = Convert.ToInt32(reader["locationID"]);
+                a.comments = reader["comments"].ToString();
             }
             con.Close();
             return a;
@@ -1002,7 +1116,7 @@ namespace SweetShop
             //New Command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "Select sku, brandID, size, colour, gender, style, price, cost, quantity, typeID, locationID From tbl_clothing Where sku = @sku";
+            cmd.CommandText = "Select sku, brandID, size, colour, gender, style, price, cost, quantity, typeID, locationID, comments From tbl_clothing Where sku = @sku";
             cmd.Parameters.AddWithValue("sku", sku);
 
             //Open Database Connection
@@ -1026,6 +1140,7 @@ namespace SweetShop
                 c.quantity = Convert.ToInt32(reader["quantity"]);
                 c.typeID = Convert.ToInt32(reader["typeID"]);
                 c.locID = Convert.ToInt32(reader["locationID"]);
+                c.comments = reader["comments"].ToString();
             }
             con.Close();
             return c;
@@ -1271,12 +1386,12 @@ namespace SweetShop
             }
             else if (type == 2)
             {
-                cmd.CommandText = "Select brandID, modelID, accessoryType, size, color from tbl_accessories where sku = @skuAc";
+                cmd.CommandText = "Select brandID, modelID, accessoryType, size, colour from tbl_accessories where sku = @skuAc";
                 cmd.Parameters.AddWithValue("@skuAc", sku);
             }
             else if (type == 3)
             {
-                cmd.CommandText = "Select brandID, size, color, gender, style from tbl_clothing where sku = @skuClo";
+                cmd.CommandText = "Select brandID, size, colour, gender, style from tbl_clothing where sku = @skuClo";
                 cmd.Parameters.AddWithValue("@skuClo", sku);
             }
             cmd.CommandText = cmd.CommandText + ";";
@@ -1382,7 +1497,7 @@ namespace SweetShop
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, "
                 + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_invoice "
-                + "WHERE invoiceDate = @givenDate AND locationID = @locationID AND transactionType = 1";
+                + "WHERE invoiceDate = @givenDate AND locationID = @locationID AND transactionType = 1 AND invoiceSubNum > 0;";
             cmd.Parameters.AddWithValue("givenDate", givenDate);
             cmd.Parameters.AddWithValue("locationID", locationID);
             cmd.Connection = con;
@@ -1571,6 +1686,180 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
+        //Gets invoices between dates
+        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate)
+        {
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, "
+                + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_invoice "
+                + "WHERE invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate";
+            cmd.Parameters.AddWithValue("startDate", startDate);
+            cmd.Parameters.AddWithValue("endDate", endDate);
+            cmd.Connection = con;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            List<Invoice> i = new List<Invoice>();
+            while (reader.Read())
+            {
+                Invoice inv = new Invoice();
+                inv.invoiceNum = Convert.ToInt32(reader["invoiceNum"]);
+                inv.invoiceSub = Convert.ToInt32(reader["invoiceSubNum"]);
+                inv.customerID = Convert.ToInt32(reader["custID"]);
+                inv.employeeID = Convert.ToInt32(reader["empID"]);
+                inv.subTotal = Convert.ToDouble(reader["subTotal"]);
+                inv.discountAmount = Convert.ToDouble(reader["discountAmount"]);
+                inv.tradeinAmount = Convert.ToDouble(reader["tradeinAmount"]);
+                inv.governmentTax = Convert.ToDouble(reader["governmentTax"]);
+                inv.provincialTax = Convert.ToDouble(reader["provincialTax"]);
+                inv.balanceDue = Convert.ToDouble(reader["balanceDue"]);
+
+                i.Add(inv);
+            }
+            con.Close();
+            return i;
+        }
+
+        //Get customer ID
+        public int invoice_getCustID(int invoiceNum, int invoiceSubNum)
+        {
+            int custID = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select custID FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                custID = Convert.ToInt32(reader["custID"]);
+            }
+            conn.Close();
+            return custID;
+        }
+        //Get Items
+        public List<Cart> invoice_getItems(int invoiceNum, int invoiceSubNum)
+        {
+            List<Cart> items = new List<Cart>();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select * FROM tbl_invoiceItem Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                int sku = Convert.ToInt32(reader["sku"]);
+                items.Add(new Cart(sku, getDescription(sku, getItemType(sku)), 
+                    Convert.ToInt32(reader["itemQuantity"]), Convert.ToDouble(reader["itemPrice"]),
+                    Convert.ToDouble(reader["itemCost"]), Convert.ToDouble(reader["itemDiscount"]), 
+                    Convert.ToBoolean(reader["percentage"])));
+            }
+            conn.Close();
+            return items;
+        }        
+        //Get Checkout Totals
+        public CheckoutManager invoice_getCheckoutTotals(int invoiceNum, int invoiceSubNum)
+        {
+            CheckoutManager ckm = new CheckoutManager();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax " +
+                "FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                double gst = Convert.ToDouble(reader["governmentTax"]);
+                double pst = Convert.ToDouble(reader["provincialTax"]);
+                bool isGST = false;
+                bool isPST = false;
+                if(gst > 0)
+                {
+                    isGST = true;
+                }
+                else
+                {
+                    isGST = false;
+                }
+                if(pst > 0)
+                {
+                    isPST = true;
+                }
+                else
+                {
+                    isPST = false;
+                }
+                double shipping;
+                try
+                {
+                    shipping = Convert.ToDouble(reader["shippingAmount"]);
+                }
+                catch(Exception ex)
+                {
+                    shipping = 0;
+                }
+
+                //ckm = new CheckoutManager(Convert.ToDouble(reader["subTotal"]), Convert.ToDouble(reader["discountAmount"]),
+                //    Convert.ToDouble(reader["tradeinAmount"]), 0, isGST, isPST, gst, pst, 0);
+                ckm = new CheckoutManager( Convert.ToDouble(reader["discountAmount"]), Convert.ToDouble(reader["tradeinAmount"]), 
+                    shipping, isGST, isPST, gst, pst, 0, Convert.ToDouble(reader["subTotal"]));
+
+
+            }
+            conn.Close();
+
+            return ckm;
+        }
+        //Get Methods of Payment
+        public List<Checkout> invoice_getMOP(int invoiceNum, int invoiceSubNum)
+        {
+            List<Checkout> mops = new List<Checkout>();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select mopType, amountPaid FROM tbl_invoiceMOP Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                
+                mops.Add(new Checkout(reader["mopType"].ToString(), Convert.ToDouble(reader["amountPaid"])));
+            }
+            conn.Close();
+
+            return mops;
+        }
+        //Gets Location id from invoice
+        public string invoice_getLocation(int invoiceNum, int invoiceSubNum)
+        {
+            int locID = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select locationID FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                locID = Convert.ToInt32(reader["locationID"]);
+            }
+            conn.Close();
+            string loc = lm.locationCity(locID);
+            return loc;
+        }
+
 
         /*******Sale Utilities************************************************************************************/
 

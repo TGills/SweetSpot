@@ -32,6 +32,7 @@ namespace SweetSpotDiscountGolfPOS
                 Response.Redirect("LoginPage.aspx");
             }
             lblInvalidQty.Visible = false;
+            bool returnedToCart = Convert.ToBoolean(Session["returnedToCart"]);
             if (!Page.IsPostBack)
             {
                 int tranType = Convert.ToInt32(Session["TranType"]);
@@ -48,11 +49,29 @@ namespace SweetSpotDiscountGolfPOS
                     }
                     //display system time in Sales Page
                     DateTime today = DateTime.Today;
-                    invNum = idu.getNextInvoiceNum();
-                    string loc = Convert.ToString(Session["Loc"]);
-                    lblInvoiceNumberDisplay.Text = loc + "-" + (invNum + "-" + idu.getNextInvoiceSubNum(invNum)).ToString();
-                    //lblInvoiceNumberDisplay.Text = loc + "-" + invNum;
-                    Session["Invoice"] = lblInvoiceNumberDisplay.Text;
+                    int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
+
+
+                    string loc;
+
+                    if (returnedToCart == false)
+                    {
+                        invNum = idu.getNextInvoiceNum(empNum);
+                        loc = Convert.ToString(Session["Loc"]);
+                        lblInvoiceNumberDisplay.Text = loc + "-" + (invNum + "-" + idu.getNextInvoiceSubNum(invNum)).ToString();
+                        //lblInvoiceNumberDisplay.Text = loc + "-" + invNum;
+                        Session["Invoice"] = lblInvoiceNumberDisplay.Text;
+                    }
+                    else
+                    {
+                        lblInvoiceNumberDisplay.Text = Session["Invoice"].ToString();
+                    }
+                    
+
+
+
+
+
                     lblDateDisplay.Text = today.ToString("yyyy-MM-dd");
                     if (Session["ItemsInCart"] != null)
                     {

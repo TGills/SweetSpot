@@ -72,7 +72,7 @@
                         <asp:Label ID="lblQuantity" runat="server" Text="Quantity: "></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="txtQuantity" runat="server" Visible="True"></asp:TextBox>
+                        <asp:TextBox ID="txtQuantity" runat="server" Visible="True" Text="1"></asp:TextBox>
                         <asp:RequiredFieldValidator ID="rfvQuantity" 
                             runat="server" ControlToValidate ="txtQuantity"
                             ErrorMessage="Quantity Required" 

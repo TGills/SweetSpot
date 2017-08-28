@@ -30,9 +30,6 @@
                         <asp:Label runat="server" ID="lblCashS" Text="Cash" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:Label runat="server" ID="lblChequeS" Text="Cheque" Width="80" />
-                    </asp:TableCell>
-                    <asp:TableCell>
                         <asp:Label runat="server" ID="lblDebitS" Text="Debit" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
@@ -42,7 +39,13 @@
                         <asp:Label runat="server" ID="lblVisaS" Text="Visa" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:Label runat="server" ID="lblAmexS" Text="American Express" Width="80" />
+                        <asp:Label runat="server" ID="lblPreTaxS" Text="Pre Tax" Width="80" />
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label runat="server" ID="lblGSTS" Text="GST" Width="80" />
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label runat="server" ID="lblPSTS" Text="PST" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:Label runat="server" ID="lblTotalS" Text="Total" Width="80" />
@@ -59,9 +62,6 @@
                         <asp:Label runat="server" ID="lblCashDisplay" Text="" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:Label runat="server" ID="lblChequeDisplay" Text="" Width="80" />
-                    </asp:TableCell>
-                    <asp:TableCell>
                         <asp:Label runat="server" ID="lblDebitDisplay" Text="" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
@@ -71,14 +71,20 @@
                         <asp:Label runat="server" ID="lblVisaDisplay" Text="" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:Label runat="server" ID="lblAmexDisplay" Text="" Width="80" />
+                        <asp:Label runat="server" ID="lblPreTaxDisplay" Text="" Width="80" />
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label runat="server" ID="lblGSTDisplay" Text="" Width="80" />
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label runat="server" ID="lblPSTDisplay" Text="" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:Label runat="server" ID="lblTotalDisplay" Text="" Width="80" />
                     </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>
-                    <asp:TableCell ColumnSpan="9">
+                    <asp:TableCell ColumnSpan="6">
                         <asp:Label runat="server" ID="lblReceipts" Text="Recipts" />
                     </asp:TableCell>
                 </asp:TableRow>
@@ -93,9 +99,6 @@
                         <asp:Label runat="server" ID="lblCashR" Text="Cash" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:Label runat="server" ID="lblChequeR" Text="Cheque" Width="80" />
-                    </asp:TableCell>
-                    <asp:TableCell>
                         <asp:Label runat="server" ID="lblDebitR" Text="Debit" Width="80" />
                     </asp:TableCell>
                     <asp:TableCell>
@@ -104,9 +107,7 @@
                     <asp:TableCell>
                         <asp:Label runat="server" ID="lblVisaR" Text="Visa" Width="80" />
                     </asp:TableCell>
-                    <asp:TableCell>
-                        <asp:Label runat="server" ID="lblAmexR" Text="American Express" Width="80" />
-                    </asp:TableCell>
+                    
                 </asp:TableRow>
                 <asp:TableRow>
                     <asp:TableCell>
@@ -119,9 +120,6 @@
                         <asp:TextBox ID="txtCash" runat="server" Width="80"></asp:TextBox>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="txtCheque" runat="server" Width="80"></asp:TextBox>
-                    </asp:TableCell>
-                    <asp:TableCell>
                         <asp:TextBox ID="txtDebit" runat="server" Width="80"></asp:TextBox>
                     </asp:TableCell>
                     <asp:TableCell>
@@ -129,17 +127,14 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="txtVisa" runat="server" Width="80"></asp:TextBox>
-                    </asp:TableCell>
-                    <asp:TableCell>
-                        <asp:TextBox ID="txtAmex" runat="server" Width="80"></asp:TextBox>
-                    </asp:TableCell>
+                    </asp:TableCell>                  
                 </asp:TableRow>
                 <asp:TableRow>
                     <asp:TableCell>
                         <asp:Button ID="btnCalculate" runat="server" Text="Calculate" Width="100px" OnClick="btnCalculate_Click" />
                     </asp:TableCell>
-                    <asp:TableCell ColumnSpan="8">
-                        <asp:Button ID="btnClear" runat="server" Width="80" Text="Clear" OnClick="btnClear_Click" />
+                    <asp:TableCell ColumnSpan="5">
+                        <asp:Button ID="btnClear" runat="server" Width="90px" Text="Clear" OnClick="btnClear_Click" />
                     </asp:TableCell>
                 </asp:TableRow>
             </asp:Table>

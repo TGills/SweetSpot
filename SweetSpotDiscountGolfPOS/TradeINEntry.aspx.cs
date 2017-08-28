@@ -22,11 +22,13 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-            storeLocation = lm.locationID(Convert.ToString(Session["Loc"]));
-            lblSKUDisplay.Text = (idu.reserveTradeInSKu(storeLocation)).ToString();
-            tradeInSku = Convert.ToInt32(lblSKUDisplay.Text);
-            //lblSKUDisplay.Text = idu.tradeInSku(storeLocation).ToString();
+            if (!IsPostBack)
+            {
+                storeLocation = Convert.ToInt32(Session["locationID"]);
+                lblSKUDisplay.Text = (idu.reserveTradeInSKu(storeLocation)).ToString();
+                tradeInSku = Convert.ToInt32(lblSKUDisplay.Text);
+                //lblSKUDisplay.Text = idu.tradeInSku(storeLocation).ToString();
+            }
         }
         //Cancelling the trade-in item
         protected void btnCancel_Click(object sender, EventArgs e)
@@ -38,7 +40,8 @@ namespace SweetSpotDiscountGolfPOS
         protected void btnAddTradeIN_Click(object sender, EventArgs e)
         {
             //Grabbing the values of the trade-in item
-            int sku = idu.tradeInSku(storeLocation);
+            //int sku = idu.tradeInSku(storeLocation);
+            int sku = Convert.ToInt32(lblSKUDisplay.Text);
             double cost = Convert.ToDouble(txtCost.Text);
             int brandID = Convert.ToInt32(ddlBrand.SelectedValue);
             int modelID = Convert.ToInt32(ddlModel.SelectedValue);
@@ -62,8 +65,9 @@ namespace SweetSpotDiscountGolfPOS
             Clubs tradeINDisplay = new Clubs(sku, brandID, modelID, 1, clubType,
                 shaft, numOfClubs, 0, 0, (cost*(-1)), quant, clubSpec, shaftSpec,
                 shaftFlex, dext, used, comments);
+            int location = Convert.ToInt32(Session["locationID"]);
             //Adding the trade-in item to the trade-in storage
-            idu.addTradeInItem(tradeIN, tradeInSku);
+            idu.addTradeInItem(tradeIN, Convert.ToInt32(lblSKUDisplay.Text), location);
             //Adding trade-in item to cart
             List<Cart> itemsInCart;
             itemsInCart = (List<Cart>)Session["ItemsInCart"];

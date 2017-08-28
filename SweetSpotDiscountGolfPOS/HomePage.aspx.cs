@@ -54,13 +54,13 @@ namespace SweetSpotDiscountGolfPOS
                 ddlLocation.Visible = false;
             }
             //populate gridview with todays sales
-            invoiceList = ssm.getInvoiceBySaleDate(DateTime.Today, lm.locationIDfromCity(Convert.ToString(Session["Loc"])));
+            invoiceList = ssm.getInvoiceBySaleDate(DateTime.Today, Convert.ToInt32(Session["locationID"]));
             grdSameDaySales.DataSource = invoiceList;
             grdSameDaySales.DataBind();
         }
         //Currently used for Removing the row
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
-        {
+        {       
             int index = e.RowIndex;
             Label lblInvoice = (Label)grdSameDaySales.Rows[index].FindControl("lblInvoiceNumber");
             string invoice = lblInvoice.Text;          
@@ -71,6 +71,25 @@ namespace SweetSpotDiscountGolfPOS
             idu.deleteInvoice(invoiceNum, invoiceSubNum);
             MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
             Response.Redirect(Request.Url.AbsoluteUri);
+        }
+
+        protected void lbtnInvoiceNumber_Click(object sender, EventArgs e)
+        {
+            //Text of the linkbutton
+            LinkButton btn = sender as LinkButton;
+            string invoice = btn.Text;
+            //Parsing into invoiceNum and invoiceSubNum
+            char[] splitchar = { '-' };
+            string[] invoiceSplit = invoice.Split(splitchar);
+            int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+            int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+            Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum);
+            Session["Invoice"] = invoice;
+            Session["useInvoice"] = true; 
+            Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum);
+            Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum);
+            Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum);
+            Response.Redirect("PrintableInvoice.aspx");
         }
     }
 }

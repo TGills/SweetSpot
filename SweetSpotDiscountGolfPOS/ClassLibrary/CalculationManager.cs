@@ -51,15 +51,15 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             double totalSubtotalAmount = 0;
             double totalDiscountAmount = returnDiscount(itemsSold);
             double totalTradeInAmount = returnTradeInAmount(itemsSold, loc);
-            double totalTotalAmount = returnTotalAmount(itemsSold);
+            double totalTotalAmount = returnTotalAmount(itemsSold, loc);
             totalSubtotalAmount = totalSubtotalAmount + totalTotalAmount;
             totalSubtotalAmount = totalSubtotalAmount - totalDiscountAmount;
             totalSubtotalAmount = totalSubtotalAmount - (totalTradeInAmount * (-1));
             return totalSubtotalAmount;
         }
-        public double returnTotalAmount(List<Cart> itemsSold)
+        public double returnTotalAmount(List<Cart> itemsSold, int loc)
         {
-            int[] range = idu.tradeInSkuRange(0);
+            int[] range = idu.tradeInSkuRange(loc);
             double singleTotalAmount = 0;
             double totalTotalAmount = 0;
             foreach (var cart in itemsSold)

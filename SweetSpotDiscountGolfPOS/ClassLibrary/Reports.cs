@@ -22,6 +22,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
     {
         string connectionString;
         List<Cashout> cashout = new List<Cashout>();
+        List<Cashout> remainingCashout = new List<Cashout>();
         Clubs c = new Clubs();
         Accessories a = new Accessories();
         Clothing cl = new Clothing();
@@ -46,7 +47,8 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "Select tbl_invoiceMOP.mopType, tbl_invoiceMOP.amountPaid, tbl_invoice.tradeinAmount from tbl_invoiceMOP " +
+            cmd.CommandText = "Select tbl_invoiceMOP.mopType, tbl_invoiceMOP.amountPaid, tbl_invoice.tradeinAmount, " +
+                "tbl_invoice.subTotal, tbl_invoice.governmentTax, tbl_invoice.provincialTax from tbl_invoiceMOP " +
                 "INNER JOIN tbl_invoice ON tbl_invoiceMOP.invoiceNum = tbl_invoice.invoiceNum " +
                 " where tbl_invoice.invoiceDate between @startDate and @endDate and tbl_invoice.locationID = @locationID;";
             cmd.Parameters.AddWithValue("@startDate", startDate);
@@ -64,11 +66,68 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                     Convert.ToString(reader["mopType"]),
                     Convert.ToDouble(reader["amountPaid"]),
                     Convert.ToDouble(reader["tradeinAmount"]));
+                    
 
                 cashout.Add(cs);
             }
             con.Close();
             return cashout;
+        }
+        public List<Cashout> getRemainingCashout(DateTime startDate, DateTime endDate, int locationID)
+        {
+
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "Select subTotal, governmentTax, provincialTax from  tbl_invoice" +                
+                " where invoiceDate between @startDate and @endDate and locationID = @locationID;";
+            cmd.Parameters.AddWithValue("@startDate", startDate);
+            cmd.Parameters.AddWithValue("@endDate", endDate);
+            cmd.Parameters.AddWithValue("@locationID", locationID);
+
+            cmd.Connection = con;
+            con.Open();
+
+            SqlDataReader reader = cmd.ExecuteReader();
+
+
+            while (reader.Read())
+            {
+                Cashout cs = new Cashout(
+                    Convert.ToDouble(reader["governmentTax"]),
+                    Convert.ToDouble(reader["provincialTax"]),
+                    Convert.ToDouble(reader["subTotal"]));
+
+
+                remainingCashout.Add(cs);
+            }
+            con.Close();
+
+            return remainingCashout;
+        }
+        public double getTradeInsCashout(DateTime startDate, DateTime endDate, int locationID)
+        {
+            double tradeintotal = 0;
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "Select tradeinAmount from  tbl_invoice" +
+                " where invoiceDate between @startDate and @endDate and locationID = @locationID;";
+            cmd.Parameters.AddWithValue("@startDate", startDate);
+            cmd.Parameters.AddWithValue("@endDate", endDate);
+            cmd.Parameters.AddWithValue("@locationID", locationID);
+
+            cmd.Connection = con;
+            con.Open();
+
+            SqlDataReader reader = cmd.ExecuteReader();
+
+
+            while (reader.Read())
+            {
+                tradeintotal += Convert.ToDouble(reader["tradeinAmount"]);                
+            }
+            con.Close();
+
+            return tradeintotal;
         }
         //Insert the cashout into the database
         public void insertCashout(Cashout cas)
@@ -96,10 +155,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "Insert into tbl_cashout values('" +
                cas.date + "', '" + cas.time + "', " + cas.saleTradeIn + ", " + cas.saleGiftCard + ", " +
-               cas.saleCash + ", " + cas.saleCheque + ", " + cas.saleDebit + ", " + cas.saleMasterCard + ", " +
-               cas.saleVisa + ", " + cas.saleAmex + ", " + cas.receiptTradeIn + ", " + cas.receiptGiftCard + ", " +
-               cas.receiptCash + ", " + cas.receiptCheque + ", " + cas.receiptDebit + ", " + cas.receiptMasterCard + ", " +
-               cas.receiptVisa + ", " + cas.receiptAmex + ", " + cas.overShort + ", " + finalized + ", " + processed + ");";
+               cas.saleCash + ", "  + cas.saleDebit + ", " + cas.saleMasterCard + ", " +
+               cas.saleVisa + ", " +  cas.receiptTradeIn + ", " + cas.receiptGiftCard + ", " +
+               cas.receiptCash + ", "  + cas.receiptDebit + ", " + cas.receiptMasterCard + ", " + cas.receiptVisa + ", " +
+               cas.preTax + ", " + cas.saleGST + ", " +  cas.salePST + ", " + 
+               cas.overShort + ", " + finalized + ", " + processed + ");";
 
             //" saleTradeIn = @saleTradeIn, " +
             //" saleGiftCard = @saleGiftCard, saleCash = @saleCash, saleCheque = @saleCheque, " +
@@ -886,15 +946,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             ExcelApp.Quit();
         }
         //Export all items in inventory
-        public void exportAllItems()
+        public System.Data.DataTable exportAllItems()
         {
-            exportTable = new System.Data.DataTable();
-            //SqlConnection sqlCon = new SqlConnection(connectionString);
-            //sqlCon.Open();
-            //This statement is going to have to go through each table and merge the data
-            //SqlDataAdapter club = new SqlDataAdapter("SELECT * FROM tbl_clubs", sqlCon);
-            //SqlDataAdapter cl = new SqlDataAdapter("SELECT * FROM tbl_clothing", sqlCon);
-            //SqlDataAdapter ac = new SqlDataAdapter("SELECT * FROM tbl_accessories", sqlCon);
+            exportTable = new System.Data.DataTable();           
 
             exportTable.Columns.Add("Vendor", typeof(string));
             exportTable.Columns.Add("Store_ID", typeof(string));
@@ -923,33 +977,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             exportAllAdd_Clubs();
             exportAllAdd_Accessories();
-            exportAllAdd_Clothing();
+            exportAllAdd_Clothing();           
 
-            DataColumnCollection dcCollection = exportTable.Columns;
-
-            // Export Data into EXCEL Sheet
-            Application ExcelApp = new Application();
-            ExcelApp.Application.Workbooks.Add(Type.Missing);
-
-            for (int i = 1; i < exportTable.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < exportTable.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        ExcelApp.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        ExcelApp.Cells[i, j] = exportTable.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Get users profile, downloads folder path, and save to workstation
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = Path.Combine(pathUser, "Downloads");
-            ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\TotalInventory-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
-            ExcelApp.ActiveWorkbook.Saved = true;
-            ExcelApp.Quit();
+            return exportTable;
         }
+        //****NEED TO ADD SUB QUEREY
         //Puts the clubs in the export table
         public void exportAllAdd_Clubs()
         {
@@ -1019,12 +1051,28 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             //itemPrice, itemDiscount, percentage
 
             //ID, invoiceNum, invoiceSubNum, mopType, amountPaid
+
             SqlConnection sqlCon = new SqlConnection(connectionString);
             sqlCon.Open();
-            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
-            System.Data.DataTable dtMainSQLData = new System.Data.DataTable();
-            da.Fill(dtMainSQLData);
-            DataColumnCollection dcCollection = dtMainSQLData.Columns;
+            SqlDataAdapter im = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+            System.Data.DataTable dtim = new System.Data.DataTable();
+            im.Fill(dtim);
+            DataColumnCollection dcimHeaders = dtim.Columns;
+            sqlCon.Close();
+
+            sqlCon.Open();
+            SqlDataAdapter ii = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+            System.Data.DataTable dtii = new System.Data.DataTable();
+            ii.Fill(dtii);
+            DataColumnCollection dciiHeaders = dtii.Columns;
+            sqlCon.Close();
+
+            sqlCon.Open();
+            SqlDataAdapter imo = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+            System.Data.DataTable dtimo = new System.Data.DataTable();
+            imo.Fill(dtimo);
+            DataColumnCollection dcimoHeaders = dtimo.Columns;
+            sqlCon.Close();
 
             //Initiating Everything
             initiateInvoiceTable();

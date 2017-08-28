@@ -20,6 +20,7 @@ namespace SweetSpotDiscountGolfPOS
             Session["Admin"] = null;
             Session["Loc"] = null;
             Session["id"] = null;
+            Session["locationID"] = null;
             Response.Redirect("LoginPage.aspx");
         }
 

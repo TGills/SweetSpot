@@ -32,7 +32,24 @@ namespace SweetSpotDiscountGolfPOS
             lblPhone.Text = c.primaryPhoneNumber.ToString();
             lblinvoiceNum.Text = Convert.ToString(Session["Invoice"]);
             lblDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
-            Location l = lm.returnLocationForInvoice(Convert.ToString(Session["Loc"]));
+
+            bool useInvoiceLocation = Convert.ToBoolean(Session["useInvoice"]);
+            Location l = new Location();
+            if (useInvoiceLocation == false)
+            {
+                l = lm.returnLocationForInvoice(Convert.ToString(Session["Loc"]));
+            }
+            else if(useInvoiceLocation == true)
+            {
+                string invoice = lblinvoiceNum.Text;
+                //Parsing into invoiceNum and invoiceSubNum
+                char[] splitchar = { '-' };
+                string[] invoiceSplit = invoice.Split(splitchar);
+                int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+                int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+                l = lm.returnLocationForInvoice(ssm.invoice_getLocation(invoiceNum, invoiceSubNum));
+            }
+
             lblSweetShopName.Text = l.location.ToString();
             lblSweetShopStreetAddress.Text = l.address.ToString();
             lblSweetShopPostalAddress.Text = l.city.ToString() + ", " + lm.provinceName(l.provID) + " " + l.postal.ToString();
@@ -47,7 +64,7 @@ namespace SweetSpotDiscountGolfPOS
                 lblTaxNum.Text = "778164723";
             }
 
-                cart = (List<Cart>)Session["ItemsInCart"];
+            cart = (List<Cart>)Session["ItemsInCart"];
             ckm = (CheckoutManager)Session["CheckOutTotals"];
             mopList = (List<Checkout>)Session["MethodsofPayment"];
 
@@ -80,6 +97,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnHome_Click(object sender, EventArgs e)
         {
+            Session["useInvoice"] = null;
             Session["Invoice"] = null;
             Session["key"] = null;
             Session["ItemsInCart"] = null;

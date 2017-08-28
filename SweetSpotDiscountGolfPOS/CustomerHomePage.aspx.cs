@@ -45,6 +45,7 @@ namespace SweetSpotDiscountGolfPOS
             }
             else if (e.CommandName == "StartSale")
             {
+                Session["returnedFromCart"] = false;
                 Session["TranType"] = 1;
                 Session["key"] = key;
                 Response.Redirect("SalesCart.aspx");

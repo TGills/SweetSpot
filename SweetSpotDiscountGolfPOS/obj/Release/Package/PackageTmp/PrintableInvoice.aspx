@@ -14,8 +14,8 @@
            float: right;*/
 			margin-left: 10px !important;
 		}
-	</style>>
-    <div id="menu_simple">
+	</style>
+    <div id="menu_simple" class="noPrint">
         <ul>
             <li><a>HOME</a></li>
             <li><a>CUSTOMERS</a></li>

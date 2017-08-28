@@ -13,20 +13,27 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
         public double saleTradeIn { get; set; }
         public double saleGiftCard { get; set; }
-        public double saleCash { get; set; }
-        public double saleCheque { get; set; }
+        public double saleCash { get; set; }        
         public double saleDebit { get; set; }
         public double saleMasterCard { get; set; }
         public double saleVisa { get; set; }
-        public double saleAmex { get; set; }
+        public double saleGST { get; set; }
+        public double salePST { get; set; }
+        public double saleSubTotal { get; set; }
+               
+
         public double receiptTradeIn { get; set; }
         public double receiptGiftCard { get; set; }
         public double receiptCash { get; set; }
-        public double receiptCheque { get; set; }
         public double receiptDebit { get; set; }
         public double receiptMasterCard { get; set; }
         public double receiptVisa { get; set; }
-        public double receiptAmex { get; set; }
+        public double receiptGST { get; set; }
+        public double receiptPST { get; set; }
+        public double receiptSubTotal { get; set; }
+
+        public double preTax { get; set; }
+
         public double overShort { get; set; }
         public bool finalized { get; set; }
         public bool processed { get; set; }
@@ -45,39 +52,51 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             tradeIn = t;
         }
 
+
+        public Cashout(double sgt, double spt, double ssub)
+        {
+            saleGST = sgt;
+            salePST = spt;
+            saleSubTotal = ssub;
+        }
+
         //Used to store values for Session["saleCashout"]
-        public Cashout(double st, double sg, double sc, double sch, double sd, double smc,
-            double sv, double sam)
+        public Cashout(double st, double sg, double sc, double sd, double smc,
+            double sv,  double sgt, double spt, double ssub)
         {
             saleTradeIn = st;
             saleGiftCard = sg;
             saleCash = sc;
-            saleCheque = sch;
             saleDebit = sd;
             saleMasterCard = smc;
             saleVisa = sv;
-            saleAmex = sam;
+            saleGST = sgt;
+            salePST = spt;
+            saleSubTotal = ssub;
         }
 
         //Used to store values for Session["receiptCashout"]
-        public Cashout(string throwaway, double rt, double rg, double rc, double rch, double rd,
-            double rmc, double rv, double ram, double os)
+        public Cashout(string throwaway, double rt, double rg, double rc, double rd,
+            double rmc, double rv, double os, double rgt, double rpt, double rsub)
         {
             receiptTradeIn = rt;
             receiptGiftCard = rg;
             receiptCash = rc;
-            receiptCheque = rch;
             receiptDebit = rd;
             receiptMasterCard = rmc;
             receiptVisa = rv;
-            receiptAmex = ram;
+            receiptGST = rgt;
+            receiptPST = rpt;
+            receiptSubTotal = rsub;
+
+
             overShort = os;
         }
 
         //Used for storing the cashout
-        public Cashout(string d, string t, double st, double sg, double sc, double sch, double sd, double smc,
-            double sv, double sam, double rt, double rg, double rc, double rch, double rd,
-            double rmc, double rv, double ram, double os, bool f, bool p)
+        public Cashout(string d, string t, double st, double sg, double sc,  double sd, double smc,
+            double sv,  double sgt, double spt, double ssub, double rt, double rg, double rc,  double rd,
+            double rmc, double rv,  double rgt, double rpt, double rsub, double os, bool f, bool p, double prt)
         {
             date = d;
             time = t;
@@ -85,20 +104,24 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             saleTradeIn = st;
             saleGiftCard = sg;
             saleCash = sc;
-            saleCheque = sch;
             saleDebit = sd;
             saleMasterCard = smc;
             saleVisa = sv;
-            saleAmex = sam;
+            saleGST = sgt;
+            salePST = spt;
+            saleSubTotal = ssub;
 
             receiptTradeIn = rt;
             receiptGiftCard = rg;
             receiptCash = rc;
-            receiptCheque = rch;
             receiptDebit = rd;
             receiptMasterCard = rmc;
             receiptVisa = rv;
-            receiptAmex = ram;
+            receiptGST = rgt;
+            receiptPST = rpt;
+            receiptSubTotal = rsub;
+
+            preTax = prt;
 
             overShort = os;
 
