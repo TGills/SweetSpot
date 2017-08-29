@@ -714,9 +714,16 @@ namespace SweetSpotProShop
             int nextInvoiceNum = Convert.ToInt32(invoiceNumber.Split('-')[1]);
 
             ////Step 2: Find the invoice sub number
-            int nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
-            //int nextInvoiceSubNum = Convert.ToInt32(invoiceNumber.Split('-')[2]);
+            int nextInvoiceSubNum = 0;
 
+            if (transactionType == 1)
+            {
+                nextInvoiceSubNum = Convert.ToInt32(invoiceNumber.Split('-')[2]);
+            }
+            else if(transactionType == 2)
+            {
+                nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
+            }
 
             //Step 3: Get date and time
             string date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -728,25 +735,32 @@ namespace SweetSpotProShop
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             //+ ", '" + date + "', '" + time + "', "
-            cmd.CommandText =
-                "update tbl_invoice set " +
-                "invoiceSubNum = @invoiceSubNum, " +
-                "custID = @custID, " +
-                "empID = @empID, " +
-                "locationID = @locationID, " +
-                "subTotal = @subtotal, " +
-                "shippingAmount = @shippingAmount, " +
-                "discountAmount = @discountAmount, " +
-                "tradeinAmount = @tradeinAmount, " +
-                "governmentTax = @governmentTax, " +
-                "provincialTax = @provincialTax, " +
-                "balanceDue = @balanceDue, " +
-                "transactionType = @transactionType, " +
-                "comments = @comments" +
-                " where invoiceNum = @invoiceNum;";
+            cmd.CommandText = "Insert Into tbl_invoice (invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, "
+                + "subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax, balanceDue, "
+                + "transactionType, comments) values(@invoiceNum, @invoiceSubNum, @invoiceDate, @invoiceTime, @custID, "
+                + "@empID, @locationID, @subtotal, @shippingAmount, @discountAmount, @tradeinAmount, @governmentTax, "
+                + "@provincialTax, @balanceDue, @transactionType, @comments);";
+
+            //"update tbl_invoice set " +
+            //    "invoiceSubNum = @invoiceSubNum, " +
+            //    "custID = @custID, " +
+            //    "empID = @empID, " +
+            //    "locationID = @locationID, " +
+            //    "subTotal = @subtotal, " +
+            //    "shippingAmount = @shippingAmount, " +
+            //    "discountAmount = @discountAmount, " +
+            //    "tradeinAmount = @tradeinAmount, " +
+            //    "governmentTax = @governmentTax, " +
+            //    "provincialTax = @provincialTax, " +
+            //    "balanceDue = @balanceDue, " +
+            //    "transactionType = @transactionType, " +
+            //    "comments = @comments" +
+            //    " where invoiceNum = @invoiceNum;";
 
             cmd.Parameters.AddWithValue("invoiceNum", nextInvoiceNum);
             cmd.Parameters.AddWithValue("invoiceSubNum", nextInvoiceSubNum);
+            cmd.Parameters.AddWithValue("invoiceDate", date);
+            cmd.Parameters.AddWithValue("invoiceTime", time);
             cmd.Parameters.AddWithValue("custID", c.customerId);
             cmd.Parameters.AddWithValue("empID", e.employeeID);
             cmd.Parameters.AddWithValue("locationID", e.locationID);
@@ -761,13 +775,22 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("comments", comments);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
-            }
+            //while (reader.Read())
+            //{
+            //    nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
+            //}
             conn.Close();
             //Step 5: Insert each item into the invoiceItem table
             //invoiceNum, invoiceSubNum, sku, itemQuantity, itemCost, itemPrice, itemDiscount, Percentage
+            string tbl = "";
+            if(transactionType == 1)
+            {
+                tbl = "tbl_invoiceItem";
+            }
+            else if (transactionType == 2)
+            {
+                tbl = "tbl_invoiceItemReturns";
+            }
             foreach (Cart item in cart)
             {
                 int percentage = 0;
@@ -779,7 +802,7 @@ namespace SweetSpotProShop
                 {
                     percentage = 0;
                 }
-                string insert = "insert into tbl_invoiceItem values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", " + item.sku + ", " + item.quantity + ", " +
+                string insert = "insert into " + tbl + " values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", " + item.sku + ", " + item.quantity + ", " +
                     item.cost + ", " + item.price + ", " + item.discount + ", " + percentage + ");";
 
                 invoiceItem(insert);
@@ -793,14 +816,14 @@ namespace SweetSpotProShop
             }
         }
         //Returns the max invoice num + 1
-        public int getNextInvoiceNum(int empID)
+        public int getNextInvoiceNum()
         {
             int nextInvoiceNum = 0;
-            int nextInvoiceSubNum = 0;
+            
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select Max(invoiceNum) as invoiceNum from tbl_invoice";
+            cmd.CommandText = "Select Max(invoiceNum) as invoiceNum from tbl_InvoiceNumbers";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -808,39 +831,38 @@ namespace SweetSpotProShop
                 if (reader["invoiceNum"] == DBNull.Value)
                 {
                     nextInvoiceNum = 0;
-                    nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
-                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum, empID);
                 }
                 else
                 {
                     nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
-                    nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
-                    createInvoiceNum(nextInvoiceNum, nextInvoiceSubNum, empID);
                 }
+                createInvoiceNum(nextInvoiceNum);
             }
             conn.Close();
             return nextInvoiceNum;
         }
         //Create  the newly found invoice number
-        public void createInvoiceNum(int invNum, int subNum, int empID)
+        public void createInvoiceNum(int invNum)
         {
-            string date = DateTime.Now.ToString("yyyy-MM-dd");
-            string time = DateTime.Now.ToString("HH:mm:ss");
+            //string date = DateTime.Now.ToString("yyyy-MM-dd");
+            //string time = DateTime.Now.ToString("HH:mm:ss");
 
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, tradeinAmount
             //governmentTax, provincialTax, balanceDue, transactionType, comments
-            cmd.CommandText = "Insert into tbl_invoice(invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, " +
-                "empID, locationID, subTotal, shippingAmount, discountAmount, tradeinAmount, " +
-                "governmentTax, provincialTax, balanceDue, transactionType, comments) values(@invNum, @invSubNum, @date, @time" +
-                ", 1, @empID, 1, 0, 0, 0, 0, 0, 0, 0, 1, '');";
+            cmd.CommandText = "Insert into tbl_InvoiceNumbers(invoiceNum) values(@invNum);";
+
+            //"Insert into tbl_invoice(invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, " +
+            //"empID, locationID, subTotal, shippingAmount, discountAmount, tradeinAmount, " +
+            //"governmentTax, provincialTax, balanceDue, transactionType, comments) values(@invNum, @invSubNum, @date, @time" +
+            //", 1, @empID, 1, 0, 0, 0, 0, 0, 0, 0, 1, '');";
             cmd.Parameters.AddWithValue("invNum", invNum);
-            cmd.Parameters.AddWithValue("invSubNum", subNum);
-            cmd.Parameters.AddWithValue("date", date);
-            cmd.Parameters.AddWithValue("time", time);            
-            cmd.Parameters.AddWithValue("@empID", empID);
+            //cmd.Parameters.AddWithValue("invSubNum", subNum);
+            //cmd.Parameters.AddWithValue("date", date);
+            //cmd.Parameters.AddWithValue("time", time);            
+            //cmd.Parameters.AddWithValue("@empID", empID);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();

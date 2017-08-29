@@ -27,10 +27,6 @@ namespace SweetSpotDiscountGolfPOS
             {
                 Response.Redirect("LoginPage.aspx");
             }
-
-
-           
-
         }
 
         protected void btnQuickSale_Click(object sender, EventArgs e)
@@ -83,19 +79,22 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void grdInvoiceSelection_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            //Not currently functional
-            int invNum = Convert.ToInt32(e.CommandArgument);
+            string strInvoice = Convert.ToString(e.CommandArgument);
+            int invNum = Convert.ToInt32(strInvoice.Split('-')[0]);
+            int invSNum = Convert.ToInt32(strInvoice.Split('-')[1]);
+
             if (e.CommandName == "returnInvoice")
             {
                 List<Invoice> combData = (List<Invoice>)Session["searchReturnInvoices"];
                 Invoice returnInvoice = new Invoice();
                 foreach (var inv in combData)
                 {
-                    if (inv.invoiceNum == invNum)
+                    if (inv.invoiceNum == invNum && inv.invoiceSub == invSNum)
                     {
                         Customer c = ssm.GetCustomerbyCustomerNumber(inv.customerID);
                         returnInvoice = inv;
                         returnInvoice.customerName = c.firstName + " " + c.lastName;
+                        Session["key"] = inv.customerID;
                         Session["searchReturnInvoices"] = returnInvoice;
                     }
                 }

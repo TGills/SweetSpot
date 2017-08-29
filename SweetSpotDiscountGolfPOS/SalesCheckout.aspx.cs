@@ -15,6 +15,7 @@ namespace SweetSpotDiscountGolfPOS
     {
         SweetShopManager ssm = new SweetShopManager();
         List<Checkout> mopList = new List<Checkout>();
+        List<Cart> itemsInCart = new List<Cart>();
         ItemDataUtilities idu = new ItemDataUtilities();
         CheckoutManager ckm;
 
@@ -46,23 +47,34 @@ namespace SweetSpotDiscountGolfPOS
                 List<Tax> t = new List<Tax>();
                 List<Cart> cart = new List<Cart>();
                 CalculationManager cm = new CalculationManager();
-                cart = (List<Cart>)Session["ItemsInCart"];
-
-
+                if (Convert.ToInt32(Session["TranType"]) == 2)
+                {
+                    btnRemoveGov.Enabled = false;
+                    btnRemoveProv.Enabled = false;
+                    cart = (List<Cart>)Session["returnedCart"];
+                    lblBalance.Text = "Due to Customer:";
+                    lblAmountPaid.Text = "Owing to Customer:";
+                    lblRemainingBalanceDue.Text = "Remaining Due to Customer:";
+                }
+                else
+                {
+                    cart = (List<Cart>)Session["ItemsInCart"];
+                }
+                DateTime recDate = Convert.ToDateTime(Session["strDate"]);
                 bool bolShipping = Convert.ToBoolean(Session["shipping"]);
                 if (bolShipping)
                 {
                     int custNum = (int)Convert.ToInt32(Session["key"].ToString());
                     Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
-                    t = ssm.getTaxes(c.province);
+                    t = ssm.getTaxes(c.province, recDate);
                     lblShipping.Visible = true;
                     lblShippingAmount.Visible = true;
-                    dblShippingAmount = Convert.ToDouble(Session["ShippingAmount".ToString()]);
+                    dblShippingAmount = Convert.ToDouble(Session["ShippingAmount"].ToString());
                 }
                 else
                 {
                     //**Will need to be enabled not shipping 
-                    t = ssm.getTaxes(cm.returnLocationID(Convert.ToString(Session["Loc"])));
+                    t = ssm.getTaxes(cm.returnLocationID(Convert.ToString(Session["Loc"])), recDate);
                     lblShipping.Visible = false;
                     lblShippingAmount.Visible = false;
                     dblShippingAmount = 0;
@@ -519,18 +531,35 @@ namespace SweetSpotDiscountGolfPOS
         //Other functionality
         protected void btnCancelSale_Click(object sender, EventArgs e)
         {
-            List<Cart> itemsInCart = new List<Cart>();
-            if (Session["ItemsInCart"] != null)
+            int tranType = Convert.ToInt32(Session["TranType"]);
+            if (tranType == 1)
             {
-                itemsInCart = (List<Cart>)Session["ItemsInCart"];
+                if (Session["ItemsInCart"] != null)
+                {
+                    itemsInCart = (List<Cart>)Session["ItemsInCart"];
+                }
+                foreach (var cart in itemsInCart)
+                {
+                    int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                    idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
+                }
             }
-            foreach (var cart in itemsInCart)
+            else if (tranType == 2)
             {
-                int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
-                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
+                if (Session["returnedCart"] != null)
+                {
+                    itemsInCart = (List<Cart>)Session["returnedCart"];
+                }
+                foreach (var cart in itemsInCart)
+                {
+                    int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                    idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY - cart.quantity));
+                }
             }
+            Session["returnedCart"] = null;
             Session["key"] = null;
             Session["shipping"] = null;
+            Session["ShippingAmount"] = null;
             Session["ItemsInCart"] = null;
             Session["CheckOutTotals"] = null;
             Session["MethodsofPayment"] = null;
@@ -538,6 +567,9 @@ namespace SweetSpotDiscountGolfPOS
             Session["SKU"] = null;
             Session["Items"] = null;
             Session["Invoice"] = null;
+            Session["TranType"] = null;
+            Session["searchReturnInvoices"] = null;
+            Session["strDate"] = null;
             Response.Redirect("HomePage.aspx");
         }
 
@@ -563,7 +595,11 @@ namespace SweetSpotDiscountGolfPOS
             {
                 //Gathering needed information for the invoice
                 //Cart
-                List<Cart> cart = (List<Cart>)Session["ItemsInCart"];
+                tranType = Convert.ToInt32(Session["TranType"]);
+                List<Cart> cart = new List<Cart>();
+                if (tranType == 1) { cart = (List<Cart>)Session["ItemsInCart"]; }
+                else if (tranType == 2) { cart = (List<Cart>)Session["returnedCart"]; }
+
                 //Customer
                 int custNum = Convert.ToInt32(Session["key"]);
                 Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
@@ -576,7 +612,7 @@ namespace SweetSpotDiscountGolfPOS
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
                 //MOP
                 mopList = (List<Checkout>)Session["MethodsofPayment"];
-                tranType = Convert.ToInt32(Session["TranType"]);
+                
 
                 //CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
                 idu.mainInvoice(ckm, cart, mopList, c, emp, tranType, (Session["Invoice"]).ToString(), txtComments.Text);
@@ -588,6 +624,9 @@ namespace SweetSpotDiscountGolfPOS
                 Session["Grid"] = null;
                 Session["SKU"] = null;
                 Session["Items"] = null;
+                Session["ShippingAmount"] = null;
+                Session["searchReturnInvoices"] = null;
+                Session["strDate"] = null;
                 Response.Redirect("PrintableInvoice.aspx");
             }
         }

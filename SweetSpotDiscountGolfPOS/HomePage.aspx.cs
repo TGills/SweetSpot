@@ -83,6 +83,7 @@ namespace SweetSpotDiscountGolfPOS
             string[] invoiceSplit = invoice.Split(splitchar);
             int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
             int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+            Session["TranType"] = 3;
             Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum);
             Session["Invoice"] = invoice;
             Session["useInvoice"] = true; 

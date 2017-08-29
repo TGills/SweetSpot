@@ -16,7 +16,7 @@ namespace SweetSpotDiscountGolfPOS
         List<Checkout> mopList = new List<Checkout>();
         List<Cart> cart = new List<Cart>();
         CheckoutManager ckm = new CheckoutManager();
-
+        int tranType;
         double dblAmountPaid;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -64,7 +64,10 @@ namespace SweetSpotDiscountGolfPOS
                 lblTaxNum.Text = "778164723";
             }
 
-            cart = (List<Cart>)Session["ItemsInCart"];
+            tranType = Convert.ToInt32(Session["TranType"]);
+            if (tranType == 1) { cart = (List<Cart>)Session["ItemsInCart"]; }
+            else if (tranType == 2) { cart = (List<Cart>)Session["returnedCart"]; }
+            else if (tranType == 3) { cart = (List<Cart>)Session["ItemsInCart"]; }
             ckm = (CheckoutManager)Session["CheckOutTotals"];
             mopList = (List<Checkout>)Session["MethodsofPayment"];
 
@@ -101,6 +104,8 @@ namespace SweetSpotDiscountGolfPOS
             Session["Invoice"] = null;
             Session["key"] = null;
             Session["ItemsInCart"] = null;
+            Session["returnedCart"] = null;
+            Session["TranType"] = null;
             Session["CheckOutTotals"] = null;
             Session["MethodsofPayment"] = null;
             Response.Redirect("HomePage.aspx");

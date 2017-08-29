@@ -22,6 +22,7 @@ namespace SweetSpotDiscountGolfPOS
         List<Items> invoiceItems = new List<Items>();
         List<Cart> itemsInCart = new List<Cart>();
         List<Cart> returnedCart = new List<Cart>();
+        List<Cart> temp = new List<Cart>();
         LocationManager lm = new LocationManager();
         Cart tempItemInCart;
         Object o = new Object();
@@ -32,7 +33,6 @@ namespace SweetSpotDiscountGolfPOS
                 Response.Redirect("LoginPage.aspx");
             }
             lblInvalidQty.Visible = false;
-            bool returnedToCart = Convert.ToBoolean(Session["returnedToCart"]);
             if (!Page.IsPostBack)
             {
                 int tranType = Convert.ToInt32(Session["TranType"]);
@@ -49,29 +49,10 @@ namespace SweetSpotDiscountGolfPOS
                     }
                     //display system time in Sales Page
                     DateTime today = DateTime.Today;
-                    int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
-
-
-                    string loc;
-
-                    if (returnedToCart == false)
-                    {
-                        invNum = idu.getNextInvoiceNum(empNum);
-                        loc = Convert.ToString(Session["Loc"]);
-                        lblInvoiceNumberDisplay.Text = loc + "-" + (invNum + "-" + idu.getNextInvoiceSubNum(invNum)).ToString();
-                        //lblInvoiceNumberDisplay.Text = loc + "-" + invNum;
-                        Session["Invoice"] = lblInvoiceNumberDisplay.Text;
-                    }
-                    else
-                    {
-                        lblInvoiceNumberDisplay.Text = Session["Invoice"].ToString();
-                    }
-                    
-
-
-
-
-
+                    invNum = idu.getNextInvoiceNum();
+                    string loc = Convert.ToString(Session["Loc"]);
+                    lblInvoiceNumberDisplay.Text = loc + "-" + invNum + "-1";
+                    Session["Invoice"] = lblInvoiceNumberDisplay.Text;
                     lblDateDisplay.Text = today.ToString("yyyy-MM-dd");
                     if (Session["ItemsInCart"] != null)
                     {
@@ -82,7 +63,27 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else if (tranType == 2)
                 {
+                    btnJumpToInventory.Visible = false;
                     Invoice rInvoice = (Invoice)Session["searchReturnInvoices"];
+                    if (Session["returnedCart"]!=null)
+                    {
+                        itemsInCart = (List<Cart>)Session["ItemsInCart"];
+                        returnedCart = (List<Cart>)Session["returnedCart"];
+                        grdReturningItems.DataSource = returnedCart;
+                        grdReturningItems.DataBind();
+                        lblSubtotalDisplay.Text = "$ " + ssm.returnSubtotalAmount(returnedCart).ToString("#0.00");
+                    }
+                    else
+                    {
+                        temp = ssm.returningItems(rInvoice.invoiceNum, rInvoice.invoiceSub);
+                        foreach (var item in temp)
+                        {
+                            if (item.typeID != 0)
+                            {
+                                itemsInCart.Add(item);
+                            }
+                        }
+                    }
                     lblCustomerDisplay.Visible = true;
                     lblCustomerDisplay.Text = rInvoice.customerName.ToString();
                     txtCustomer.Visible = false;
@@ -91,7 +92,8 @@ namespace SweetSpotDiscountGolfPOS
                     RadioButton2.Visible = false;
                     lblShipping.Visible = false;
                     txtShippingAmount.Visible = false;
-                    lblInvoiceNumberDisplay.Text = rInvoice.invoiceNum.ToString() + "-" + idu.getNextInvoiceSubNum(rInvoice.invoiceNum).ToString();
+                    lblInvoiceNumberDisplay.Text = Convert.ToString(Session["Loc"]) + "-" + rInvoice.invoiceNum.ToString() + "-" + idu.getNextInvoiceSubNum(rInvoice.invoiceNum).ToString();
+                    Session["Invoice"] = lblInvoiceNumberDisplay.Text;
                     lblDateDisplay.Text = rInvoice.invoiceDate.ToString();
                     txtSearch.Visible = false;
                     btnInventorySearch.Visible = false;
@@ -99,22 +101,17 @@ namespace SweetSpotDiscountGolfPOS
                     grdCartItems.Visible = false;
                     grdInvoicedItems.Visible = true;
                     grdReturningItems.Visible = true;
+
                     lblSubtotal.Text = "Return Total:";
                     btnCancelSale.Text = "Cancel Return";
                     btnProceedToCheckout.Text = "Reimburse Customer";
-                    itemsInCart = ssm.returningItems(rInvoice.invoiceNum, rInvoice.invoiceSub);
                     Session["ItemsInCart"] = itemsInCart;
                     grdInvoicedItems.DataSource = itemsInCart;
                     grdInvoicedItems.DataBind();
 
                 }
             }
-            //else if (Convert.ToBoolean(Session["UpdateTheCart"]))
-            //{
-            //    grdCartItems.DataSource = Session["ItemsInCart"];
-            //    grdCartItems.DataBind();
-            //    Session["UpdateTheCart"] = null;
-            //}
+            Session["strDate"] = lblDateDisplay.Text;
         }
         protected void btnCustomerSelect_Click(object sender, EventArgs e)
         {
@@ -392,18 +389,33 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnCancelSale_Click(object sender, EventArgs e)
         {
-            if (Session["ItemsInCart"] != null)
+            int tranType = Convert.ToInt32(Session["TranType"]);
+            if(tranType == 1) { 
+                if (Session["ItemsInCart"] != null)
+                {
+                    itemsInCart = (List<Cart>)Session["ItemsInCart"];
+                }
+                foreach(var cart in itemsInCart){
+                    int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                    idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
+                }
+            }
+            else if(tranType == 2)
             {
-                itemsInCart = (List<Cart>)Session["ItemsInCart"];
+                if (Session["returnedCart"] != null)
+                {
+                    itemsInCart = (List<Cart>)Session["returnedCart"];
+                }
+                foreach (var cart in itemsInCart)
+                {
+                    int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                    idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY - cart.quantity));
+                }
             }
-            foreach(var cart in itemsInCart){
-                int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
-                idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
-            }
-
 
             lblInvalidQty.Visible = false;
             //* *update * *to null any new seesions btnCancelSale_Click;
+            Session["returnedCart"] = null;
             Session["key"] = null;
             Session["shipping"] = null;
             Session["ItemsInCart"] = null;
@@ -415,6 +427,8 @@ namespace SweetSpotDiscountGolfPOS
             Session["Invoice"] = null;
             Session["searchReturnInvoices"] = null;
             Session["TranType"] = null;
+            Session["ShippingAmount"] = null;
+            Session["strDate"] = null;
             Response.Redirect("HomePage.aspx");
         }
         protected void btnProceedToCheckout_Click(object sender, EventArgs e)
@@ -535,6 +549,7 @@ namespace SweetSpotDiscountGolfPOS
             List<Cart> duplicateCart = (List<Cart>)Session["ItemsInCart"];
             Cart returnedItem = new Cart();
             List<Cart> duplicateReturnedCart = new List<Cart>();
+            bool bolAdded = false;
             bool bolCart = true;
             if (Session["returnedCart"] != null)
             {
@@ -558,17 +573,26 @@ namespace SweetSpotDiscountGolfPOS
                             if (retCart.sku == cart.sku)
                             {
                                 returnedItem = new Cart(retCart.sku, retCart.description, retCart.quantity + 1, retCart.price, retCart.cost, retCart.discount, retCart.percentage, retCart.tradeIn, retCart.typeID);
+                                idu.removeQTYfromInventoryWithSKU(returnedItem.sku, returnedItem.typeID, inStockQTY + 1);
+                                bolAdded = true;
                             }
                             else
                             {
-                                returnedItem = new Cart(cart.sku, cart.description, 1, cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                                returnedItem = new Cart(retCart.sku, retCart.description, retCart.quantity, retCart.price, retCart.cost, retCart.discount, retCart.percentage, retCart.tradeIn, retCart.typeID);
                             }
+                            returnedCart.Add(returnedItem);
+                        }
+                        if (!bolAdded)
+                        {
+                            returnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                            idu.removeQTYfromInventoryWithSKU(returnedItem.sku, returnedItem.typeID, inStockQTY + 1);
                             returnedCart.Add(returnedItem);
                         }
                     }
                     else
                     {
-                        returnedItem = new Cart(cart.sku, cart.description, 1, cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                        returnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                        idu.removeQTYfromInventoryWithSKU(returnedItem.sku, returnedItem.typeID, inStockQTY + 1);
                         returnedCart.Add(returnedItem);
                     }
                 }
@@ -577,7 +601,7 @@ namespace SweetSpotDiscountGolfPOS
                     itemsInCart.Add(cart);
                 }
             }
-            idu.removeQTYfromInventoryWithSKU(returnedItem.sku, returnedItem.typeID, inStockQTY + 1);
+            
             grdInvoicedItems.EditIndex = -1;
             Session["ItemsInCart"] = itemsInCart;
             grdInvoicedItems.DataSource = itemsInCart;
@@ -607,6 +631,7 @@ namespace SweetSpotDiscountGolfPOS
             List<Cart> duplicateCart = (List<Cart>)Session["returnedCart"];
             Cart cancelReturnedItem = new Cart();
             List<Cart> duplicateReturnedCart = (List<Cart>)Session["ItemsInCart"];
+            bool bolAdded = false;
             bool bolCart = true;
             if (duplicateReturnedCart.Count > 0)
             {
@@ -629,17 +654,26 @@ namespace SweetSpotDiscountGolfPOS
                             if (retCart.sku == cart.sku)
                             {
                                 cancelReturnedItem = new Cart(retCart.sku, retCart.description, retCart.quantity + 1, retCart.price, retCart.cost, retCart.discount, retCart.percentage, retCart.tradeIn, retCart.typeID);
+                                idu.removeQTYfromInventoryWithSKU(cancelReturnedItem.sku, cancelReturnedItem.typeID, inStockQTY - 1);
+                                bolAdded = true;
                             }
                             else
                             {
-                                cancelReturnedItem = new Cart(cart.sku, cart.description, 1, cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                                cancelReturnedItem = new Cart(retCart.sku, retCart.description, retCart.quantity, retCart.price, retCart.cost, retCart.discount, retCart.percentage, retCart.tradeIn, retCart.typeID);
                             }
+                            itemsInCart.Add(cancelReturnedItem);
+                        }
+                        if (!bolAdded)
+                        {
+                            cancelReturnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                            idu.removeQTYfromInventoryWithSKU(cancelReturnedItem.sku, cancelReturnedItem.typeID, inStockQTY - 1);
                             itemsInCart.Add(cancelReturnedItem);
                         }
                     }
                     else
                     {
-                        cancelReturnedItem = new Cart(cart.sku, cart.description, 1, cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                        cancelReturnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                        idu.removeQTYfromInventoryWithSKU(cancelReturnedItem.sku, cancelReturnedItem.typeID, inStockQTY - 1);
                         itemsInCart.Add(cancelReturnedItem);
                     }
                 }
@@ -648,7 +682,6 @@ namespace SweetSpotDiscountGolfPOS
                     returnedCart.Add(cart);
                 }
             }
-            idu.removeQTYfromInventoryWithSKU(cancelReturnedItem.sku, cancelReturnedItem.typeID, inStockQTY - 1);
             grdReturningItems.EditIndex = -1;
             if (returnedCart.Count > 0)
             {

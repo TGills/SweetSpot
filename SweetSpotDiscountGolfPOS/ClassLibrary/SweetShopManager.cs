@@ -1623,8 +1623,51 @@ namespace SweetShop
 
                 retItems.Add(cartItem);
             }
+            reader.Close();
+            List<Cart> remaingItemsAvailForRet = new List<Cart>();
+
+            cmd.CommandText = "select tbl_invoiceItem.invoiceNum, tbl_invoiceItem.sku, sum(distinct tbl_invoiceItem.itemQuantity) - "
+                            + "case when sum(tbl_invoiceItemReturns.itemQuantity) is null or sum(tbl_invoiceItemReturns.itemQuantity) = '' "
+                            + "then 0 else sum(tbl_invoiceItemReturns.itemQuantity) end as itemQuantity from tbl_invoiceItem "
+                            + "left Join tbl_invoiceItemReturns ON tbl_invoiceItem.invoiceNum = tbl_invoiceItemReturns.invoiceNum "
+                            + "and tbl_invoiceItem.sku = tbl_invoiceItemReturns.sku where tbl_invoiceItem.invoiceNum = @iNum "
+                            + "group by tbl_invoiceItem.invoiceNum, tbl_invoiceItem.sku";
+
+            cmd.Parameters.AddWithValue("iNum", invoiceNumber);
+
+
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                cartItem = new Cart(Convert.ToInt32(reader["sku"]), "", Convert.ToInt32(reader["itemQuantity"]),
+                0, 0, 0, false, false, 0);
+
+                remaingItemsAvailForRet.Add(cartItem);
+            }
+            List<Cart> finalItems = new List<Cart>();
+            foreach (var rCart in retItems)
+            {
+                bool bolAlreadyRet = false;
+                foreach (var arCart in remaingItemsAvailForRet)
+                {
+                    if (rCart.sku == arCart.sku)
+                    {
+                        bolAlreadyRet = true;
+                        if (arCart.quantity > 0)
+                        {
+                            cartItem = new Cart(rCart.sku, rCart.description, arCart.quantity,
+                                    rCart.price, rCart.cost, rCart.discount, rCart.percentage, rCart.tradeIn, rCart.typeID);
+                            finalItems.Add(cartItem);
+                        }
+                    }
+                }
+                if (!bolAlreadyRet)
+                {
+                    finalItems.Add(rCart);
+                }
+            }
             con.Close();
-            return retItems;
+            return finalItems;
         }
         //public void updateReturnToInvoice(int invoiceID, double gstRefund, double pstRefund, double retailPrice, double totalRefund)
         //{
@@ -1991,16 +2034,17 @@ namespace SweetShop
 
         /*******Tax Utilities************************************************************************************/
 
-        public List<Tax> getTaxes(int provStateID)
+        public List<Tax> getTaxes(int provStateID, DateTime recDate)
         {
             //New command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "select tr.taxRate, tbl_taxType.taxName from tbl_taxRate tr"
                             + " inner Join tbl_taxType on tr.taxID = tbl_taxType.taxID"
-                            + " inner join (select taxID, max(taxDate) as MTD from tbl_taxRate where provStateID = @provStateID Group By taxID) td"
+                            + " inner join (select taxID, max(taxDate) as MTD from tbl_taxRate where taxDate <= @recDate and provStateID = @provStateID Group By taxID) td"
                             + " on tr.taxID = td.taxID and tr.taxDate = td.MTD where provStateID = @provStateID;";
             cmd.Parameters.AddWithValue("provStateID", provStateID);
+            cmd.Parameters.AddWithValue("recDate", recDate);
             //Declare and open connection
             cmd.Connection = con;
             con.Open();
