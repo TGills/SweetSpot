@@ -584,14 +584,18 @@ namespace SweetSpotDiscountGolfPOS
                         }
                         if (!bolAdded)
                         {
-                            returnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                            int multi;
+                            if (cart.percentage) { multi = 1; } else { multi = -1; }
+                            returnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, multi * cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
                             idu.removeQTYfromInventoryWithSKU(returnedItem.sku, returnedItem.typeID, inStockQTY + 1);
                             returnedCart.Add(returnedItem);
                         }
                     }
                     else
                     {
-                        returnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                        int multi;
+                        if (cart.percentage) { multi = 1; } else { multi = -1; }
+                        returnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, multi * cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
                         idu.removeQTYfromInventoryWithSKU(returnedItem.sku, returnedItem.typeID, inStockQTY + 1);
                         returnedCart.Add(returnedItem);
                     }
@@ -665,14 +669,18 @@ namespace SweetSpotDiscountGolfPOS
                         }
                         if (!bolAdded)
                         {
-                            cancelReturnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                            int multi;
+                            if (cart.percentage) { multi = 1; } else { multi = -1; }
+                            cancelReturnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, multi * cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
                             idu.removeQTYfromInventoryWithSKU(cancelReturnedItem.sku, cancelReturnedItem.typeID, inStockQTY - 1);
                             itemsInCart.Add(cancelReturnedItem);
                         }
                     }
                     else
                     {
-                        cancelReturnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
+                        int multi;
+                        if (cart.percentage) { multi = 1; } else { multi = -1; }
+                        cancelReturnedItem = new Cart(cart.sku, cart.description, 1, -1 * cart.price, cart.cost, multi * cart.discount, cart.percentage, cart.tradeIn, cart.typeID);
                         idu.removeQTYfromInventoryWithSKU(cancelReturnedItem.sku, cancelReturnedItem.typeID, inStockQTY - 1);
                         itemsInCart.Add(cancelReturnedItem);
                     }
