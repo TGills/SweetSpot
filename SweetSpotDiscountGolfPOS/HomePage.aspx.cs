@@ -60,15 +60,20 @@ namespace SweetSpotDiscountGolfPOS
         }
         //Currently used for Removing the row
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
-        {       
+        {
+            string deletionReason = Microsoft.VisualBasic.Interaction.InputBox("Reason for deleting invioce", "", "", -1, -1);
+            while (deletionReason == "")
+            {
+                deletionReason = Microsoft.VisualBasic.Interaction.InputBox("Reason for deleting invioce", "", "", -1, -1);
+            }
             int index = e.RowIndex;
             Label lblInvoice = (Label)grdSameDaySales.Rows[index].FindControl("lblInvoiceNumber");
-            string invoice = lblInvoice.Text;          
+            string invoice = lblInvoice.Text;
             char[] splitchar = { '-' };
             string[] invoiceSplit = invoice.Split(splitchar);
             int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
             int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
-            idu.deleteInvoice(invoiceNum, invoiceSubNum);
+            idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
             MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
             Response.Redirect(Request.Url.AbsoluteUri);
         }

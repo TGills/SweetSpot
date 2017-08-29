@@ -955,42 +955,89 @@ namespace SweetSpotProShop
             return maxSku;
         }
 
+        //Returns max sku from the skuNumber table based on itemType and directs code to store it
+        public int maxSku(int itemType)
+        {
+            int maxSku = 0;
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select Max(sku) as largestSku from tbl_skuNumbers where itemType = @itemType;";
+            cmd.Parameters.AddWithValue("@itemType", itemType);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader["largestSku"] == DBNull.Value)
+                {
+                    maxSku = 0;
+                    storeMaxSku(maxSku, itemType);
+                }
+                else
+                {
+                    maxSku = Convert.ToInt32(reader["largestSku"]) + 1;
+                    storeMaxSku(maxSku, itemType);
+                }
+            }
+            conn.Close();
+            return maxSku;
+        }
+        //Stores the max sku in the skuNumber table
+        public void storeMaxSku(int sku, int itemType)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "insert into tbl_skuNumbers values(@sku, @itemType);";
+            cmd.Parameters.AddWithValue("@sku", sku);
+            cmd.Parameters.AddWithValue("@itemType", itemType);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+        }
+
         //************************Deleting invoices**********************************
-        public void deleteInvoice(int invoiceNum, int invoiceSubNum)
+        public void deleteInvoice(int invoiceNum, int invoiceSubNum, string deletionReason)
         {
             //Step 1: Re-add the removed items back into inventory
             //Gathering items in the invoice
             List<Items> itemsToAdd = getItemsToReAdd(invoiceNum, invoiceSubNum);
-            foreach(Items i in itemsToAdd)
+            foreach (Items i in itemsToAdd)
             {
                 //Checks what type of item the item from the invoice is
                 bool isClub = checkInClub(i.sku);
                 bool isClothing = checkInClothing(i.sku);
                 bool isAccessorie = checkInAccessories(i.sku);
                 int previousQuantity = 0;
-                if(isClub == true)
+                if (isClub == true)
                 {
                     //Gets the current quantity in the inventory
                     previousQuantity = getQuantity(i.sku, "clubs");
                     //Updates the current inventory's quantity by adding the previous quantity with the quantity in the invoice
                     reAddingItems(i.sku, previousQuantity + i.quantity, "clubs");
                 }
-                else if(isClothing == true)
+                else if (isClothing == true)
                 {
                     previousQuantity = getQuantity(i.sku, "clothing");
                     reAddingItems(i.sku, previousQuantity + i.quantity, "clothing");
                 }
-                else if(isAccessorie == true)
+                else if (isAccessorie == true)
                 {
                     previousQuantity = getQuantity(i.sku, "accessories");
                     reAddingItems(i.sku, previousQuantity + i.quantity, "accessories");
                 }
             }
-            //Step 2: Remove MOPS 
+            //Step 2: Get invoice Data and transfer to the deleted invoice table
+            getInvoiceData(invoiceNum, invoiceSubNum, deletionReason);
+            getInvoiceItems(invoiceNum, invoiceSubNum);
+            getInvoiceMOPs(invoiceNum, invoiceSubNum);
+
+
+            //Step 3: Remove MOPS 
             deleteInvoiceMOP(invoiceNum, invoiceSubNum);
-            //Step 3: Remove Items
+            //Step 4: Remove Items
             deleteInvoiceItem(invoiceNum, invoiceSubNum);
-            //Step 4: Remove the overall Invoice
+            //Step 5: Remove the overall Invoice
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
@@ -1079,7 +1126,7 @@ namespace SweetSpotProShop
         }
         public bool checkInAccessories(int sku)
         {
-            bool isAccessorie= false;
+            bool isAccessorie = false;
             //New command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -1111,7 +1158,7 @@ namespace SweetSpotProShop
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select Max(quantity) as itemQuantity from tbl_"+table+" Where sku = @sku;";
+            cmd.CommandText = "Select Max(quantity) as itemQuantity from tbl_" + table + " Where sku = @sku;";
             cmd.Parameters.AddWithValue("sku", sku);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
@@ -1134,9 +1181,176 @@ namespace SweetSpotProShop
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "update tbl_"+table+" set quantity = @quantity where sku = @sku;";
+            cmd.CommandText = "update tbl_" + table + " set quantity = @quantity where sku = @sku;";
             cmd.Parameters.AddWithValue("sku", sku);
             cmd.Parameters.AddWithValue("quantity", quantity);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+        }
+        public void getInvoiceData(int invoiceNum, int invoiceSubNum, string deletionReason)
+        {
+            Invoice i = new Invoice();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select * from tbl_invoice where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                i = new Invoice(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]), Convert.ToDateTime(reader["invoiceDate"]),
+                    Convert.ToString(reader["invoiceTime"]), Convert.ToInt32(reader["custID"]), Convert.ToInt32(reader["empID"]),
+                    Convert.ToInt32(reader["locationID"]), Convert.ToDouble(reader["subTotal"]), Convert.ToDouble(reader["shippingAmount"]),
+                    Convert.ToDouble(reader["discountAmount"]), Convert.ToDouble(reader["tradeinAmount"]), Convert.ToDouble(reader["governmentTax"]),
+                    Convert.ToDouble(reader["provincialTax"]), Convert.ToDouble(reader["balanceDue"]), Convert.ToInt32(reader["transactionType"]),
+                    Convert.ToString(reader["comments"]));
+            }
+            conn.Close();
+            transferMainInvoice(i, deletionReason);
+        }
+        public void getInvoiceItems(int invoiceNum, int invoiceSubNum)
+        {
+            List<InvoiceItems> it = new List<InvoiceItems>();
+            InvoiceItems inItem = new InvoiceItems();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select * from tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                inItem = new InvoiceItems(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]),
+                    Convert.ToInt32(reader["sku"]), Convert.ToInt32(reader["itemQuantity"]), Convert.ToDouble(reader["itemCost"]),
+                    Convert.ToDouble(reader["itemPrice"]), Convert.ToDouble(reader["itemDiscount"]), Convert.ToBoolean(reader["percentage"]));
+                it.Add(inItem);
+            }
+            conn.Close();
+            foreach (InvoiceItems iItems in it)
+            {
+                transferInvoiceItem(iItems);
+            }
+        }
+        public void getInvoiceMOPs(int invoiceNum, int invoiceSubNum)
+        {
+            List<InvoiceMOPs> im = new List<InvoiceMOPs>();
+            InvoiceMOPs inMOPS = new InvoiceMOPs();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select * from tbl_invoiceMOP where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                inMOPS = new InvoiceMOPs(Convert.ToInt32(reader["ID"]), Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]),
+                    Convert.ToString(reader["mopType"]), Convert.ToDouble(reader["amountPaid"]));
+                im.Add(inMOPS);
+            }
+            conn.Close();
+            foreach (InvoiceMOPs iMOPS in im)
+            {
+                transferInoviceMOP(iMOPS);
+            }
+        }
+        public void transferMainInvoice(Invoice i, string deletionReason)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText =
+                "insert into tbl_deletedInvoice values( " +
+                "@invoiceNum, " +
+                "@invoiceSubNum, " +
+                "@invoiceDate, " +
+                "@invoiceTime, " +
+                "@custID, " +
+                "@empID, " +
+                "@locationID, " +
+                "@subtotal, " +
+                "@shippingAmount, " +
+                "@discountAmount, " +
+                "@tradeinAmount, " +
+                "@governmentTax, " +
+                "@provincialTax, " +
+                "@balanceDue, " +
+                "@transactionType, " +
+                "@comments, " +
+                "@deletionReason);";
+            cmd.Parameters.AddWithValue("invoiceNum", i.invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", i.invoiceSub);
+            cmd.Parameters.AddWithValue("invoiceDate", i.invoiceDate);
+            cmd.Parameters.AddWithValue("invoiceTime", i.invoiceTime);
+            cmd.Parameters.AddWithValue("custID", i.customerID);
+            cmd.Parameters.AddWithValue("empID", i.employeeID);
+            cmd.Parameters.AddWithValue("locationID", i.locationID);
+            cmd.Parameters.AddWithValue("subTotal", i.subTotal);
+            cmd.Parameters.AddWithValue("shippingAmount", i.shippingAmount);
+            cmd.Parameters.AddWithValue("discountAmount", i.discountAmount);
+            cmd.Parameters.AddWithValue("tradeinAmount", i.tradeinAmount);
+            cmd.Parameters.AddWithValue("governmentTax", i.governmentTax);
+            cmd.Parameters.AddWithValue("provincialTax", i.provincialTax);
+            cmd.Parameters.AddWithValue("balanceDue", i.balanceDue);
+            cmd.Parameters.AddWithValue("transactionType", i.transactionType);
+            cmd.Parameters.AddWithValue("comments", i.comments);
+            cmd.Parameters.AddWithValue("deletionReason", deletionReason);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+        }
+        public void transferInvoiceItem(InvoiceItems im)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText =
+                "insert into tbl_deletedInvoiceItem values( " +
+                "@invoiceNum, " +
+                "@invoiceSubNum, " +
+                "@sku, " +
+                "@itemQuantity, " +
+                "@itemCost, " +
+                "@itemPrice, " +
+                "@itemDiscount, " +
+                "@percentage);";
+            cmd.Parameters.AddWithValue("invoiceNum", im.invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", im.invoiceSubNum);
+            cmd.Parameters.AddWithValue("sku", im.sku);
+            cmd.Parameters.AddWithValue("itemQuantity", im.itemQuantity);
+            cmd.Parameters.AddWithValue("itemCost", im.itemCost);
+            cmd.Parameters.AddWithValue("itemPrice", im.itemPrice);
+            cmd.Parameters.AddWithValue("itemDiscount", im.itemDiscount);
+            cmd.Parameters.AddWithValue("percentage", im.percentage);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
+
+        }
+        public void transferInoviceMOP(InvoiceMOPs im)
+        {
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText =
+                "insert into tbl_deletedInvoiceMOP values( " +
+                "@ID, " +
+                "@invoiceNum, " +
+                "@invoiceSubNum, " +
+                "@mopType, " +
+                "@amountPaid);";
+            cmd.Parameters.AddWithValue("ID", im.id);
+            cmd.Parameters.AddWithValue("invoiceNum", im.invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", im.invoiceSubNum);
+            cmd.Parameters.AddWithValue("mopType", im.mopType);
+            cmd.Parameters.AddWithValue("amountPaid", im.amountPaid);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();

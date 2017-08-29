@@ -25,6 +25,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -130,6 +131,8 @@
     <Compile Include="ClassLibrary\EmployeeManager.cs" />
     <Compile Include="ClassLibrary\ErrorReporting.cs" />
     <Compile Include="ClassLibrary\Invoice.cs" />
+    <Compile Include="ClassLibrary\InvoiceItems.cs" />
+    <Compile Include="ClassLibrary\InvoiceMOPs.cs" />
     <Compile Include="ClassLibrary\InvSale.cs" />
     <Compile Include="ClassLibrary\ItemDataUtilities.cs" />
     <Compile Include="ClassLibrary\Items.cs" />

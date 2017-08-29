@@ -133,8 +133,6 @@ namespace SweetSpotDiscountGolfPOS
             lblGSTDisplay.Text = gstTotal.ToString("#0.00");
             lblPSTDisplay.Text = pstTotal.ToString("#0.00");
             lblPreTaxDisplay.Text = (subtotalTotal + tradeinTotal).ToString("#0.00");
-
-
         }
         //Calculating the cashout
         protected void btnCalculate_Click(object sender, EventArgs e)

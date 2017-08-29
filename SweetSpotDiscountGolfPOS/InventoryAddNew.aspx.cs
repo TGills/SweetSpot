@@ -251,6 +251,7 @@ namespace SweetSpotDiscountGolfPOS
             Session["itemType"] = type;
             if (ddlType.SelectedIndex == 2)
             {
+                c.sku = idu.maxSku(1);
                 c.cost = Convert.ToDouble(txtCost.Text);
                 c.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                 c.price = Convert.ToDouble(txtPrice.Text);
@@ -271,6 +272,7 @@ namespace SweetSpotDiscountGolfPOS
             }
             else if (ddlType.SelectedIndex == 0)
             {
+                a.sku = idu.maxSku(2);
                 a.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                 a.cost = Convert.ToDouble(txtCost.Text);
                 a.price = Convert.ToDouble(txtPrice.Text);
@@ -280,10 +282,12 @@ namespace SweetSpotDiscountGolfPOS
                 a.size = txtClubType.Text;
                 a.colour = txtShaft.Text;
                 a.accessoryType = txtNumberofClubs.Text;
+                a.comments = txtComments.Text;
                 o = a as Object;
             }
             else if (ddlType.SelectedIndex == 1)
             {
+                cl.sku = idu.maxSku(3);
                 cl.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                 cl.cost = Convert.ToDouble(txtCost.Text);
                 cl.price = Convert.ToDouble(txtPrice.Text);
@@ -294,6 +298,7 @@ namespace SweetSpotDiscountGolfPOS
                 cl.colour = txtShaft.Text;
                 cl.gender = txtClubSpec.Text;
                 cl.style = txtShaftFlex.Text;
+                cl.comments = txtComments.Text;
                 o = cl as Object;
             }
             skuNum = ssm.addItem(o);

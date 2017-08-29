@@ -27,6 +27,7 @@ namespace SweetShop
         public string customerName { get; set; }
         public string employeeName { get; set; }
         public string locationName { get; set; }
+        public double shippingAmount { get; set; }
 
         public Invoice() { }
         public Invoice(int I, double G, double P, double S, double B, int T)
@@ -76,7 +77,26 @@ namespace SweetShop
             balanceDue = BD;
             transactionType = TT;
             comments = C;
-    }
+        }
+        public Invoice(int I, int IS, DateTime ID, string IT, int CN, int EN, int L, double ST, double SA, double DA, double TA, double G, double P, double BD, int TT, string C)
+        {
+            invoiceNum = I;
+            invoiceSub = IS;
+            invoiceDate = ID;
+            invoiceTime = IT;
+            customerID = CN;
+            employeeID = EN;
+            locationID = L;
+            subTotal = ST;
+            shippingAmount = SA;
+            discountAmount = DA;
+            tradeinAmount = TA;
+            governmentTax = G;
+            provincialTax = P;
+            balanceDue = BD;
+            transactionType = TT;
+            comments = C;
+        }
         //public Invoice(int invoiceID)
         //{
         //    invoiceId = invoiceID;

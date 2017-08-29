@@ -751,13 +751,13 @@ namespace SweetShop
             }
             else
             {
-                int nextSku = idu.maxSku(c.sku, "clubs");
+                //int nextSku = idu.maxSku(c.sku, "clubs");
                 cmd.CommandText = "Insert Into tbl_clubs (sku, brandID, modelID, clubType, shaft, numberOfClubs,"
                     + " premium, cost, price, quantity, clubSpec, shaftSpec, shaftFlex, dexterity, typeID, locationID, used, comments)"
-                    + " Values (" + nextSku + ", @brandID, @modelID, @clubType, @shaft, @numberOfClubs, @premium, @cost, @price,"
+                    + " Values (@sku, @brandID, @modelID, @clubType, @shaft, @numberOfClubs, @premium, @cost, @price,"
                     + " @quantity, @clubSpec, @shaftSpec, @shaftFlex, @dexterity, @typeID, @locationID, @used, @comments)";
             }
-
+            cmd.Parameters.AddWithValue("sku", c.sku);
             cmd.Parameters.AddWithValue("brandID", c.brandID);
             cmd.Parameters.AddWithValue("modelID", c.modelID);
             cmd.Parameters.AddWithValue("clubType", c.clubType);
@@ -797,11 +797,11 @@ namespace SweetShop
             }
             else
             {
-                int nextSku = idu.maxSku(a.sku, "accessories");
+                // int nextSku = idu.maxSku(a.sku, "accessories");
                 cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, modelID, accessoryType, quantity, typeID, locationID, comments)"
-            + " Values (" + nextSku + ", @size, @colour, @price, @cost, @brandID, @modelID, @accessoryType, @quantity, @typeID, @locationID, @comments)";
+            + " Values (@sku, @size, @colour, @price, @cost, @brandID, @modelID, @accessoryType, @quantity, @typeID, @locationID, @comments)";
             }
-
+            cmd.Parameters.AddWithValue("sku", a.sku);
             cmd.Parameters.AddWithValue("size", a.size);
             cmd.Parameters.AddWithValue("colour", a.colour);
             cmd.Parameters.AddWithValue("price", a.price);
@@ -833,10 +833,11 @@ namespace SweetShop
             }
             else
             {
-                int nextSku = idu.maxSku(c.sku, "clothing");
+                //int nextSku = idu.maxSku(c.sku, "clothing");
                 cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID, comments)"
-                + " Values (" + nextSku + ",, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID, @comments)";
+                + " Values (@sku, @size, @colour, @gender, @style, @price, @cost, @brandID, @quantity, @typeID, @locationID, @comments)";
             }
+            cmd.Parameters.AddWithValue("sku", c.sku);
             cmd.Parameters.AddWithValue("size", c.size);
             cmd.Parameters.AddWithValue("colour", c.colour);
             cmd.Parameters.AddWithValue("gender", c.gender);
