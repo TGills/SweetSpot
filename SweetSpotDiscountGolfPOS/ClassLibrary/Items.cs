@@ -23,7 +23,7 @@ namespace SweetShop
         public double price { get; set; }
         public double cost { get; set; }
         public string location { get; set; }
-        public string accessoryType { get; set; }
+        public int typeID { get; set; }
 
         public Items() { }
 
@@ -53,6 +53,16 @@ namespace SweetShop
             quantity = q;
             price = p;
             cost = c;
+            location = l;
+        }
+        public Items(int s, string d, int q, double p, double c, int t, string l)
+        {
+            sku = s;
+            description = d;
+            quantity = q;
+            price = p;
+            cost = c;
+            typeID = t;
             location = l;
         }
         //Accessories table constructor

@@ -424,7 +424,7 @@ namespace SweetSpotProShop
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             conn.Open();
-            cmd.CommandText = "Select sku, quantity, brandID, accessoryType size, colour, price, cost, locationID From tbl_accessories Where SKU = @skuAcc";
+            cmd.CommandText = "Select sku, quantity, brandID, accessoryType size, colour, price, cost, typeID, locationID From tbl_accessories Where SKU = @skuAcc";
             cmd.Parameters.AddWithValue("skuAcc", ItemNumber);
 
             SqlDataReader readerAcc = cmd.ExecuteReader();
@@ -434,13 +434,14 @@ namespace SweetSpotProShop
                 i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) 
                     + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
                     Convert.ToInt32(readerAcc["quantity"]), Convert.ToDouble(readerAcc["price"]),
-                    Convert.ToDouble(readerAcc["cost"]), lm.locationName(Convert.ToInt32(readerAcc["locationID"])));
+                    Convert.ToDouble(readerAcc["cost"]), Convert.ToInt32(readerAcc["typeID"]),
+                    lm.locationName(Convert.ToInt32(readerAcc["locationID"])));
 
             }
             if (!readerAcc.HasRows)
             {
                 readerAcc.Close();
-                cmd.CommandText = "Select sku, brandID, modelID, clubType, shaft, numberOfClubs, dexterity, quantity, price, cost, locationID From tbl_clubs Where SKU = @skuClubs";
+                cmd.CommandText = "Select sku, brandID, modelID, clubType, shaft, numberOfClubs, dexterity, quantity, price, cost, typeID, locationID From tbl_clubs Where SKU = @skuClubs";
                 cmd.Parameters.AddWithValue("skuClubs", ItemNumber);
                 SqlDataReader readerClubs = cmd.ExecuteReader();
                 while (readerClubs.Read())
@@ -449,13 +450,14 @@ namespace SweetSpotProShop
                         + " " + modelType(Convert.ToInt32(readerClubs["modelID"])) + " " + readerClubs["clubType"].ToString()
                         + " " + readerClubs["shaft"].ToString() + " " + readerClubs["numberOfClubs"].ToString() + " "
                         + readerClubs["dexterity"].ToString(), Convert.ToInt32(readerClubs["quantity"]),
-                        Convert.ToDouble(readerClubs["price"]), Convert.ToDouble(readerClubs["cost"]), lm.locationName(Convert.ToInt32(readerClubs["locationID"])));
+                        Convert.ToDouble(readerClubs["price"]), Convert.ToDouble(readerClubs["cost"]),
+                        Convert.ToInt32(readerClubs["typeID"]), lm.locationName(Convert.ToInt32(readerClubs["locationID"])));
 
                 }
                 if (!readerClubs.HasRows)
                 {
                     readerClubs.Close();
-                    cmd.CommandText = "Select sku, brandID, size, colour, gender, style, quantity, price, cost, locationID From tbl_clothing Where SKU = @skuClothing";
+                    cmd.CommandText = "Select sku, brandID, size, colour, gender, style, quantity, price, cost, typeID, locationID From tbl_clothing Where SKU = @skuClothing";
                     cmd.Parameters.AddWithValue("skuClothing", ItemNumber);
                     SqlDataReader readerClothing = cmd.ExecuteReader();
                     while (readerClothing.Read())
@@ -464,7 +466,8 @@ namespace SweetSpotProShop
                             + " " + readerClothing["size"].ToString() + " " + readerClothing["colour"].ToString()
                             + " " + readerClothing["gender"].ToString() + " " + readerClothing["style"].ToString(),
                             Convert.ToInt32(readerClothing["quantity"]), Convert.ToDouble(readerClothing["price"]),
-                            Convert.ToDouble(readerClothing["cost"]), lm.locationName(Convert.ToInt32(readerClothing["locationID"])));
+                            Convert.ToDouble(readerClothing["cost"]), Convert.ToInt32(readerClothing["typeID"]), 
+                            lm.locationName(Convert.ToInt32(readerClothing["locationID"])));
                     }
                 }
             }

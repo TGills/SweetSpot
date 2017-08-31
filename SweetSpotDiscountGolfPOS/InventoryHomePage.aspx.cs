@@ -37,25 +37,25 @@ namespace SweetSpotDiscountGolfPOS
             {
                 string loc = Convert.ToString(Session["Loc"]);
                 SweetShopManager ssm = new SweetShopManager();
-
+                string itemType = ddlInventoryType.SelectedItem.ToString();
                 if (!int.TryParse(txtSearch.Text, out skuInt))
                 {
                     skuString = txtSearch.Text;
-                    searched = ssm.GetItemfromSearch(txtSearch.Text, ddlInventoryType.SelectedItem.Text);
+                    searched = ssm.GetItemfromSearch(txtSearch.Text, itemType);
                 }
                 else
                 {
                     skuString = txtSearch.Text;
                     // this looks for the item in the database
                     List<Items> i = idu.getItemByID(Convert.ToInt32(skuInt));
-
+                    itemType = idu.typeName(i.ElementAt(0).typeID);
                     //if adding new item
                     if (i != null && i.Count >= 1)
                     {
                         searched.Add(i.ElementAt(0));
                     }
                 }
-
+                Session["itemType"] = itemType;
                 grdInventorySearched.Visible = true;
                 grdInventorySearched.DataSource = searched;
                 grdInventorySearched.DataBind();
@@ -70,10 +70,8 @@ namespace SweetSpotDiscountGolfPOS
         protected void grdInventorySearched_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             string itemKey = e.CommandArgument.ToString();
-            string itemType = ddlInventoryType.SelectedItem.ToString();
             if (e.CommandName == "viewItem")
             {
-                Session["itemType"] = itemType;
                 Session["itemKey"] = itemKey;
                 Response.Redirect("InventoryAddNew.aspx");
             }
