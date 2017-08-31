@@ -13,6 +13,7 @@ namespace SweetSpotDiscountGolfPOS
 {
     public partial class SalesHomePage : System.Web.UI.Page
     {
+        ErrorReporting er = new ErrorReporting();
         private String connectionString;
         SweetShopManager ssm = new SweetShopManager();
         LocationManager lm = new LocationManager();
@@ -23,87 +24,129 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            Session["currPage"] = "SalesHomePage";
+            Session["prevPage"] = "HomePage";
+            try
             {
-                Response.Redirect("LoginPage.aspx");
+                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                {
+                    Response.Redirect("LoginPage.aspx");
+                }
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
         }
 
         protected void btnQuickSale_Click(object sender, EventArgs e)
         {
-            Session["returnedFromCart"] = false;
-            Session["TranType"] = 1;
-            int custId = 1;
-            Session["key"] = custId;
-            Response.Redirect("SalesCart.aspx");
+            try
+            {
+                Session["returnedFromCart"] = false;
+                Session["TranType"] = 1;
+                int custId = 1;
+                Session["key"] = custId;
+                Response.Redirect("SalesCart.aspx");
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
 
         //Searches invoices and displays them 
         //By date or customer
         protected void btnSearch_Click(object sender, EventArgs e)
         {
-            bool bolSearchInvoice = rdbSearchByInvoiceNumber.Checked;
-            string strSearch = txtInvoiceSearch.Text;
-            List<Invoice> fullInvoices = new List<Invoice>();
-            Nullable<DateTime> dtmSearch;
-            if (txtSearchDate.Text == "")
+            try
             {
-                dtmSearch = null;
+                bool bolSearchInvoice = rdbSearchByInvoiceNumber.Checked;
+                string strSearch = txtInvoiceSearch.Text;
+                List<Invoice> fullInvoices = new List<Invoice>();
+                Nullable<DateTime> dtmSearch;
+                if (txtSearchDate.Text == "")
+                {
+                    dtmSearch = null;
+                }
+                else
+                {
+                    dtmSearch = DateTime.ParseExact(txtSearchDate.Text, "M/dd/yy", null);
+                }
+                if (bolSearchInvoice)
+                {
+                    fullInvoices = ssm.getInvoice(Convert.ToInt32(strSearch));
+                }
+                else
+                {
+                    fullInvoices = ssm.multiTypeSearchInvoices(strSearch, dtmSearch);
+                }
+                List<Invoice> viewInvoices = new List<Invoice>();
+                foreach (var i in fullInvoices)
+                {
+                    Customer c = ssm.GetCustomerbyCustomerNumber(i.customerID);
+                    Employee emp = em.getEmployeeByID(i.employeeID);
+                    Invoice iv = new Invoice(i.invoiceNum, i.invoiceSub, i.invoiceDate, c.firstName + " " + c.lastName, i.balanceDue, lm.locationName(i.locationID), emp.firstName + " " + emp.lastName);
+                    viewInvoices.Add(iv);
+                }
+                grdInvoiceSelection.DataSource = viewInvoices;
+                grdInvoiceSelection.DataBind();
+                Session["searchReturnInvoices"] = fullInvoices;
             }
-            else
+            catch (Exception ex)
             {
-                dtmSearch = DateTime.ParseExact(txtSearchDate.Text, "M/dd/yy", null);
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
-
-            if (bolSearchInvoice)
-            {
-                fullInvoices = ssm.getInvoice(Convert.ToInt32(strSearch));
-            }
-            else
-            {
-                fullInvoices = ssm.multiTypeSearchInvoices(strSearch, dtmSearch);
-            }
-            List<Invoice> viewInvoices = new List<Invoice>();
-            foreach (var i in fullInvoices)
-            {
-                Customer c = ssm.GetCustomerbyCustomerNumber(i.customerID);
-                Employee emp = em.getEmployeeByID(i.employeeID);
-                Invoice iv = new Invoice(i.invoiceNum, i.invoiceSub, i.invoiceDate, c.firstName + " " + c.lastName, i.balanceDue, lm.locationName(i.locationID), emp.firstName + " " + emp.lastName);
-                viewInvoices.Add(iv);
-            }
-
-            grdInvoiceSelection.DataSource = viewInvoices;
-            grdInvoiceSelection.DataBind();
-            Session["searchReturnInvoices"] = fullInvoices;
         }
 
         protected void grdInvoiceSelection_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            string strInvoice = Convert.ToString(e.CommandArgument);
-            int invNum = Convert.ToInt32(strInvoice.Split('-')[0]);
-            int invSNum = Convert.ToInt32(strInvoice.Split('-')[1]);
-
-            if (e.CommandName == "returnInvoice")
+            try
             {
-                List<Invoice> combData = (List<Invoice>)Session["searchReturnInvoices"];
-                Invoice returnInvoice = new Invoice();
-                foreach (var inv in combData)
+                string strInvoice = Convert.ToString(e.CommandArgument);
+                int invNum = Convert.ToInt32(strInvoice.Split('-')[0]);
+                int invSNum = Convert.ToInt32(strInvoice.Split('-')[1]);
+
+                if (e.CommandName == "returnInvoice")
                 {
-                    if (inv.invoiceNum == invNum && inv.invoiceSub == invSNum)
+                    List<Invoice> combData = (List<Invoice>)Session["searchReturnInvoices"];
+                    Invoice returnInvoice = new Invoice();
+                    foreach (var inv in combData)
                     {
-                        Customer c = ssm.GetCustomerbyCustomerNumber(inv.customerID);
-                        returnInvoice = inv;
-                        returnInvoice.customerName = c.firstName + " " + c.lastName;
-                        Session["key"] = inv.customerID;
-                        Session["searchReturnInvoices"] = returnInvoice;
+                        if (inv.invoiceNum == invNum && inv.invoiceSub == invSNum)
+                        {
+                            Customer c = ssm.GetCustomerbyCustomerNumber(inv.customerID);
+                            returnInvoice = inv;
+                            returnInvoice.customerName = c.firstName + " " + c.lastName;
+                            Session["key"] = inv.customerID;
+                            Session["searchReturnInvoices"] = returnInvoice;
+                        }
                     }
+                    Session["TranType"] = 2;
+                    Session["prevPage"] = Session["currPage"];
+                    Response.Redirect("SalesCart.aspx");
                 }
-                Session["TranType"] = 2;
-                Response.Redirect("SalesCart.aspx");
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
         }
-
-        
-
     }
 }

@@ -18,7 +18,7 @@ namespace SweetSpotDiscountGolfPOS
 {
     public partial class SettingsHomePage : System.Web.UI.Page
     {
-
+        ErrorReporting er = new ErrorReporting();
         SweetShopManager ssm = new SweetShopManager();
         EmployeeManager em = new EmployeeManager();
         Reports r = new Reports();
@@ -26,61 +26,127 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            Session["currPage"] = "InventoryHomePage";
+            Session["prevPage"] = "HomePage";
+            try
             {
-                Response.Redirect("LoginPage.aspx");
+                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                {
+                    Response.Redirect("LoginPage.aspx");
+                }
+                if (Session["Admin"] == null)
+                {
+                    //btnAddNewEmployee.Enabled = false;
+                    //btnLoadCustomers.Enabled = false;
+                    //btnLoadEmployees.Enabled = false;
+                    //btnLoadItems.Enabled = false;
+                }
             }
-            if (Session["Admin"] == null)
+            catch (Exception ex)
             {
-                //btnAddNewEmployee.Enabled = false;
-                //btnLoadCustomers.Enabled = false;
-                //btnLoadEmployees.Enabled = false;
-                //btnLoadItems.Enabled = false;
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
         }
         protected void btnAddNewEmployee_Click(object sender, EventArgs e)
         {
-            Response.Redirect("EmployeeAddNew.aspx");
+            try
+            {
+                Session["prevPage"] = Session["currPage"];
+                Response.Redirect("EmployeeAddNew.aspx");
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
         protected void grdEmployeesSearched_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            string key = e.CommandArgument.ToString();
-            if (e.CommandName == "ViewProfile")
+            try
             {
-                Session["empKey"] = key;
-                Response.Redirect("EmployeeAddNew.aspx");
-
+                string key = e.CommandArgument.ToString();
+                if (e.CommandName == "ViewProfile")
+                {
+                    Session["empKey"] = key;
+                    Session["prevPage"] = Session["currPage"];
+                    Response.Redirect("EmployeeAddNew.aspx");
+                }
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
         }
         protected void btnEmployeeSearch_Click(object sender, EventArgs e)
         {
-
-
-            List<Employee> emp = em.GetEmployeefromSearch(txtSearch.Text);
-
-            grdEmployeesSearched.Visible = true;
-            grdEmployeesSearched.DataSource = emp;
-            grdEmployeesSearched.DataBind();
+            try
+            {
+                List<Employee> emp = em.GetEmployeefromSearch(txtSearch.Text);
+                grdEmployeesSearched.Visible = true;
+                grdEmployeesSearched.DataSource = emp;
+                grdEmployeesSearched.DataBind();
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
 
         }
         //Importing
         protected void btnLoadItems_Click(object sender, EventArgs e)
         {
-            if (fupItemSheet.HasFile)
-            {                                
-                r.importItems(fupItemSheet);
+            try
+            {
+                if (fupItemSheet.HasFile)
+                {
+                    r.importItems(fupItemSheet);
+                }
+                //Show that it is done
+                MessageBox.ShowMessage("Importing Complete", this);
             }
-            //Show that it is done
-            MessageBox.ShowMessage("Importing Complete", this);
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
         protected void btnImportCustomers_Click(object sender, EventArgs e)
         {
-            if (fupCustomers.HasFile)
+            try
             {
-                r.importCustomers(fupCustomers);
+                if (fupCustomers.HasFile)
+                {
+                    r.importCustomers(fupCustomers);
+                }
+                //Show that it is done
+                MessageBox.ShowMessage("Importing Complete", this);
             }
-            //Show that it is done
-            MessageBox.ShowMessage("Importing Complete", this);
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
 
         //Exporting
@@ -88,60 +154,97 @@ namespace SweetSpotDiscountGolfPOS
         {
             //r.exportAllItems();
             //MessageBox.ShowMessage("Export Complete", this);
-
-
-
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = (pathUser + "\\Downloads\\");
-            FileInfo newFile = new FileInfo(pathDownload + "TotalInventory.xlsx");
-            using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+            try
             {
-                ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Inventory");
-                // write to sheet
-                DataTable exportTable = r.exportAllItems();
-
-                DataColumnCollection dcCollection = exportTable.Columns;               
-                
-
-                for (int i = 1; i < exportTable.Rows.Count + 2; i++)
+                string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string pathDownload = (pathUser + "\\Downloads\\");
+                FileInfo newFile = new FileInfo(pathDownload + "TotalInventory.xlsx");
+                using (ExcelPackage xlPackage = new ExcelPackage(newFile))
                 {
-                    for (int j = 1; j < exportTable.Columns.Count + 1; j++)
+                    ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets.Add("Inventory");
+                    // write to sheet
+                    DataTable exportTable = r.exportAllItems();
+
+                    DataColumnCollection dcCollection = exportTable.Columns;
+
+                    for (int i = 1; i < exportTable.Rows.Count + 2; i++)
                     {
-                        if (i == 1)
+                        for (int j = 1; j < exportTable.Columns.Count + 1; j++)
                         {
-                            worksheet.Cells[i, j].Value = dcCollection[j - 1].ToString();
+                            if (i == 1)
+                            {
+                                worksheet.Cells[i, j].Value = dcCollection[j - 1].ToString();
+                            }
+                            else
+                                worksheet.Cells[i, j].Value = exportTable.Rows[i - 2][j - 1].ToString();
                         }
-                        else
-                            worksheet.Cells[i, j].Value = exportTable.Rows[i - 2][j - 1].ToString();
                     }
+
+                    Response.Clear();
+                    Response.AddHeader("content-disposition", "attachment; filename=TotalInventory.xlsx");
+                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    Response.BinaryWrite(xlPackage.GetAsByteArray());
+                    Response.End();
                 }
-
-
-
-                Response.Clear();
-                Response.AddHeader("content-disposition", "attachment; filename=TotalInventory.xlsx");
-                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                Response.BinaryWrite(xlPackage.GetAsByteArray());
-                Response.End();
             }
-
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
         protected void btnExportClubs_Click(object sender, EventArgs e)
         {
-            r.exportClubs();
-            MessageBox.ShowMessage("Export Complete", this);
+            try
+            {
+                r.exportClubs();
+                MessageBox.ShowMessage("Export Complete", this);
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
         protected void btnExportClothing_Click(object sender, EventArgs e)
         {
-            r.exportClothing();
-            MessageBox.ShowMessage("Export Complete", this);
+            try
+            {
+                r.exportClothing();
+                MessageBox.ShowMessage("Export Complete", this);
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
         protected void btnExportAccessories_Click(object sender, EventArgs e)
         {
-            r.exportAccessories();
-            MessageBox.ShowMessage("Export Complete", this);
+            try
+            {
+                r.exportAccessories();
+                MessageBox.ShowMessage("Export Complete", this);
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
 
-       
+
     }
 }

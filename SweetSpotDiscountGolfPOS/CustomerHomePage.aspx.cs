@@ -5,50 +5,100 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using SweetShop;
+using SweetSpotDiscountGolfPOS.ClassLibrary;
 
 namespace SweetSpotDiscountGolfPOS
 {
     public partial class CustomerHomePage : System.Web.UI.Page
     {
+        ErrorReporting er = new ErrorReporting();
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Convert.ToBoolean(Session["loggedIn"]) == false)
+            Session["currPage"] = "CustomerHomePage";
+            Session["prevPage"] = "HomePage";
+            try
             {
-                Response.Redirect("LoginPage.aspx");
+                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                {
+                    Response.Redirect("LoginPage.aspx");
+                }
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
         }
 
         protected void btnCustomerSearch_Click(object sender, EventArgs e)
         {
+            try
+            {
+                SweetShopManager ssm = new SweetShopManager();
+                List<Customer> c = ssm.GetCustomerfromSearch(txtSearch.Text);
 
-            SweetShopManager ssm = new SweetShopManager();
-            List<Customer> c = ssm.GetCustomerfromSearch(txtSearch.Text);
-
-            grdCustomersSearched.Visible = true;
-            grdCustomersSearched.DataSource = c;
-            grdCustomersSearched.DataBind();
+                grdCustomersSearched.Visible = true;
+                grdCustomersSearched.DataSource = c;
+                grdCustomersSearched.DataBind();
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
 
         protected void btnAddNewCustomer_Click(object sender, EventArgs e)
         {
-            Response.Redirect("CustomerAddNew.aspx");
+            try
+            {
+                Session["prevPage"] = Session["currPage"];
+                Response.Redirect("CustomerAddNew.aspx");
+            }
+            catch (Exception ex)
+            {
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
+            }
         }
 
         protected void grdCustomersSearched_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            string key = e.CommandArgument.ToString();
-            if (e.CommandName == "ViewProfile")
+            try
             {
-                Session["key"] = key;
-                Response.Redirect("CustomerAddNew.aspx");
+                string key = e.CommandArgument.ToString();
+                if (e.CommandName == "ViewProfile")
+                {
+                    Session["key"] = key;
+                    Session["prevPage"] = Session["currPage"];
+                    Response.Redirect("CustomerAddNew.aspx");
 
+                }
+                else if (e.CommandName == "StartSale")
+                {
+                    Session["returnedFromCart"] = false;
+                    Session["TranType"] = 1;
+                    Session["key"] = key;
+                    Session["prevPage"] = Session["currPage"];
+                    Response.Redirect("SalesCart.aspx");
+                }
             }
-            else if (e.CommandName == "StartSale")
+            catch (Exception ex)
             {
-                Session["returnedFromCart"] = false;
-                Session["TranType"] = 1;
-                Session["key"] = key;
-                Response.Redirect("SalesCart.aspx");
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Response.Redirect(prevPage);
             }
         }
     }
