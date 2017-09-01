@@ -39,7 +39,7 @@ namespace SweetSpotDiscountGolfPOS
             {
                 l = lm.returnLocationForInvoice(Convert.ToString(Session["Loc"]));
             }
-            else if(useInvoiceLocation == true)
+            else if (useInvoiceLocation == true)
             {
                 string invoice = lblinvoiceNum.Text;
                 //Parsing into invoiceNum and invoiceSubNum
@@ -47,7 +47,20 @@ namespace SweetSpotDiscountGolfPOS
                 string[] invoiceSplit = invoice.Split(splitchar);
                 int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
                 int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
-                l = lm.returnLocationForInvoice(ssm.invoice_getLocation(invoiceNum, invoiceSubNum));
+                Boolean isDeleted = Convert.ToBoolean(Session["isDeleted"]);
+                if (isDeleted == false)
+                {
+                    l = lm.returnLocationForInvoice(ssm.invoice_getLocation(invoiceNum, invoiceSubNum, "tbl_invoice"));
+                    lbldeletedMessage.Visible = false;
+                    lbldeletedMessageDisplay.Visible = false;
+                }
+                else if (isDeleted == true)
+                {
+                    l = lm.returnLocationForInvoice(ssm.invoice_getLocation(invoiceNum, invoiceSubNum, "tbl_deletedInvoice"));
+                    lbldeletedMessage.Visible = true;
+                    lbldeletedMessageDisplay.Visible = true;
+                    lbldeletedMessageDisplay.Text = ssm.deletedInvoice_getReason(invoiceNum, invoiceSubNum);
+                }
             }
 
             lblSweetShopName.Text = l.location.ToString();

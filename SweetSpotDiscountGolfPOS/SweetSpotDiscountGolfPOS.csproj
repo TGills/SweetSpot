@@ -68,6 +68,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
@@ -127,6 +128,7 @@
     <Compile Include="ClassLibrary\Clubs.cs" />
     <Compile Include="ClassLibrary\CurrentUser.cs" />
     <Compile Include="ClassLibrary\Customer.cs" />
+    <Compile Include="ClassLibrary\CustomMessageBox.cs" />
     <Compile Include="ClassLibrary\Employee.cs" />
     <Compile Include="ClassLibrary\EmployeeManager.cs" />
     <Compile Include="ClassLibrary\ErrorReporting.cs" />

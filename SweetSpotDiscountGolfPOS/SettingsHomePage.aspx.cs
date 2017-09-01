@@ -193,7 +193,7 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportClubs_Click(object sender, EventArgs e)

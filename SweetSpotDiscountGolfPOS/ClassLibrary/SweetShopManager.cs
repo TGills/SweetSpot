@@ -1731,13 +1731,13 @@ namespace SweetShop
             con.Close();
         }
         //Gets invoices between dates
-        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate)
+        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate, string table)
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, "
-                + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_invoice "
-                + "WHERE invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate";
+                + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM " + table
+                + " WHERE invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate";
             cmd.Parameters.AddWithValue("startDate", startDate);
             cmd.Parameters.AddWithValue("endDate", endDate);
             cmd.Connection = con;
@@ -1765,13 +1765,13 @@ namespace SweetShop
         }
 
         //Get customer ID
-        public int invoice_getCustID(int invoiceNum, int invoiceSubNum)
+        public int invoice_getCustID(int invoiceNum, int invoiceSubNum, string table)
         {
             int custID = 0;
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select custID FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.CommandText = "Select custID FROM " + table + " Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
             cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
             cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
             conn.Open();
@@ -1784,13 +1784,13 @@ namespace SweetShop
             return custID;
         }
         //Get Items
-        public List<Cart> invoice_getItems(int invoiceNum, int invoiceSubNum)
+        public List<Cart> invoice_getItems(int invoiceNum, int invoiceSubNum, string table)
         {
             List<Cart> items = new List<Cart>();
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select * FROM tbl_invoiceItem Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.CommandText = "Select * FROM " + table + " Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
             cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
             cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
             conn.Open();
@@ -1798,23 +1798,23 @@ namespace SweetShop
             while (reader.Read())
             {
                 int sku = Convert.ToInt32(reader["sku"]);
-                items.Add(new Cart(sku, getDescription(sku, getItemType(sku)), 
+                items.Add(new Cart(sku, getDescription(sku, getItemType(sku)),
                     Convert.ToInt32(reader["itemQuantity"]), Convert.ToDouble(reader["itemPrice"]),
-                    Convert.ToDouble(reader["itemCost"]), Convert.ToDouble(reader["itemDiscount"]), 
+                    Convert.ToDouble(reader["itemCost"]), Convert.ToDouble(reader["itemDiscount"]),
                     Convert.ToBoolean(reader["percentage"])));
             }
             conn.Close();
             return items;
-        }        
+        }
         //Get Checkout Totals
-        public CheckoutManager invoice_getCheckoutTotals(int invoiceNum, int invoiceSubNum)
+        public CheckoutManager invoice_getCheckoutTotals(int invoiceNum, int invoiceSubNum, string table)
         {
             CheckoutManager ckm = new CheckoutManager();
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
             cmd.CommandText = "Select subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax " +
-                "FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+                "FROM " + table + " Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
             cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
             cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
             conn.Open();
@@ -1825,7 +1825,7 @@ namespace SweetShop
                 double pst = Convert.ToDouble(reader["provincialTax"]);
                 bool isGST = false;
                 bool isPST = false;
-                if(gst > 0)
+                if (gst > 0)
                 {
                     isGST = true;
                 }
@@ -1833,7 +1833,7 @@ namespace SweetShop
                 {
                     isGST = false;
                 }
-                if(pst > 0)
+                if (pst > 0)
                 {
                     isPST = true;
                 }
@@ -1846,14 +1846,14 @@ namespace SweetShop
                 {
                     shipping = Convert.ToDouble(reader["shippingAmount"]);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     shipping = 0;
                 }
 
                 //ckm = new CheckoutManager(Convert.ToDouble(reader["subTotal"]), Convert.ToDouble(reader["discountAmount"]),
                 //    Convert.ToDouble(reader["tradeinAmount"]), 0, isGST, isPST, gst, pst, 0);
-                ckm = new CheckoutManager( Convert.ToDouble(reader["discountAmount"]), Convert.ToDouble(reader["tradeinAmount"]), 
+                ckm = new CheckoutManager(Convert.ToDouble(reader["discountAmount"]), Convert.ToDouble(reader["tradeinAmount"]),
                     shipping, isGST, isPST, gst, pst, 0, Convert.ToDouble(reader["subTotal"]));
 
 
@@ -1863,20 +1863,20 @@ namespace SweetShop
             return ckm;
         }
         //Get Methods of Payment
-        public List<Checkout> invoice_getMOP(int invoiceNum, int invoiceSubNum)
+        public List<Checkout> invoice_getMOP(int invoiceNum, int invoiceSubNum, string table)
         {
             List<Checkout> mops = new List<Checkout>();
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select mopType, amountPaid FROM tbl_invoiceMOP Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.CommandText = "Select mopType, amountPaid FROM " + table + " Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
             cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
             cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                
+
                 mops.Add(new Checkout(reader["mopType"].ToString(), Convert.ToDouble(reader["amountPaid"])));
             }
             conn.Close();
@@ -1884,13 +1884,13 @@ namespace SweetShop
             return mops;
         }
         //Gets Location id from invoice
-        public string invoice_getLocation(int invoiceNum, int invoiceSubNum)
+        public string invoice_getLocation(int invoiceNum, int invoiceSubNum, string table)
         {
             int locID = 0;
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select locationID FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.CommandText = "Select locationID FROM " + table + " Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
             cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
             cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
             conn.Open();
@@ -1902,6 +1902,25 @@ namespace SweetShop
             conn.Close();
             string loc = lm.locationCity(locID);
             return loc;
+        }
+        //Gets the reason why the invoice was deleted
+        public string deletedInvoice_getReason(int invoiceNum, int invoiceSubNum)
+        {
+            string reason = "";
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select deletionReason FROM tbl_deletedInvoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                reason = reader["deletionReason"].ToString();
+            }
+            conn.Close();
+            return reason;
         }
 
 

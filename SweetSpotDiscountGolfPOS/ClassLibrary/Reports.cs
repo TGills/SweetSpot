@@ -304,7 +304,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                         a.accessoryType = "";
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     a.accessoryType = "";
                                 }
@@ -320,7 +320,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                         a.cost = 0;
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     a.cost = 0;
                                 }
@@ -336,7 +336,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                         a.price = 0;
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     a.price = 0;
                                 }
@@ -352,7 +352,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                         a.quantity = 0;
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     a.quantity = 0;
                                 }
@@ -372,8 +372,30 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 {
                                     a.comments = "";
                                 }
+                                //***************LOCATIONID***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    {
+                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
+                                        {
+                                            a.locID = lm.locationID("The Sweet Spot Discount Golf");
 
-                                a.locID = 1;//
+                                        }
+                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
+                                        {
+                                            a.locID = lm.locationID("Golf Traders");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        a.locID = 1;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    a.locID = 1;
+                                }
                                 a.typeID = 2;
                                 a.size = "";
                                 a.colour = "";
@@ -499,8 +521,31 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 {
                                     cl.comments = "";
                                 }
+                                //***************LOCATIONID***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    {
+                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
+                                        {
+                                            cl.locID = lm.locationID("The Sweet Spot Discount Golf");
 
-                                cl.locID = 1;//
+                                        }
+                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
+                                        {
+                                            cl.locID = lm.locationID("Golf Traders");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        cl.locID = 1;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    cl.locID = 1;
+                                }
+
                                 cl.typeID = 3; //Type can be directly assigned
                                 cl.size = "";
                                 cl.colour = "";
@@ -745,11 +790,35 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 {
                                     c.dexterity = "";
                                 }
+                                //***************LOCATIONID***************
+                                try
+                                {
+                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    {
+                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
+                                        {
+                                            c.itemlocation = lm.locationID("The Sweet Spot Discount Golf");
+
+                                        }
+                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
+                                        {
+                                            c.itemlocation = lm.locationID("Golf Traders");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        c.itemlocation = 1;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    c.itemlocation = 1;
+                                }
+
+
 
                                 c.typeID = 1;
-                                c.itemlocation = 1;//
                                 c.used = false;//
-
                                 listClub.Add(c);
                                 o = c as Object;
                             }
@@ -758,7 +827,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                     }
                 }
             }
-
         }
         public void importCustomers(FileUpload fup)
         {
@@ -948,7 +1016,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         //Export all items in inventory
         public System.Data.DataTable exportAllItems()
         {
-            exportTable = new System.Data.DataTable();           
+            exportTable = new System.Data.DataTable();
 
             exportTable.Columns.Add("Vendor", typeof(string));
             exportTable.Columns.Add("Store_ID", typeof(string));
@@ -977,7 +1045,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             exportAllAdd_Clubs();
             exportAllAdd_Accessories();
-            exportAllAdd_Clothing();           
+            exportAllAdd_Clothing();
 
             return exportTable;
         }
@@ -988,16 +1056,42 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select * from tbl_clubs";
+            cmd.CommandText = "select tbl_clubs.sku, " +
+                                    "(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_clubs.modelID ) as modelName , " +
+                                    "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clubs.brandID ) as brandName , " +
+                                    "tbl_clubs.clubType, tbl_clubs.shaft, tbl_clubs.numberOfClubs, tbl_clubs.premium, tbl_clubs.cost, tbl_clubs.price," +
+                                    "tbl_clubs.quantity, tbl_clubs.clubSpec, tbl_clubs.shaftSpec, tbl_clubs.shaftFlex, tbl_clubs.dexterity, " +
+                                    "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clubs.typeID ) as itemType , " +
+                                    "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clubs.locationID) as locationName, " +
+                                    "tbl_clubs.used, tbl_clubs.comments from tbl_clubs";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                exportTable.Rows.Add("", (lm.locationName(Convert.ToInt32(reader["locationID"]))).ToString(), (Convert.ToInt32(reader["sku"])).ToString(),
-                    "", idu.brandType(Convert.ToInt32(reader["brandID"])), idu.modelType(Convert.ToInt32(reader["brandID"])), reader["clubType"].ToString(),
-                    reader["shaft"].ToString(), reader["numberOfClubs"].ToString(), 0, Convert.ToDouble(reader["premium"]), Convert.ToDouble(reader["cost"]),
-                    Convert.ToInt32(reader["quantity"]), 0, Convert.ToDouble(reader["price"]), reader["comments"].ToString(), "", reader["clubSpec"].ToString(),
-                    reader["shaftSpec"].ToString(), reader["shaftFlex"].ToString(), reader["dexterity"].ToString(), "", "", "");
+                exportTable.Rows.Add("",
+                    reader["locationName"].ToString(),
+                    (Convert.ToInt32(reader["sku"])).ToString(),
+                    "",
+                    reader["brandName"].ToString(),
+                    reader["modelName"].ToString(),
+                    reader["clubType"].ToString(),
+                    reader["shaft"].ToString(),
+                    reader["numberOfClubs"].ToString(),
+                    0,
+                    Convert.ToDouble(reader["premium"]),
+                    Convert.ToDouble(reader["cost"]),
+                    Convert.ToInt32(reader["quantity"]),
+                    0,
+                    Convert.ToDouble(reader["price"]),
+                    reader["comments"].ToString(),
+                    "",
+                    reader["clubSpec"].ToString(),
+                    reader["shaftSpec"].ToString(),
+                    reader["shaftFlex"].ToString(),
+                    reader["dexterity"].ToString(),
+                    "",
+                    "",
+                    "");
             }
             conn.Close();
         }
@@ -1007,16 +1101,34 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select * from tbl_accessories";
+            cmd.CommandText = "select tbl_accessories.sku, tbl_accessories.size, tbl_accessories.colour, tbl_accessories.price, tbl_accessories.cost, " +
+                                    "(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_accessories.modelID ) as modelName , " +
+                                    "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_accessories.brandID ) as brandName ," +
+                                    "tbl_accessories.accessoryType, tbl_accessories.quantity, " +
+                                    "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_accessories.typeID ) as itemType , " +
+                                    "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_accessories.locationID) as locationName, " +
+                                    "tbl_accessories.comments " +
+                                    "from tbl_accessories; ";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                exportTable.Rows.Add("", (lm.locationName(Convert.ToInt32(reader["locationID"]))).ToString(), (Convert.ToInt32(reader["sku"])).ToString(),
-                    "", idu.brandType(Convert.ToInt32(reader["brandID"])), idu.modelType(Convert.ToInt32(reader["modelID"])), "",
-                    "", "", 0, 0, Convert.ToDouble(reader["cost"]),
-                    Convert.ToInt32(reader["quantity"]), 0, Convert.ToDouble(reader["price"]), "", "", "",
-                   "", "", "", "", "", "");
+                exportTable.Rows.Add("",
+                    reader["locationName"].ToString(),
+                    (Convert.ToInt32(reader["sku"])).ToString(),
+                    "",
+                    reader["brandName"].ToString(),
+                    reader["modelName"].ToString(),
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    Convert.ToDouble(reader["cost"]),
+                    Convert.ToInt32(reader["quantity"]),
+                    0,
+                    Convert.ToDouble(reader["price"]),
+                    "", "", "", "", "", "", "", "", "");
             }
             conn.Close();
         }
@@ -1026,16 +1138,32 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select * from tbl_clothing";
+            cmd.CommandText = "select tbl_clothing.sku, tbl_clothing.size, tbl_clothing.colour, tbl_clothing.gender, tbl_clothing.style, tbl_clothing.price, tbl_clothing.cost,  " +
+                                    "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clothing.brandID ) as brandName , " +
+                                    "tbl_clothing.quantity, " +
+                                    "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clothing.typeID ) as itemType ,  " +
+                                    "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clothing.locationID) as locationName,  " +
+                                    "tbl_clothing.comments from tbl_clothing;";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                exportTable.Rows.Add("", (lm.locationName(Convert.ToInt32(reader["locationID"]))).ToString(), (Convert.ToInt32(reader["sku"])).ToString(),
-                    "", idu.brandType(Convert.ToInt32(reader["brandID"])), reader["gender"].ToString(), reader["style"].ToString(),
-                    "", "", 0, 0, Convert.ToDouble(reader["cost"]),
-                    Convert.ToInt32(reader["quantity"]), 0, Convert.ToDouble(reader["price"]), "", "", "",
-                   "", "", "", "", "", "");
+                exportTable.Rows.Add("",
+                    reader["locationName"].ToString(),
+                    (Convert.ToInt32(reader["sku"])).ToString(),
+                    "",
+                    reader["brandName"].ToString(),
+                    reader["gender"].ToString(),
+                    reader["style"].ToString(),
+                    "",
+                    "",
+                    0,
+                    0,
+                    Convert.ToDouble(reader["cost"]),
+                    Convert.ToInt32(reader["quantity"]),
+                    0,
+                    Convert.ToDouble(reader["price"]),
+                    "", "", "", "", "", "", "", "", "");
             }
             conn.Close();
         }

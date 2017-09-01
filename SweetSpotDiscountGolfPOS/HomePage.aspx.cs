@@ -20,6 +20,7 @@ namespace SweetSpotDiscountGolfPOS
         LocationManager lm = new LocationManager();
         ItemDataUtilities idu = new ItemDataUtilities();
         List<Invoice> invoiceList = new List<Invoice>();
+        Boolean isDeleted = false;
         protected void Page_Load(object sender, EventArgs e)
         {
             Session["currPage"] = "HomePage";
@@ -103,33 +104,34 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void lbtnInvoiceNumber_Click(object sender, EventArgs e)
         {
-            try
+            //Text of the linkbutton
+            LinkButton btn = sender as LinkButton;
+            string invoice = btn.Text;
+            //Parsing into invoiceNum and invoiceSubNum
+            char[] splitchar = { '-' };
+            string[] invoiceSplit = invoice.Split(splitchar);
+            int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+            int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+
+            if (isDeleted == false)
             {
-                //Text of the linkbutton
-                LinkButton btn = sender as LinkButton;
-                string invoice = btn.Text;
-                //Parsing into invoiceNum and invoiceSubNum
-                char[] splitchar = { '-' };
-                string[] invoiceSplit = invoice.Split(splitchar);
-                int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
-                int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
-                Session["TranType"] = 3;
-                Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum);
+                Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_invoice");
                 Session["Invoice"] = invoice;
                 Session["useInvoice"] = true;
-                Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum);
-                Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum);
-                Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum);
-                Response.Redirect("PrintableInvoice.aspx");
+                Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_invoiceItem");
+                Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_invoice");
+                Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_invoiceMOP");
             }
-            catch (Exception ex)
+            else if (isDeleted == true)
             {
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
-                string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
+                Session["Invoice"] = invoice;
+                Session["useInvoice"] = true;
+                Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceItem");
+                Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
+                Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
             }
+            Response.Redirect("PrintableInvoice.aspx");
         }
     }
 }

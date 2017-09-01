@@ -109,11 +109,22 @@
                 </div>
             </div>--%>
 
-            <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
+            <div>
+                <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
+            </div>
+
             <asp:Button ID="btnExportInvoices" runat="server" Text="Invoice Report" Width="200px" OnClick="btnExportInvoices_Click" />
-            <asp:Button ID="btnInvoiceBetweenDates" runat="server" Text="Search Invoice's Between Dates" Width="200px" OnClick="btnInvoiceBetweenDates_Click" />
+            <div>
+                <div>
+                    <asp:Label runat="server" Text="Search Between Dates For:"></asp:Label>
+                </div>
+                <asp:Button ID="btnInvoiceBetweenDates" runat="server" Text="Invoices" Width="200px" OnClick="btnInvoiceBetweenDates_Click" />
+                <asp:Button ID="btnDeletedInvoiceBetweenDates" runat="server" Text="Deleted Invoices" Width="200px" OnClick="btnDeletedInvoiceBetweenDates_Click" />
+            </div>
             <asp:Button ID="btnReturnInvoice" runat="server" Text="Search For Invoice" OnClick="btnReturnInvoice_Click" />
-            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClick="btnTesting_Click" />
+            <%--Testing--%>
+            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClientClick="javascript:return getInput();" /><asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+
 
 
             <hr />

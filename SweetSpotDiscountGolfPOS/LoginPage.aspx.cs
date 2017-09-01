@@ -86,8 +86,8 @@ namespace SweetSpotDiscountGolfPOS
                     Session["loggedIn"] = true;
                     Session["id"] = txtPassword.Text;
                     Session["loginEmployeeID"] = dt.Rows[0].ItemArray[0];
-                    Session["prevPage"] = "LoginPage";
-                    Response.Redirect("HomePage.aspx");
+                    Session["prevPage"] = "LoginPage.aspx";
+                    Server.Transfer("HomePage.aspx", false);
                     Session.RemoveAll();
 
                 }
@@ -103,7 +103,7 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
     }

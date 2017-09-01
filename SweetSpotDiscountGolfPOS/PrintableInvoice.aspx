@@ -54,6 +54,8 @@
         </div>
         <br />
         <div id="finalInvoice" class="yesPrint">
+            <asp:Label ID="lbldeletedMessage" runat="server" Text="This invoice was deleted for the following reason: " Visible="false" BackColor="Red" />
+            <asp:Label ID="lbldeletedMessageDisplay" runat="server" Visible="false" />
             <asp:Table ID="tblPartiesInvolved" runat="server" Width="100%">
                 <asp:TableRow>
                     <asp:TableCell CssClass="leftSide">

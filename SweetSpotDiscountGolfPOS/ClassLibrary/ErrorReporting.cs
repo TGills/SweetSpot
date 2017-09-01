@@ -53,7 +53,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
-            MessageBox.ShowMessage("An Error has occured and been logged. If you continue to receive this message please contact your system administrator",page);
+            MessageBox.ShowMessage("An Error has occured and been logged. If you continue to receive this message please contact your system administrator", webPage);
         }
     }
 }
