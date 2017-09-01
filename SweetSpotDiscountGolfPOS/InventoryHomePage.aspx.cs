@@ -15,13 +15,14 @@ namespace SweetSpotDiscountGolfPOS
         ErrorReporting er = new ErrorReporting();
         protected void Page_Load(object sender, EventArgs e)
         {
+            string method = "Page_Load";
             Session["currPage"] = "InventoryHomePage";
             Session["prevPage"] = "HomePage";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
-                    Response.Redirect("LoginPage.aspx");
+                    Server.Transfer("LoginPage.aspx", false);
                 }
                 if (Session["Admin"] == null)
                 {
@@ -32,14 +33,15 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 
         protected void btnInventorySearch_Click(object sender, EventArgs e)
         {
+            string method = "btnInventorySearch_Click";
             try
             {
                 List<Items> searched = new List<Items>();
@@ -82,31 +84,33 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 
         protected void btnAddNewInventory_Click(object sender, EventArgs e)
         {
+            string method = "btnAddNewInventory_Click";
             try
             {
                 Session["prevPage"] = Session["currPage"];
-                Response.Redirect("InventoryAddNew.aspx");
+                Server.Transfer("InventoryAddNew.aspx", false);
             }
             catch (Exception ex)
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 
         protected void grdInventorySearched_RowCommand(object sender, GridViewCommandEventArgs e)
         {
+            string method = "grdInventorySearched_RowCommand";
             try
             {
                 string itemKey = e.CommandArgument.ToString();
@@ -114,16 +118,16 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     Session["itemKey"] = itemKey;
                     Session["prevPage"] = Session["currPage"];
-                    Response.Redirect("InventoryAddNew.aspx");
+                    Server.Transfer("InventoryAddNew.aspx", false);
                 }
             }
             catch (Exception ex)
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
     }

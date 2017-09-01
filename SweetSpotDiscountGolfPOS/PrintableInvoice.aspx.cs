@@ -22,7 +22,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             if (Convert.ToBoolean(Session["loggedIn"]) == false)
             {
-                Response.Redirect("LoginPage.aspx");
+                Server.Transfer("LoginPage.aspx", false);
             }
             int custNum = (Convert.ToInt32(Session["key"].ToString()));
             Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
@@ -121,7 +121,7 @@ namespace SweetSpotDiscountGolfPOS
             Session["TranType"] = null;
             Session["CheckOutTotals"] = null;
             Session["MethodsofPayment"] = null;
-            Response.Redirect("HomePage.aspx");
+            Server.Transfer("HomePage.aspx", false);
         }
     }
 }

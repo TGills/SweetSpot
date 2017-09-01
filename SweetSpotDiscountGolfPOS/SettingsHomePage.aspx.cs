@@ -26,13 +26,14 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Session["currPage"] = "InventoryHomePage";
-            Session["prevPage"] = "HomePage";
+            string method = "Page_Load";
+            Session["currPage"] = "InventoryHomePage.aspx";
+            Session["prevPage"] = "HomePage.aspx";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
-                    Response.Redirect("LoginPage.aspx");
+                    Server.Transfer("LoginPage.aspx", false);
                 }
                 if (Session["Admin"] == null)
                 {
@@ -46,29 +47,31 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void btnAddNewEmployee_Click(object sender, EventArgs e)
         {
+            string method = "btnAddNewEmployee_Click";
             try
             {
                 Session["prevPage"] = Session["currPage"];
-                Response.Redirect("EmployeeAddNew.aspx");
+                Server.Transfer("EmployeeAddNew.aspx", false);
             }
             catch (Exception ex)
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void grdEmployeesSearched_RowCommand(object sender, GridViewCommandEventArgs e)
         {
+            string method = "grdEmployeesSearched_RowCommand";
             try
             {
                 string key = e.CommandArgument.ToString();
@@ -76,20 +79,21 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     Session["empKey"] = key;
                     Session["prevPage"] = Session["currPage"];
-                    Response.Redirect("EmployeeAddNew.aspx");
+                    Server.Transfer("EmployeeAddNew.aspx", false);
                 }
             }
             catch (Exception ex)
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void btnEmployeeSearch_Click(object sender, EventArgs e)
         {
+            string method = "btnEmployeeSearch_Click";
             try
             {
                 List<Employee> emp = em.GetEmployeefromSearch(txtSearch.Text);
@@ -101,15 +105,16 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
 
         }
         //Importing
         protected void btnLoadItems_Click(object sender, EventArgs e)
         {
+            string method = "btnLoadItems_Click";
             try
             {
                 if (fupItemSheet.HasFile)
@@ -123,13 +128,14 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void btnImportCustomers_Click(object sender, EventArgs e)
         {
+            string method = "btnImportCustomers_Click";
             try
             {
                 if (fupCustomers.HasFile)
@@ -143,9 +149,9 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 
@@ -154,6 +160,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             //r.exportAllItems();
             //MessageBox.ShowMessage("Export Complete", this);
+            string method = "btnExportAll_Click";
             try
             {
                 string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -191,13 +198,14 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
                 Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportClubs_Click(object sender, EventArgs e)
         {
+            string method = "btnExportClubs_Click";
             try
             {
                 r.exportClubs();
@@ -207,13 +215,14 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportClothing_Click(object sender, EventArgs e)
         {
+            string method = "btnExportClothing_Click";
             try
             {
                 r.exportClothing();
@@ -223,13 +232,14 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportAccessories_Click(object sender, EventArgs e)
         {
+            string method = "btnExportAccessories_Click";
             try
             {
                 r.exportAccessories();
@@ -239,9 +249,9 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method,  this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 

@@ -17,6 +17,7 @@ namespace SweetSpotDiscountGolfPOS
         ErrorReporting er = new ErrorReporting();
         protected void Page_Load(object sender, EventArgs e)
         {
+            string method = "Page_Load";
             Session["currPage"] = "LoginPage";
             Session["prevPage"] = "LoginPage";
             try { txtPassword.Focus(); }
@@ -24,14 +25,15 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = 0;
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         //test
         protected void btnLogin_Click(object sender, EventArgs e)
         {
+            string method = "btnLogin_Click";
             try
             {
                 SqlConnection con = new SqlConnection(WebConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString);
@@ -101,7 +103,7 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = 0;
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
                 Server.Transfer(prevPage, false);
             }

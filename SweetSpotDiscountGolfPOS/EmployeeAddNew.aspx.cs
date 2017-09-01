@@ -17,7 +17,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             if (Convert.ToBoolean(Session["loggedIn"]) == false)
             {
-                Response.Redirect("LoginPage.aspx");
+                Server.Transfer("LoginPage.aspx", false);
             }
 
             if (Session["Admin"] == null)
@@ -115,7 +115,7 @@ namespace SweetSpotDiscountGolfPOS
             em.country = Convert.ToInt32(ddlCountry.SelectedValue);
 
             Session["empKey"] = empM.addEmployee(em);
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
         }
         protected void btnEditEmployee_Click(object sender, EventArgs e)
         {
@@ -235,17 +235,17 @@ namespace SweetSpotDiscountGolfPOS
             btnAddEmployee.Visible = false;
             btnBackToSearch.Visible = true;
 
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
 
         }
         protected void btnCancel_Click(object sender, EventArgs e)
         {
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
         }
         protected void btnBackToSearch_Click(object sender, EventArgs e)
         {
             Session["empKey"] = null;
-            Response.Redirect("SettingsHomePage.aspx");
+            Server.Transfer("SettingsHomePage.aspx", false);
         }
     }
 }

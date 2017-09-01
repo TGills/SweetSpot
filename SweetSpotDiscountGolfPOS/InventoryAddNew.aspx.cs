@@ -23,7 +23,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             if (Convert.ToBoolean(Session["loggedIn"]) == false)
             {
-                Response.Redirect("LoginPage.aspx");
+                Server.Transfer("LoginPage.aspx", false);
             }
             if (Session["Admin"] == null)
             {
@@ -303,7 +303,7 @@ namespace SweetSpotDiscountGolfPOS
             }
             skuNum = ssm.addItem(o);
             Session["itemKey"] = skuNum;
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
         }
         protected void btnEditItem_Click(object sender, EventArgs e)
         {
@@ -554,18 +554,18 @@ namespace SweetSpotDiscountGolfPOS
             btnAddItem.Visible = false;
             btnBackToSearch.Visible = true;
 
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
 
         }
         protected void btnCancel_Click(object sender, EventArgs e)
         {
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
         }
         protected void btnBackToSearch_Click(object sender, EventArgs e)
         {
             Session["itemType"] = null;
             Session["itemKey"] = null;
-            Response.Redirect("InventoryHomePage.aspx");
+            Server.Transfer("InventoryHomePage.aspx", false);
         }
         protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
         {

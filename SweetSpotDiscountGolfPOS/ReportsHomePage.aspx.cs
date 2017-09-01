@@ -27,13 +27,14 @@ namespace SweetSpotDiscountGolfPOS
         //List<Invoice> invoice;
         protected void Page_Load(object sender, EventArgs e)
         {
+            string method = "Page_Load";
             Session["currPage"] = "ReportsHomePage";
             Session["prevPage"] = "HomePage";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
-                    Response.Redirect("LoginPage.aspx");
+                    Server.Transfer("LoginPage.aspx", false);
                 }
                 if (!IsPostBack)
                 {
@@ -60,9 +61,9 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 
@@ -99,7 +100,7 @@ namespace SweetSpotDiscountGolfPOS
                 //}
             }
 
-            Response.Redirect("ReportsCashOut.aspx");
+            Server.Transfer("ReportsCashOut.aspx", false);
         }
         protected void btnExportInvoices_Click(object sender, EventArgs e)
         {
@@ -186,18 +187,12 @@ namespace SweetSpotDiscountGolfPOS
                         }
                     }
                 }
-
-
-
                 Response.Clear();
                 Response.AddHeader("content-disposition", "attachment; filename=InvoiceReport.xlsx");
                 Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                 Response.BinaryWrite(xlPackage.GetAsByteArray());
                 Response.End();
             }
-
-
-
         }
         protected void btnTesting_Click(object sender, EventArgs e)
         {
@@ -292,7 +287,7 @@ namespace SweetSpotDiscountGolfPOS
                 Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
                 Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
             }
-            Response.Redirect("PrintableInvoice.aspx");
+            Server.Transfer("PrintableInvoice.aspx", false);
         }
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
         {
@@ -313,7 +308,7 @@ namespace SweetSpotDiscountGolfPOS
             int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
             idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
             MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
-            Response.Redirect(Request.Url.AbsoluteUri);
+            Server.Transfer(Request.RawUrl, false);
         }
     }
 }

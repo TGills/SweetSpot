@@ -34,7 +34,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             
             SmtpServer.Send(mail);
         }
-        public void logError(Exception er, int employeeID, string page, System.Web.UI.Page webPage)
+        public void logError(Exception er, int employeeID, string page, string method, System.Web.UI.Page webPage)
         {
             string date = DateTime.Now.ToString("yyyy-MM-dd");
             string time = DateTime.Now.ToString("HH:mm:ss");
@@ -48,6 +48,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             cmd.Parameters.AddWithValue("date", date);
             cmd.Parameters.AddWithValue("time", time);
             cmd.Parameters.AddWithValue("errorPage", er.Source + " - " + page);
+            cmd.Parameters.AddWithValue("errorMethod", method);
             cmd.Parameters.AddWithValue("errorCode", er.HResult);
             cmd.Parameters.AddWithValue("errorText", er.Message);
             conn.Open();

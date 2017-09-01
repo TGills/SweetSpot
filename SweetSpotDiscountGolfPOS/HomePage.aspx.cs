@@ -23,11 +23,12 @@ namespace SweetSpotDiscountGolfPOS
         Boolean isDeleted = false;
         protected void Page_Load(object sender, EventArgs e)
         {
+            string method = "Page_Load";
             Session["currPage"] = "HomePage";
             Session["prevPage"] = "Login";
             if (Convert.ToBoolean(Session["loggedIn"]) == false)
             {
-                Response.Redirect("LoginPage.aspx");
+                Server.Transfer("LoginPage.aspx", false);
             }
             try
             {
@@ -66,14 +67,15 @@ namespace SweetSpotDiscountGolfPOS
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
         //Currently used for Removing the row
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
         {
+            string method = "OnRowDeleting";
             try
             {
                 string deletionReason = Microsoft.VisualBasic.Interaction.InputBox("Reason for deleting invioce", "", "", -1, -1);
@@ -90,48 +92,61 @@ namespace SweetSpotDiscountGolfPOS
                 int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
                 idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
                 MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
-                Response.Redirect(Request.Url.AbsoluteUri);
+                Server.Transfer(Request.RawUrl, false);
             }
             catch (Exception ex)
             {
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
-                er.logError(ex, employeeID, currPage, this);
+                er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Response.Redirect(prevPage);
+                Server.Transfer(prevPage, false);
             }
         }
 
         protected void lbtnInvoiceNumber_Click(object sender, EventArgs e)
         {
-            //Text of the linkbutton
-            LinkButton btn = sender as LinkButton;
-            string invoice = btn.Text;
-            //Parsing into invoiceNum and invoiceSubNum
-            char[] splitchar = { '-' };
-            string[] invoiceSplit = invoice.Split(splitchar);
-            int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
-            int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+            string method = "lbtnInvoiceNumber_Click";
+            try
+            {
+                //Text of the linkbutton
+                LinkButton btn = sender as LinkButton;
+                string invoice = btn.Text;
+                //Parsing into invoiceNum and invoiceSubNum
+                char[] splitchar = { '-' };
+                string[] invoiceSplit = invoice.Split(splitchar);
+                int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+                int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
 
-            if (isDeleted == false)
-            {
-                Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_invoice");
-                Session["Invoice"] = invoice;
-                Session["useInvoice"] = true;
-                Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_invoiceItem");
-                Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_invoice");
-                Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_invoiceMOP");
+                if (isDeleted == false)
+                {
+                    Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_invoice");
+                    Session["Invoice"] = invoice;
+                    Session["useInvoice"] = true;
+                    Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_invoiceItem");
+                    Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_invoice");
+                    Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_invoiceMOP");
+                }
+                else if (isDeleted == true)
+                {
+                    Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
+                    Session["Invoice"] = invoice;
+                    Session["useInvoice"] = true;
+                    Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceItem");
+                    Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
+                    Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
+                }
+                Session["prevPage"] = Session["currPage"];
+                Server.Transfer("PrintableInvoice.aspx", false);
             }
-            else if (isDeleted == true)
+            catch (Exception ex)
             {
-                Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
-                Session["Invoice"] = invoice;
-                Session["useInvoice"] = true;
-                Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceItem");
-                Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
-                Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
+                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                string currPage = Convert.ToString(Session["currPage"]);
+                er.logError(ex, employeeID, currPage, method, this);
+                string prevPage = Convert.ToString(Session["prevPage"]);
+                Server.Transfer(prevPage, false);
             }
-            Response.Redirect("PrintableInvoice.aspx");
         }
     }
 }

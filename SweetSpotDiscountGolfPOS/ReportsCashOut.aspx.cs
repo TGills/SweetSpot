@@ -53,7 +53,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             if (Convert.ToBoolean(Session["loggedIn"]) == false)
             {
-                Response.Redirect("LoginPage.aspx");
+                Server.Transfer("LoginPage.aspx", false);
             }
 
 

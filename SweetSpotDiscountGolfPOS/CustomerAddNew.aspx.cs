@@ -17,7 +17,7 @@ namespace SweetSpotDiscountGolfPOS
         {
             if(Convert.ToBoolean(Session["loggedIn"]) == false)
             {
-                Response.Redirect("LoginPage.aspx");
+                Server.Transfer("LoginPage.aspx", false);
             }
 
             if (Session["key"] != null)
@@ -106,7 +106,7 @@ namespace SweetSpotDiscountGolfPOS
             c.postalCode = txtPostalCode.Text;
 
             Session["key"] = ssm.addCustomer(c);
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
         }
         protected void btnEditCustomer_Click(object sender, EventArgs e)
         {
@@ -227,23 +227,23 @@ namespace SweetSpotDiscountGolfPOS
             btnAddCustomer.Visible = false;
             btnBackToSearch.Visible = true;
 
-            Response.Redirect(Request.RawUrl);
+            Server.Transfer(Request.RawUrl, false);
 
         }
         protected void btnCancel_Click(object sender, EventArgs e)
         {
-            Response.Redirect("CustomerHomePage.aspx");
+            Server.Transfer("CustomerHomePage.aspx", false);
         }
         protected void btnStartSale_Click(object sender, EventArgs e)
         {
             Session["returnedFromCart"] = false;
             Session["TranType"] = 1;
-            Response.Redirect("SalesCart.aspx");
+            Server.Transfer("SalesCart.aspx", false);
         }
         protected void btnBackToSearch_Click(object sender, EventArgs e)
         {
             Session["key"] = null;
-            Response.Redirect("CustomerHomePage.aspx");
+            Server.Transfer("CustomerHomePage.aspx", false);
         }
     }
 }
