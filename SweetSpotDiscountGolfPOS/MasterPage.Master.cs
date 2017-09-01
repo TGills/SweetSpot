@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SweetSpotDiscountGolfPOS.ClassLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -9,6 +10,7 @@ namespace SweetSpotDiscountGolfPOS
 {
     public partial class MasterPage : System.Web.UI.MasterPage
     {
+        ErrorReporting er = new ErrorReporting();
         protected void Page_Load(object sender, EventArgs e)
         {
 

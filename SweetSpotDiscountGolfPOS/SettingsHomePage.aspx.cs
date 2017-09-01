@@ -27,7 +27,7 @@ namespace SweetSpotDiscountGolfPOS
         protected void Page_Load(object sender, EventArgs e)
         {
             string method = "Page_Load";
-            Session["currPage"] = "InventoryHomePage.aspx";
+            Session["currPage"] = "SettingsHomePage.aspx";
             Session["prevPage"] = "HomePage.aspx";
             try
             {
