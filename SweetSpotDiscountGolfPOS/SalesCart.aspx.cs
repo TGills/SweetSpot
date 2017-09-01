@@ -124,6 +124,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -160,6 +163,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -203,6 +209,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -296,6 +305,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -354,6 +366,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -376,6 +391,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -469,6 +487,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -528,6 +549,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -556,6 +580,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -657,6 +684,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -755,6 +785,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -851,6 +884,9 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 Server.Transfer(prevPage, false);
             }
         }
@@ -869,6 +905,9 @@ namespace SweetSpotDiscountGolfPOS
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
             }
         }
     }

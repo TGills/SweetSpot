@@ -10,12 +10,9 @@ namespace SweetSpotDiscountGolfPOS
 {
     public partial class MasterPage : System.Web.UI.MasterPage
     {
-        ErrorReporting er = new ErrorReporting();
         protected void Page_Load(object sender, EventArgs e)
         {
-
         }
-
         protected void btnLogout_Click(object sender, EventArgs e)
         {
             Session["loggedIn"] = false;
@@ -25,6 +22,5 @@ namespace SweetSpotDiscountGolfPOS
             Session["locationID"] = null;
             Server.Transfer("LoginPage.aspx", false);
         }
-
     }
 }
