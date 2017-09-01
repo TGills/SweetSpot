@@ -24,8 +24,8 @@ namespace SweetSpotDiscountGolfPOS
         protected void Page_Load(object sender, EventArgs e)
         {
             string method = "Page_Load";
-            Session["currPage"] = "HomePage";
-            Session["prevPage"] = "Login";
+            Session["currPage"] = "HomePage.aspx";
+            Session["prevPage"] = "HomePage.aspx";
             if (Convert.ToBoolean(Session["loggedIn"]) == false)
             {
                 Server.Transfer("LoginPage.aspx", false);
@@ -72,7 +72,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         //Currently used for Removing the row
@@ -106,7 +106,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -142,7 +142,6 @@ namespace SweetSpotDiscountGolfPOS
                     Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
                     Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
                 }
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("PrintableInvoice.aspx", false);
             }
             catch (Exception ex)
@@ -154,7 +153,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }

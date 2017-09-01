@@ -300,7 +300,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -343,7 +343,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         //Account
@@ -393,7 +393,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         //Debit
@@ -421,7 +421,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         //Visa
@@ -449,7 +449,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         //Gift Card
@@ -477,7 +477,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -532,7 +532,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -576,7 +576,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -625,7 +625,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnRemoveProvTax(object sender, EventArgs e)
@@ -671,7 +671,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         //Other functionality
@@ -719,7 +719,6 @@ namespace SweetSpotDiscountGolfPOS
                 Session["TranType"] = null;
                 Session["searchReturnInvoices"] = null;
                 Session["strDate"] = null;
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("HomePage.aspx", false);
             }
             catch (Exception ex)
@@ -731,7 +730,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -741,7 +740,6 @@ namespace SweetSpotDiscountGolfPOS
             try
             {
                 Session["returnedToCart"] = true;
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("SalesCart.aspx", false);
             }
             catch (Exception ex)
@@ -753,7 +751,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -771,7 +769,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -821,7 +819,6 @@ namespace SweetSpotDiscountGolfPOS
                     Session["ShippingAmount"] = null;
                     Session["searchReturnInvoices"] = null;
                     Session["strDate"] = null;
-                    Session["prevPage"] = Session["currPage"];
                     Server.Transfer("PrintableInvoice.aspx", false);
                 }
             }
@@ -834,7 +831,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }

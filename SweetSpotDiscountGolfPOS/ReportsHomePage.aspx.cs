@@ -29,7 +29,6 @@ namespace SweetSpotDiscountGolfPOS
         {
             string method = "Page_Load";
             Session["currPage"] = "ReportsHomePage";
-            Session["prevPage"] = "HomePage";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
@@ -66,7 +65,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -86,7 +85,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void calEnd_SelectionChanged(object sender, EventArgs e)
@@ -105,7 +104,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnSubmit_Click(object sender, EventArgs e)
@@ -135,7 +134,6 @@ namespace SweetSpotDiscountGolfPOS
 
                     //}
                 }
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("ReportsCashOut.aspx", false);
             }
             catch (Exception ex)
@@ -147,7 +145,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportInvoices_Click(object sender, EventArgs e)
@@ -254,7 +252,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnTesting_Click(object sender, EventArgs e)
@@ -291,7 +289,7 @@ namespace SweetSpotDiscountGolfPOS
                 string currPage = Convert.ToString(Session["currPage"]);
                 er.logError(ex, employeeID, currPage, method, this);
                 string prevPage = Convert.ToString(Session["prevPage"]);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         
@@ -318,9 +316,8 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
-
         }
         protected void btnReturnInvoice_Click(object sender, EventArgs e)
         {
@@ -346,7 +343,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnDeletedInvoiceBetweenDates_Click(object sender, EventArgs e)
@@ -371,7 +368,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void lbtnInvoiceNumber_Click(object sender, EventArgs e)
@@ -406,7 +403,6 @@ namespace SweetSpotDiscountGolfPOS
                     Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
                     Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
                 }
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("PrintableInvoice.aspx", false);
             }
             catch (Exception ex)
@@ -418,7 +414,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
@@ -454,7 +450,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }

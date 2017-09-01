@@ -17,7 +17,6 @@ namespace SweetSpotDiscountGolfPOS
         {
             string method = "Page_Load";
             Session["currPage"] = "CustomerHomePage";
-            Session["prevPage"] = "HomePage";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
@@ -34,7 +33,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -59,7 +58,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -68,7 +67,6 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnAddNewCustomer_Click";
             try
             {
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("CustomerAddNew.aspx", false);
             }
             catch (Exception ex)
@@ -80,7 +78,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -93,7 +91,6 @@ namespace SweetSpotDiscountGolfPOS
                 if (e.CommandName == "ViewProfile")
                 {
                     Session["key"] = key;
-                    Session["prevPage"] = Session["currPage"];
                     Server.Transfer("CustomerAddNew.aspx", false);
 
                 }
@@ -102,7 +99,6 @@ namespace SweetSpotDiscountGolfPOS
                     Session["returnedFromCart"] = false;
                     Session["TranType"] = 1;
                     Session["key"] = key;
-                    Session["prevPage"] = Session["currPage"];
                     Server.Transfer("SalesCart.aspx", false);
                 }
             }
@@ -115,7 +111,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }

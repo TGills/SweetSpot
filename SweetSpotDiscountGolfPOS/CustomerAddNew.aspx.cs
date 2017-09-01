@@ -103,7 +103,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnAddCustomer_Click(object sender, EventArgs e)
@@ -137,7 +137,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnEditCustomer_Click(object sender, EventArgs e)
@@ -212,7 +212,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnSaveCustomer_Click(object sender, EventArgs e)
@@ -286,7 +286,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnCancel_Click(object sender, EventArgs e)
@@ -294,7 +294,6 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnCancel_Click";
             try
             {
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("CustomerHomePage.aspx", false);
             }
             catch (Exception ex)
@@ -306,7 +305,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnStartSale_Click(object sender, EventArgs e)
@@ -316,7 +315,6 @@ namespace SweetSpotDiscountGolfPOS
             {
                 Session["returnedFromCart"] = false;
                 Session["TranType"] = 1;
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("SalesCart.aspx", false);
             }
             catch (Exception ex)
@@ -328,7 +326,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnBackToSearch_Click(object sender, EventArgs e)
@@ -337,7 +335,6 @@ namespace SweetSpotDiscountGolfPOS
             try
             {
                 Session["key"] = null;
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("CustomerHomePage.aspx", false);
             }
             catch (Exception ex)
@@ -349,7 +346,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }

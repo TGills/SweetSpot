@@ -17,7 +17,6 @@ namespace SweetSpotDiscountGolfPOS
         {
             string method = "Page_Load";
             Session["currPage"] = "InventoryHomePage";
-            Session["prevPage"] = "HomePage";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
@@ -38,7 +37,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -92,7 +91,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -101,7 +100,6 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnAddNewInventory_Click";
             try
             {
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("InventoryAddNew.aspx", false);
             }
             catch (Exception ex)
@@ -113,21 +111,21 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
         protected void grdInventorySearched_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            string method = "grdInventorySearched_RowCommand";
+            string method = "err_grdInventorySearched_RowCommand";
             try
             {
                 string itemKey = e.CommandArgument.ToString();
                 if (e.CommandName == "viewItem")
                 {
                     Session["itemKey"] = itemKey;
-                    Session["prevPage"] = Session["currPage"];
-                    Server.Transfer("InventoryAddNew.aspx", false);
+                    Session["itemType"] = ddlInventoryType.SelectedItem.ToString();
+                    Server.Transfer("InventoryAddNew.aspx");
                 }
             }
             catch (Exception ex)
@@ -139,7 +137,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage);
             }
         }
     }

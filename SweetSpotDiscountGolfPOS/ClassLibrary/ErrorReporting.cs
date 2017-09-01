@@ -43,7 +43,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             cmd.Connection = conn;
             cmd.CommandText = "Insert into tbl_error values(@employeeID, @date, @time, "
-                + "@errorPage, @errorCode, @errorText)";
+                + "@errorPage, @errorMethod, @errorCode, @errorText)";
             cmd.Parameters.AddWithValue("employeeID", employeeID);
             cmd.Parameters.AddWithValue("date", date);
             cmd.Parameters.AddWithValue("time", time);

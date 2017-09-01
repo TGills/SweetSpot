@@ -28,7 +28,6 @@ namespace SweetSpotDiscountGolfPOS
         {
             string method = "Page_Load";
             Session["currPage"] = "SettingsHomePage.aspx";
-            Session["prevPage"] = "HomePage.aspx";
             try
             {
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
@@ -52,7 +51,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnAddNewEmployee_Click(object sender, EventArgs e)
@@ -60,7 +59,6 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnAddNewEmployee_Click";
             try
             {
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("EmployeeAddNew.aspx", false);
             }
             catch (Exception ex)
@@ -72,7 +70,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void grdEmployeesSearched_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -84,7 +82,6 @@ namespace SweetSpotDiscountGolfPOS
                 if (e.CommandName == "ViewProfile")
                 {
                     Session["empKey"] = key;
-                    Session["prevPage"] = Session["currPage"];
                     Server.Transfer("EmployeeAddNew.aspx", false);
                 }
             }
@@ -97,7 +94,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnEmployeeSearch_Click(object sender, EventArgs e)
@@ -119,7 +116,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
 
         }
@@ -145,7 +142,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnImportCustomers_Click(object sender, EventArgs e)
@@ -169,7 +166,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
 
@@ -221,7 +218,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportClubs_Click(object sender, EventArgs e)
@@ -241,7 +238,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportClothing_Click(object sender, EventArgs e)
@@ -261,7 +258,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnExportAccessories_Click(object sender, EventArgs e)
@@ -281,7 +278,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }

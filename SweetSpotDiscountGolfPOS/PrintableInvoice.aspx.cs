@@ -125,7 +125,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
         protected void btnHome_Click(object sender, EventArgs e)
@@ -141,7 +141,6 @@ namespace SweetSpotDiscountGolfPOS
                 Session["TranType"] = null;
                 Session["CheckOutTotals"] = null;
                 Session["MethodsofPayment"] = null;
-                Session["prevPage"] = Session["currPage"];
                 Server.Transfer("HomePage.aspx", false);
             }
             catch (Exception ex)
@@ -153,7 +152,7 @@ namespace SweetSpotDiscountGolfPOS
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
-                Server.Transfer(prevPage, false);
+                //Server.Transfer(prevPage, false);
             }
         }
     }
