@@ -124,7 +124,6 @@ namespace SweetSpotDiscountGolfPOS
                 if (e.CommandName == "viewItem")
                 {
                     Session["itemKey"] = itemKey;
-                    Session["itemType"] = ddlInventoryType.SelectedItem.ToString();
                     Server.Transfer("InventoryAddNew.aspx");
                 }
             }
