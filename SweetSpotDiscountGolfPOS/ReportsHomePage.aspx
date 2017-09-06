@@ -150,12 +150,35 @@
                     <asp:BoundField DataField="balanceDue" ReadOnly="true" HeaderText="Balance Paid" DataFormatString="{0:0.00}" />
                     <asp:TemplateField HeaderText="Delete Invoice">
                         <ItemTemplate>
-                            <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />
+                            <%--<asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />--%>
+                            <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="userInput()" CausesValidation="false" />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
+            <div>
+                <asp:HiddenField ID="hidden" runat="server" />
 
+            </div>
+            <script>
+                function userInput() {
+                    var reason = prompt("Enter reason for deleting invoice", "");
+                    //User pressed okay but didn't type anything
+                    while (reason == "") {
+                        //Keeps cycling until reason given or cancel is hit
+                        reason = prompt("Enter reason for deleting invoice", "");
+                    }
+                    if (reason != "" && reason != "Code:CancelDelete") {
+                        //User typed something and hit okay
+                        document.getElementById('IndividualPageContent_hidden').value = reason.toString();
+                    }
+                    else {
+                        //User hits cancel
+                        document.getElementById('IndividualPageContent_hidden').value = "Code:CancelDelete";
+                    }
+                }
+
+            </script>
         </asp:Panel>
     </div>
 </asp:Content>

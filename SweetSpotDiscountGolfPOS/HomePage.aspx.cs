@@ -81,21 +81,45 @@ namespace SweetSpotDiscountGolfPOS
             string method = "OnRowDeleting";
             try
             {
-                string deletionReason = Microsoft.VisualBasic.Interaction.InputBox("Reason for deleting invioce", "", "", -1, -1);
-                while (deletionReason == "")
+                string deleteReason = hidden.Value;
+                //string deleteReason = test.InnerHtml.ToString();
+                if (deleteReason.Equals("Code:CancelDelete"))
                 {
-                    deletionReason = Microsoft.VisualBasic.Interaction.InputBox("Reason for deleting invioce", "", "", -1, -1);
+
                 }
-                int index = e.RowIndex;
-                Label lblInvoice = (Label)grdSameDaySales.Rows[index].FindControl("lblInvoiceNumber");
-                string invoice = lblInvoice.Text;
-                char[] splitchar = { '-' };
-                string[] invoiceSplit = invoice.Split(splitchar);
-                int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
-                int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
-                idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
-                MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
-                Server.Transfer(Request.RawUrl, false);
+                else if (!deleteReason.Equals("Code:CancelDelete") && !deleteReason.Equals(""))
+                {
+                    int index = e.RowIndex;
+                    Label lblInvoice = (Label)grdSameDaySales.Rows[index].FindControl("lblInvoiceNumber");
+                    string invoice = lblInvoice.Text;
+                    char[] splitchar = { '-' };
+                    string[] invoiceSplit = invoice.Split(splitchar);
+                    int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+                    int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+                    string deletionReason = deleteReason;
+                    idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
+                    MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
+                    Server.Transfer(Request.RawUrl);
+                }
+                //Page.ClientScript.RegisterStartupScript(GetType(), "CallMyFunction", "userInput()", true);
+                ////string deletionReason = cmb.inputBoxV2("Reason", "Reason for deleting invoice:");
+                //string deletionReason = deletionReason = cmb.InputBox("Reason", "Reason for deleting invoice:");
+                //while (deletionReason == "")
+                //{
+                //    deletionReason = cmb.InputBox("Reason", "Reason for deleting invoice:");
+                //    //deletionReason = Microsoft.VisualBasic.Interaction.InputBox("Reason for deleting invioce", "", "", -1, -1);
+                //}
+                //Label1.Text = deletionReason;
+                //int index = e.RowIndex;
+                //Label lblInvoice = (Label)grdInvoicesBetweenDates.Rows[index].FindControl("lblInvoiceNumber");
+                //string invoice = lblInvoice.Text;
+                //char[] splitchar = { '-' };
+                //string[] invoiceSplit = invoice.Split(splitchar);
+                //int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
+                //int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+                //idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
+                //MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
+                //Server.Transfer(Request.RawUrl);
             }
             catch (Exception ex)
             {
@@ -142,6 +166,7 @@ namespace SweetSpotDiscountGolfPOS
                     Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
                     Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
                 }
+                Session["TranType"] = 1;
                 Server.Transfer("PrintableInvoice.aspx", false);
             }
             catch (Exception ex)

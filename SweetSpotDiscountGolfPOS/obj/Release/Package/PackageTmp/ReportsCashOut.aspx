@@ -6,8 +6,13 @@
 </asp:Content>--%>
 
 <asp:Content ID="ReportsCashOutPageContent" ContentPlaceHolderID="IndividualPageContent" runat="server">
+    <script>
+        function printReport(printable) {
+            window.print();
+        }
+    </script>
     <link href="MainStyleSheet.css" rel="stylesheet" type="text/css" />
-    <div id="CashOut">
+    <div id="CashOut"  class="yesPrint">
         <h2>Cash Out</h2>
         <hr />
         <%--Payment Breakdown--%>       

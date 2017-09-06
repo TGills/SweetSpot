@@ -109,11 +109,22 @@
                 </div>
             </div>--%>
 
-            <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
+            <div>
+                <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
+            </div>
+
             <asp:Button ID="btnExportInvoices" runat="server" Text="Invoice Report" Width="200px" OnClick="btnExportInvoices_Click" />
-            <asp:Button ID="btnInvoiceBetweenDates" runat="server" Text="Search Invoice's Between Dates" Width="200px" OnClick="btnInvoiceBetweenDates_Click" />
+            <div>
+                <div>
+                    <asp:Label runat="server" Text="Search Between Dates For:"></asp:Label>
+                </div>
+                <asp:Button ID="btnInvoiceBetweenDates" runat="server" Text="Invoices" Width="200px" OnClick="btnInvoiceBetweenDates_Click" />
+                <asp:Button ID="btnDeletedInvoiceBetweenDates" runat="server" Text="Deleted Invoices" Width="200px" OnClick="btnDeletedInvoiceBetweenDates_Click" />
+            </div>
             <asp:Button ID="btnReturnInvoice" runat="server" Text="Search For Invoice" OnClick="btnReturnInvoice_Click" />
-            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClick="btnTesting_Click" />
+            <%--Testing--%>
+            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClientClick="javascript:return getInput();" /><asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+
 
 
             <hr />
@@ -139,12 +150,35 @@
                     <asp:BoundField DataField="balanceDue" ReadOnly="true" HeaderText="Balance Paid" DataFormatString="{0:0.00}" />
                     <asp:TemplateField HeaderText="Delete Invoice">
                         <ItemTemplate>
-                            <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />
+                            <%--<asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />--%>
+                            <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="userInput()" CausesValidation="false" />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
+            <div>
+                <asp:HiddenField ID="hidden" runat="server" />
 
+            </div>
+            <script>
+                function userInput() {
+                    var reason = prompt("Enter reason for deleting invoice", "");
+                    //User pressed okay but didn't type anything
+                    while (reason == "") {
+                        //Keeps cycling until reason given or cancel is hit
+                        reason = prompt("Enter reason for deleting invoice", "");
+                    }
+                    if (reason != "" && reason != "Code:CancelDelete") {
+                        //User typed something and hit okay
+                        document.getElementById('IndividualPageContent_hidden').value = reason.toString();
+                    }
+                    else {
+                        //User hits cancel
+                        document.getElementById('IndividualPageContent_hidden').value = "Code:CancelDelete";
+                    }
+                }
+
+            </script>
         </asp:Panel>
     </div>
 </asp:Content>
