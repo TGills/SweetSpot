@@ -61,6 +61,14 @@ namespace SweetSpotDiscountGolfPOS
                 DateTime[] reportDates = (DateTime[])Session["reportDates"];
                 startDate = reportDates[0];
                 endDate = reportDates[1];
+                if(startDate == endDate)
+                {
+                    lblCashoutDate.Text = "Cashout for: " + startDate.ToString("d");
+                }
+                else
+                {
+                    lblCashoutDate.Text = "Cashout for: " + startDate.ToString("d") + " to " + endDate.ToString("d");
+                }
                 //Creating a cashout list and calling a method that grabs all mops and amounts paid
                 EmployeeManager em = new EmployeeManager();
                 int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));

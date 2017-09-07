@@ -1731,15 +1731,16 @@ namespace SweetShop
             con.Close();
         }
         //Gets invoices between dates
-        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate, string table)
+        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate, string table, string locationID)
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, "
                 + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM " + table
-                + " WHERE invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate";
+                + " WHERE locationID = @locationID and invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate";
             cmd.Parameters.AddWithValue("startDate", startDate);
             cmd.Parameters.AddWithValue("endDate", endDate);
+            cmd.Parameters.AddWithValue("locationID", locationID);
             cmd.Connection = con;
             con.Open();
             SqlDataReader reader = cmd.ExecuteReader();

@@ -2,19 +2,20 @@
 
 <%--<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>--%>
-<asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server" >
+<asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server">
     <style media="print">
-		.noPrint {
-			display: none;
-			margin-left: 0;
-		}
-		.yesPrint {
-			display: inline-block !important;
-			/* margin-right:100px;
+        .noPrint {
+            display: none;
+            /*margin-left: 0;*/
+        }
+
+        .yesPrint { 
+            display: inline-block !important;
+            /* margin-right:100px;
            float: right;*/
-			margin-left: 10px !important;
-		}
-	</style>
+            margin-left: 10px !important;
+        }
+    </style>
     <div id="menu_simple" class="noPrint">
         <ul>
             <li><a>HOME</a></li>
@@ -30,7 +31,7 @@
     </div>
     <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
 </asp:Content>
-<asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server" >
+<asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server">
 
     <script>
         function printReport(printable) {
@@ -211,8 +212,8 @@
                 <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>--%>
             </div>
             <p><b>PLEASE NOTE: </b>All used equipment is sold as is and it is understood that its' condition</p>
-                <p>and usability may reflect prior use. The Sweet Spot Discount Golf assumes no responsibility</p>
-                <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>
+            <p>and usability may reflect prior use. The Sweet Spot Discount Golf assumes no responsibility</p>
+            <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>
         </div>
     </div>
 

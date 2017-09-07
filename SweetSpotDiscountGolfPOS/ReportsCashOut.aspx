@@ -18,6 +18,7 @@
         <%--Payment Breakdown--%>       
 
        <div class="CashoutTable">
+           <asp:Label ID="lblCashoutDate" runat="server"></asp:Label>
             <asp:Table ID="tblCashout" runat="server" GridLines="Both" CssClass="CashoutTable">
                 <asp:TableRow>
                     <asp:TableCell ColumnSpan="9">

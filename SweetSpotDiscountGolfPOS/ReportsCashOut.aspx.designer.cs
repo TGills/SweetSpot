@@ -13,6 +13,15 @@ namespace SweetSpotDiscountGolfPOS {
     public partial class ReportsCashOut {
         
         /// <summary>
+        /// lblCashoutDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCashoutDate;
+        
+        /// <summary>
         /// tblCashout control.
         /// </summary>
         /// <remarks>

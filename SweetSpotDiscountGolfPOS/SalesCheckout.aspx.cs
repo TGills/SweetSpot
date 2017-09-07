@@ -323,13 +323,16 @@ namespace SweetSpotDiscountGolfPOS
         {
             string method = "mopCash_Click";
             try
-            {
+            {                              
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
+                
+                
                 //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
                 string boxResult = txtAmountPaying.Text;
                 if (boxResult != "")
                 {
                     amountPaid = Convert.ToDouble(boxResult);
+                    ClientScript.RegisterStartupScript(GetType(), "hwa", "userInput(" + amountPaid + ")", true);
                     string methodOfPayment = "Cash";
                     populateGridviewMOP(amountPaid, methodOfPayment);
                 }

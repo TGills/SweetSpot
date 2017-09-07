@@ -59,7 +59,8 @@ namespace SweetSpotDiscountGolfPOS
                     ddlLocation.Visible = false;
                 }
                 //populate gridview with todays sales
-                invoiceList = ssm.getInvoiceBySaleDate(DateTime.Today, Convert.ToInt32(Session["locationID"]));
+                int locationID = lm.locationIDfromCity(ddlLocation.SelectedValue);
+                invoiceList = ssm.getInvoiceBySaleDate(DateTime.Today, locationID);
                 grdSameDaySales.DataSource = invoiceList;
                 grdSameDaySales.DataBind();
             }
@@ -181,5 +182,7 @@ namespace SweetSpotDiscountGolfPOS
                 //Server.Transfer(prevPage, false);
             }
         }
+
+        
     }
 }

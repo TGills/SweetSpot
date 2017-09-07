@@ -396,6 +396,8 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 {
                                     a.locID = 1;
                                 }
+
+
                                 a.typeID = 2;
                                 a.size = "";
                                 a.colour = "";

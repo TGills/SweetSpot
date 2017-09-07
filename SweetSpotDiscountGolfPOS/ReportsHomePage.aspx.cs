@@ -302,7 +302,8 @@ namespace SweetSpotDiscountGolfPOS
                 Session["isDeleted"] = false;
                 DateTime startDate = calStartDate.SelectedDate;
                 DateTime endDate = calEndDate.SelectedDate;
-                List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_invoice");
+                string locationID = ddlLocation.SelectedValue;
+                List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_invoice", locationID);
                 grdInvoicesBetweenDates.Columns[8].Visible = true;
                 grdInvoicesBetweenDates.DataSource = i;
                 grdInvoicesBetweenDates.DataBind();
@@ -354,7 +355,8 @@ namespace SweetSpotDiscountGolfPOS
                 Session["isDeleted"] = true;
                 DateTime startDate = calStartDate.SelectedDate;
                 DateTime endDate = calEndDate.SelectedDate;
-                List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_deletedInvoice");
+                string locationID = ddlLocation.SelectedValue;
+                List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_deletedInvoice", locationID);
                 grdInvoicesBetweenDates.Columns[8].Visible = false;
                 grdInvoicesBetweenDates.DataSource = i;
                 grdInvoicesBetweenDates.DataBind();

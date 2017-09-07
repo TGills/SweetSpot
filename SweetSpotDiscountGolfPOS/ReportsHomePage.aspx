@@ -6,6 +6,7 @@
 </asp:Content>--%>
 
 <asp:Content ID="ReportsPageContent" ContentPlaceHolderID="IndividualPageContent" runat="server">
+    <asp:SqlDataSource ID="sqlLocations" runat="server" ConnectionString="<%$ ConnectionStrings:SweetSpotDevConnectionString %>" SelectCommand="SELECT [locationID], [locationName] FROM [tbl_location] ORDER BY [locationName]"></asp:SqlDataSource>
     <div id="Reports">
         <div style="text-align: left">
             <asp:Label ID="lblReport" runat="server" Visible="false" Text="Report Access"></asp:Label>
@@ -28,6 +29,9 @@
                     <asp:TableCell>
                         <asp:Label runat="server" Text="Inovice Number:"></asp:Label>
                     </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label runat="server" Text="Select Location for Invoice Viewing:" />
+                    </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>
                     <asp:TableCell>
@@ -38,6 +42,9 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="txtInvoiceNum" Width="195px" placeholder="Please enter an invoice number" Text="" runat="server"></asp:TextBox>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:DropDownList ID="ddlLocation" runat="server" AutoPostBack="True" DataSourceID="sqlLocations" DataTextField="locationName" DataValueField="locationID" Visible="true"></asp:DropDownList>
                     </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>

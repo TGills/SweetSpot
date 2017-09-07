@@ -10,7 +10,7 @@
     <%--REMEMBER TO SET DEFAULT BUTTON--%>
     <%--<asp:Panel ID="pnlDefaultButton" runat="server" DefaultButton="btn">--%>
     <asp:Label ID="lblLoc" runat="server" Text="Location : "></asp:Label>
-    <asp:DropDownList ID="ddlLocation" runat="server">
+    <asp:DropDownList ID="ddlLocation" runat="server" AutoPostBack="true">
     </asp:DropDownList>
     <asp:Label ID="lblLocation" runat="server" Visible="false" Text="Loc"></asp:Label>
 
