@@ -771,8 +771,12 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("shippingAmount", ckm.dblShipping);
             cmd.Parameters.AddWithValue("discountAmount", ckm.dblDiscounts);
             cmd.Parameters.AddWithValue("tradeinAmount", ckm.dblTradeIn);
-            cmd.Parameters.AddWithValue("governmentTax", ckm.dblGst);
-            cmd.Parameters.AddWithValue("provincialTax", ckm.dblPst);
+            double gTax = 0;
+            if (ckm.blGst) { gTax = ckm.dblGst; }
+            cmd.Parameters.AddWithValue("governmentTax", gTax);
+            double pTax = 0;
+            if (ckm.blPst) { pTax = ckm.dblPst; }
+            cmd.Parameters.AddWithValue("provincialTax", pTax);
             cmd.Parameters.AddWithValue("balanceDue", ckm.dblBalanceDue);
             cmd.Parameters.AddWithValue("transactionType", transactionType);
             cmd.Parameters.AddWithValue("comments", comments);

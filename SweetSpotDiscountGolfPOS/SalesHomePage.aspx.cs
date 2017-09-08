@@ -148,7 +148,7 @@ namespace SweetSpotDiscountGolfPOS
                         }
                     }
                     Session["TranType"] = 2;
-                    Server.Transfer("SalesCart.aspx", false);
+                    Server.Transfer("ReturnsCart.aspx", false);
                 }
             }
             catch (Exception ex)

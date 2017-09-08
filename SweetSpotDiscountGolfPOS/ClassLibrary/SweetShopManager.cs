@@ -2354,6 +2354,17 @@ namespace SweetShop
             totalSubtotalAmount = totalSubtotalAmount - (totalTradeInAmount * (-1));
             return totalSubtotalAmount;
         }
+        public double returnRefundSubtotalAmount(List<Cart> itemsSold)
+        {
+            double singleRefundSubtotalAmount = 0;
+            double totalRefundSubtotalAmount = 0;
+            foreach (var cart in itemsSold)
+            {
+                singleRefundSubtotalAmount = cart.quantity * cart.returnAmount;
+                totalRefundSubtotalAmount += singleRefundSubtotalAmount;
+            }
+            return totalRefundSubtotalAmount;
+        }
         public double returnTotalAmount(List<Cart> itemsSold)
         {
             ItemDataUtilities idu = new ItemDataUtilities();

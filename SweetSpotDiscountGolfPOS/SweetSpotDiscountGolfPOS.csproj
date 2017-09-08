@@ -108,7 +108,9 @@
     <Content Include="PrintableInvoice.aspx" />
     <Content Include="ReportsCashOut.aspx" />
     <Content Include="ReportsHomePage.aspx" />
+    <Content Include="ReturnsCart.aspx" />
     <Content Include="SalesCart.aspx" />
+    <Content Include="ReturnsCheckout.aspx" />
     <Content Include="SalesCheckout.aspx" />
     <Content Include="SalesHomePage.aspx" />
     <Content Include="SettingsHomePage.aspx" />
@@ -230,12 +232,26 @@
     <Compile Include="ReportsHomePage.aspx.designer.cs">
       <DependentUpon>ReportsHomePage.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ReturnsCart.aspx.cs">
+      <DependentUpon>ReturnsCart.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ReturnsCart.aspx.designer.cs">
+      <DependentUpon>ReturnsCart.aspx</DependentUpon>
+    </Compile>
     <Compile Include="SalesCart.aspx.cs">
       <DependentUpon>SalesCart.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="SalesCart.aspx.designer.cs">
       <DependentUpon>SalesCart.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ReturnsCheckout.aspx.cs">
+      <DependentUpon>ReturnsCheckout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ReturnsCheckout.aspx.designer.cs">
+      <DependentUpon>ReturnsCheckout.aspx</DependentUpon>
     </Compile>
     <Compile Include="SalesCheckout.aspx.cs">
       <DependentUpon>SalesCheckout.aspx</DependentUpon>

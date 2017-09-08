@@ -110,6 +110,12 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     dblAmountPaid += mop.amountPaid;
                 }
+                if (tranType == 2)
+                {
+                    grdItemsSoldList.Columns[3].HeaderText = "Sold At";
+                    grdItemsSoldList.Columns[4].HeaderText = "Non Refundable";
+                    grdItemsSoldList.Columns[5].HeaderText = "Returned At";
+                }
                 grdItemsSoldList.DataSource = cart;
                 grdItemsSoldList.DataBind();
                 lblTotalPaidDisplay.Text = "$ " + dblAmountPaid.ToString("#0.00");

@@ -72,6 +72,17 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             return totalTotalAmount;
         }
+        public double returnRefundTotalAmount(List<Cart> itemsSold)
+        {
+            double singleRefundSubtotalAmount = 0;
+            double totalRefundSubtotalAmount = 0;
+            foreach (var cart in itemsSold)
+            {
+                singleRefundSubtotalAmount = cart.quantity * cart.returnAmount;
+                totalRefundSubtotalAmount += singleRefundSubtotalAmount;
+            }
+            return totalRefundSubtotalAmount;
+        }
         public double returnGSTAmount(double rate, double subtotal)
         {
             double GSTAmount = 0;
