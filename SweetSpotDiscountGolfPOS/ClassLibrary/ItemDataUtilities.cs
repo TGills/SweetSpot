@@ -10,18 +10,19 @@ using SweetSpotDiscountGolfPOS.ClassLibrary;
 
 namespace SweetSpotProShop
 {
+    //This class is used for way too much...
     public class ItemDataUtilities
     {
         private String connectionString;
         LocationManager lm = new LocationManager();
+        //Connection String
         public ItemDataUtilities()
         {
             connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
         }
-        //Return Model string created by Nathan and Tyler
+        //Return Model string created by Nathan and Tyler **getModelName
         public string modelType(int modelID)
         {
-
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
 
@@ -38,9 +39,10 @@ namespace SweetSpotProShop
                 model = m;
             }
             conn.Close();
+            //Returns the model name
             return model;
         }
-        //Return Brand string created by Nathan and Tyler
+        //Return Brand string created by Nathan and Tyler **getBrandName
         public string brandType(int brandID)
         {
 
@@ -60,10 +62,10 @@ namespace SweetSpotProShop
                 brand = b;
             }
             conn.Close();
-
+            //Returns the brand name
             return brand;
         }
-        //Return Model Int created by Nathan and Tyler
+        //Return Model Int created by Nathan and Tyler **getModelID
         public int modelName(string modelN)
         {
             int model = 0;
@@ -87,10 +89,10 @@ namespace SweetSpotProShop
             {
                 model = insertModel(modelN);
             }
-
+            //Returns the modelID 
             return model;
         }
-        //Return Brand Int created by Nathan and Tyler
+        //Return Brand Int created by Nathan and Tyler **getBrandID
         public int brandName(string brandN)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -115,10 +117,10 @@ namespace SweetSpotProShop
             {
                 brand = insertBrand(brandN);
             }
-
+            //Returns the brandID
             return brand;
         }
-        //Return Model string created by Nathan and Tyler
+        //Return Model string created by Nathan and Tyler **getItemTypeDescritpion
         public string typeName(int typeNum)
         {
 
@@ -138,9 +140,9 @@ namespace SweetSpotProShop
                 type = t;
             }
             conn.Close();
+            //Returns the item type description
             return type;
         }
-
         //Insert new brand name. Returns new brandID
         public int insertBrand(string brandName)
         {
@@ -153,6 +155,7 @@ namespace SweetSpotProShop
             conn.Open();
             brandID = (int)cmd.ExecuteScalar();
             conn.Close();
+            //Returns the brandID of the newly added brand
             return brandID;
         }
         //Insert new model name. return new modelID
@@ -167,11 +170,10 @@ namespace SweetSpotProShop
             conn.Open();
             modelID = (int)cmd.ExecuteScalar();
             conn.Close();
+            //Returns the modelID of the newly added model
             return modelID;
         }
-
-
-
+        //***NOT USED
         //Return Vendor ID
         public int getVendorID(string vendorName)
         {
@@ -212,6 +214,7 @@ namespace SweetSpotProShop
 
             return vendorName;
         }
+        //NOT USED***
 
 
         //Return Club Type ID
@@ -230,6 +233,7 @@ namespace SweetSpotProShop
                 typeID = tID;
             }
             conn.Close();
+            //Returns the club type ID
             return typeID;
         }
         //Return Club Type Name
@@ -251,24 +255,27 @@ namespace SweetSpotProShop
                 typeName = tN;
             }
             conn.Close();
-
+            //Returns the name of the club type
             return typeName;
         }
-
         //Adding items to the Cart class. Totally not stolen by Tickles
         public Cart addingToCart(Object o)
-        {
+        {            
             Cart ca = new Cart();
+            //Checks if the item is a club
             if (o is Clubs)
             {
+                //Converts the object to type club
                 Clubs c = o as Clubs;
                 ca.sku = c.sku;
+                //Creates the description of the item for the cart
                 ca.description = brandType(c.brandID) + " " + modelType(c.modelID) + " " + 
                     c.clubSpec + " " + c.clubType + " " + c.shaftSpec + " " + c.shaftFlex + " " + c.dexterity;
                 ca.price = c.price;
                 ca.cost = c.cost;
                 ca.typeID = c.typeID;
             }
+            //Checks if the item is an accessory
             else if (o is Accessories)
             {
                 Accessories a = o as Accessories;
@@ -278,6 +285,7 @@ namespace SweetSpotProShop
                 ca.cost = a.cost;
                 ca.typeID = a.typeID;
             }
+            //Checks if the item is clothing
             else if (o is Clothing)
             {
                 Clothing cl = o as Clothing;
@@ -288,8 +296,10 @@ namespace SweetSpotProShop
                 ca.typeID = cl.typeID;
             }
             ca.quantity = 1;
+            //Returns the item in the form of a cart
             return ca;
         }
+        //Converts a dbnull value to a string
         public string ConvertDBNullToString(Object o)
         {
             if (o is DBNull)
@@ -298,6 +308,7 @@ namespace SweetSpotProShop
             return o.ToString();
 
         }
+        //Converts a dbnull value to a double
         public double ConvertDBNullToDouble(Object o)
         {
             double dbl = 0.0;
@@ -309,6 +320,7 @@ namespace SweetSpotProShop
             return dbl;
 
         }
+        //Returns the GST of a province
         public double GetTaxRates(int ProId)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -325,8 +337,10 @@ namespace SweetSpotProShop
 
 
             conn.Close();
+            //Returns the GST rate
             return t;
         }
+        //Returns the PST of a province
         public double GetPSTTax(int ProId)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -341,11 +355,13 @@ namespace SweetSpotProShop
             double t = Convert.ToDouble(read["pst"]);
 
             conn.Close();
+            //Returns the PST rate
             return t;
         }
-        //populating gridView on Inventory Search button in Sales Cart with location
+        //Populating gridView on Inventory Search button in Sales Cart with location **NOT USED
         public List<Items> getItemByID(Int32 ItemNumber, string loc)
         {
+            //Loops through the database and adds items with the matching sku to a list of type item
             List<Items> items = new List<Items>();
             Items i = new Items();
             SqlConnection conn = new SqlConnection(connectionString);
@@ -415,9 +431,12 @@ namespace SweetSpotProShop
             return items;
 
         }
-        //populating gridView on Inventory Search button for all locations
+        //Populating gridView on Inventory Search button for all locations
         public List<Items> getItemByID(Int32 ItemNumber)
         {
+            //Loops through the database searching for items that match sku's with the search
+
+            //Adds the items that are found to a list of type item
             List<Items> items = new List<Items>();
             Items i = new Items();
             SqlConnection conn = new SqlConnection(connectionString);
@@ -428,8 +447,10 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("skuAcc", ItemNumber);
 
             SqlDataReader readerAcc = cmd.ExecuteReader();
+            //Starts the search by looking in the accessories
             while (readerAcc.Read())
             {
+                //If an item is found, creating a new "item" with the accessory information
                 //+ " " + readerAcc["accessoryType"].ToString()
                 i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) 
                     + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
@@ -438,6 +459,7 @@ namespace SweetSpotProShop
                     lm.locationName(Convert.ToInt32(readerAcc["locationID"])));
 
             }
+            //If the search provides no results, we move into the next item type category - Clubs
             if (!readerAcc.HasRows)
             {
                 readerAcc.Close();
@@ -446,6 +468,7 @@ namespace SweetSpotProShop
                 SqlDataReader readerClubs = cmd.ExecuteReader();
                 while (readerClubs.Read())
                 {
+                    //If an item is found, creating a new "item" with the club information
                     i = new Items(Convert.ToInt32(readerClubs["sku"]), brandType(Convert.ToInt32(readerClubs["brandID"]))
                         + " " + modelType(Convert.ToInt32(readerClubs["modelID"])) + " " + readerClubs["clubType"].ToString()
                         + " " + readerClubs["shaft"].ToString() + " " + readerClubs["numberOfClubs"].ToString() + " "
@@ -454,6 +477,7 @@ namespace SweetSpotProShop
                         Convert.ToInt32(readerClubs["typeID"]), lm.locationName(Convert.ToInt32(readerClubs["locationID"])));
 
                 }
+                //If the search once again provides no results, we search the clothing table for matches
                 if (!readerClubs.HasRows)
                 {
                     readerClubs.Close();
@@ -462,6 +486,7 @@ namespace SweetSpotProShop
                     SqlDataReader readerClothing = cmd.ExecuteReader();
                     while (readerClothing.Read())
                     {
+                        //If an item is found, creating a new "item" with the clothing information
                         i = new Items(Convert.ToInt32(readerClothing["sku"]), brandType(Convert.ToInt32(readerClothing["brandID"]))
                             + " " + readerClothing["size"].ToString() + " " + readerClothing["colour"].ToString()
                             + " " + readerClothing["gender"].ToString() + " " + readerClothing["style"].ToString(),
@@ -471,12 +496,14 @@ namespace SweetSpotProShop
                     }
                 }
             }
+            //If the sku is greater than 0, add the item to the list
             if (i.sku > 0)
             {
+                //Adding the item to the list
                 items.Add(i);
             }
             conn.Close();
-
+            //Returns a list of any items that are found
             return items;
 
         }
@@ -492,10 +519,14 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             int itemQTY = 0;
 
+            //Loops through the three item tables looking for the item so it can return its quantity
+            //Starting the search with clubs
             while (reader.Read())
             {
+                //Setting the itemQTY to the found quantity
                 itemQTY = Convert.ToInt32(reader["quantity"]);
             }
+            //If the item can't be found in the clubs table, we search the accessory table
             if (!reader.HasRows)
             {
                 reader.Close();
@@ -505,8 +536,10 @@ namespace SweetSpotProShop
 
                 while (readerAccesories.Read())
                 {
+                    //Setting the itemQTY to the found quantity
                     itemQTY = Convert.ToInt32(readerAccesories["quantity"]);
                 }
+                //If the item is not in the accessory table, we search the third table - clothing
                 if (!readerAccesories.HasRows)
                 {
                     readerAccesories.Close();
@@ -516,17 +549,22 @@ namespace SweetSpotProShop
 
                     while (readerclothing.Read())
                     {
+                        //Setting the itemQTY to the found quantity
                         itemQTY = Convert.ToInt32(readerclothing["quantity"]);
                     }
                 }
             }
             conn.Close();
+            //Returns the quantity of the searched item
             return itemQTY;
         }
+        //This method updates an item with its new quantity
         public void removeQTYfromInventoryWithSKU(int sku, int typeID, int remainingQTY)
         {
+            //Works by recieving a sku, a typeID, and the new quantity
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
+            //Determines which table to look in by using the typeID and returning the type name(clubs, accessories, clothing)
             string table = typeName(typeID);
             cmd.CommandText = "UPDATE tbl_" + table + " SET quantity = @quantity WHERE sku = @sku and typeID = @typeID";
             cmd.Parameters.AddWithValue("@sku", sku);
@@ -539,10 +577,13 @@ namespace SweetSpotProShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
+        //This method updates an item with its new quantity
         public void updateQuantity(int sku, int typeID, int quantity)
         {
+            //Works by recieving a sku, a typeID, and the new quantity
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
+            //Determines which table to look in by using the typeID and returning the type name(clubs, accessories, clothing)
             string table = typeName(typeID);
             cmd.CommandText = "UPDATE tbl_" + table + " SET quantity = @quantity WHERE sku = @sku and typeID = @typeID";
             cmd.Parameters.AddWithValue("@sku", sku);
@@ -555,14 +596,14 @@ namespace SweetSpotProShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-
-
         //Reserve trade-in sku
         public int reserveTradeInSKu(int loc)
         {
             int tradeInSkuDisplay = 0;
+            //Grabs the trade in sku
             tradeInSkuDisplay = tradeInSku(loc);
             int[] range = new int[2];
+            //Returns the range for the trade in sku
             range = tradeInSkuRange(loc);
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -573,14 +614,15 @@ namespace SweetSpotProShop
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
+            //Returns the trade in items display sku
             return tradeInSkuDisplay;
         }
-
         //Grabbing trade-in sku
         public int tradeInSku(int location)
         {
             int sku = 0;
             int[] range = new int[2];
+            //Returns the range for the trade in sku
             range = tradeInSkuRange(location);
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -596,6 +638,7 @@ namespace SweetSpotProShop
             int maxSku = 0;
             while (reader.Read())
             {
+                //Gets the max sku
                 maxSku = (reader["maxsku"] as int?) ?? range[0]; //Setting it to 0
             }
             conn.Close();
@@ -616,9 +659,10 @@ namespace SweetSpotProShop
                 sku = range[0];
             }
 
-
+            //Returns the sku that will be used
             return sku;
         }
+        //Finds and returns an array containing the upper and lower range for the trade in skus
         public int[] tradeInSkuRange(int location)
         {
             int[] range = new int[2];
@@ -638,33 +682,27 @@ namespace SweetSpotProShop
                 upper = Convert.ToInt32(reader["skuStopAt"].ToString());
                 lower = Convert.ToInt32(reader["skuStartAt"].ToString());
             }
-            range[0] = lower;
+            //Setting the values in the array
+            range[0] = lower; 
             range[1] = upper;
 
 
             conn.Close();
+            //Returns the range
             return range;
         }
         //Adding tradein item 
         public void addTradeInItem(Clubs tradeInItem, int sku, int loc)
         {
+            //This method addes the trade in item to the tempTradeInCartSKus table
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             int used = 0;
             if (tradeInItem.used == true)
-            {
-                used = 1;
-            }
-            else
-            {
-                used = 0;
-            }
+            { used = 1; }
+            else { used = 0; }
             if(tradeInItem.itemlocation == 0)
-            {
-                tradeInItem.itemlocation = 1;
-            }
-
-
+            { tradeInItem.itemlocation = 1; }
             cmd.Connection = conn;
             //cmd.CommandText = "insert into tbl_tempTradeInCartSkus values(" + tradeInItem.sku + ", " + tradeInItem.brandID + ", " +
             //    tradeInItem.modelID + ", '" + tradeInItem.clubType + "', '" + tradeInItem.shaft + "', '" + tradeInItem.numberOfClubs + "', " +
@@ -672,40 +710,32 @@ namespace SweetSpotProShop
             //    tradeInItem.clubSpec + "', '" + tradeInItem.shaftSpec + "', '" + tradeInItem.shaftFlex + "', '" +
             //    tradeInItem.dexterity + "', " + tradeInItem.typeID + ", " + tradeInItem.itemlocation + ", " +
             //    used + ", '" + tradeInItem.comments + "');";
-
             cmd.CommandText = "Update tbl_tempTradeInCartSkus set brandID = @brandID, modelID = @modelID, clubType = @clubType, shaft = @shaft," +
                 "numberOfClubs = @numberOfClubs, premium = @premium, cost = @cost, price = @price, quantity = @quantity, clubSpec = @clubSpec," +
                 "shaftSpec = @shaftSpec, shaftFlex = @shaftFlex, dexterity = @dexterity, typeID = @typeID, locationID = @locationID, used = @used," +
                 "comments = @comments where sku = @sku;";
-
             cmd.Parameters.AddWithValue("sku", sku);
-
             cmd.Parameters.AddWithValue("brandID", tradeInItem.brandID);
             cmd.Parameters.AddWithValue("modelID", tradeInItem.modelID);
             cmd.Parameters.AddWithValue("clubType", tradeInItem.clubType);
             cmd.Parameters.AddWithValue("shaft", tradeInItem.shaft);
-
             cmd.Parameters.AddWithValue("numberOfClubs", tradeInItem.numberOfClubs);
             cmd.Parameters.AddWithValue("premium", tradeInItem.premium);
             cmd.Parameters.AddWithValue("cost", tradeInItem.cost);
             cmd.Parameters.AddWithValue("price", tradeInItem.price);
             cmd.Parameters.AddWithValue("quantity", tradeInItem.quantity);
             cmd.Parameters.AddWithValue("clubSpec", tradeInItem.clubSpec);
-
             cmd.Parameters.AddWithValue("shaftSpec", tradeInItem.shaftSpec);
             cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.shaftFlex);
             cmd.Parameters.AddWithValue("dexterity", tradeInItem.dexterity);
             cmd.Parameters.AddWithValue("typeID", tradeInItem.typeID);
             cmd.Parameters.AddWithValue("locationID", loc);
             cmd.Parameters.AddWithValue("used", tradeInItem.used);
-
             cmd.Parameters.AddWithValue("comments", tradeInItem.comments);
-
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
-
         //Sending all of the invoice information to the database 
         public void mainInvoice(CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
         {
@@ -718,13 +748,15 @@ namespace SweetSpotProShop
 
             ////Step 2: Find the invoice sub number
             int nextInvoiceSubNum = 0;
-
+            //If the transaction is a sale
             if (transactionType == 1)
             {
                 nextInvoiceSubNum = Convert.ToInt32(invoiceNumber.Split('-')[2]);
             }
+            //If the transaction is a return
             else if(transactionType == 2)
             {
+                //Gets the next sub num
                 nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
             }
 
@@ -772,9 +804,11 @@ namespace SweetSpotProShop
             cmd.Parameters.AddWithValue("discountAmount", ckm.dblDiscounts);
             cmd.Parameters.AddWithValue("tradeinAmount", ckm.dblTradeIn);
             double gTax = 0;
+            //If the GST is included, set it's value to the checkoutmanager GST value otherwise it stays at 0
             if (ckm.blGst) { gTax = ckm.dblGst; }
             cmd.Parameters.AddWithValue("governmentTax", gTax);
             double pTax = 0;
+            //If the GST is included, set it's value to the checkoutmanager GST value otherwise it stays at 0
             if (ckm.blPst) { pTax = ckm.dblPst; }
             cmd.Parameters.AddWithValue("provincialTax", pTax);
             cmd.Parameters.AddWithValue("balanceDue", ckm.dblBalanceDue);
@@ -790,14 +824,17 @@ namespace SweetSpotProShop
             //Step 5: Insert each item into the invoiceItem table
             //invoiceNum, invoiceSubNum, sku, itemQuantity, itemCost, itemPrice, itemDiscount, Percentage
             string tbl = "";
+            //If it is a sale, use tbl_invoiceItem
             if(transactionType == 1)
             {
                 tbl = "tbl_invoiceItem";
             }
+            //If it is a return, use tbl_invoiceItemReturns
             else if (transactionType == 2)
             {
                 tbl = "tbl_invoiceItemReturns";
             }
+            //Loops through the cart to look at the items
             foreach (Cart item in cart)
             {
                 int percentage = 0;
@@ -811,14 +848,16 @@ namespace SweetSpotProShop
                 }
                 string insert = "insert into " + tbl + " values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", " + item.sku + ", " + item.quantity + ", " +
                     item.cost + ", " + item.price + ", " + item.discount + ", " + percentage + ");";
-
+                //Inserts the item
                 invoiceItem(insert);
             }
             //Step 6: Insert each MOP into the invoiceMOP table
             //ID(autoincrementing), invoiceNum, invoiceSubNum, mopID, amountPaid
+            //Loops through the checkout to get the mops
             foreach (Checkout mop in mops)
             {
                 string insert = "insert into tbl_invoiceMOP values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", '" + mop.methodOfPayment + "', " + mop.amountPaid + ");";
+                //Inserts the mop
                 invoiceMOP(insert);
             }
         }
@@ -835,17 +874,22 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
+                //If there there is no invoiceNum
                 if (reader["invoiceNum"] == DBNull.Value)
                 {
                     nextInvoiceNum = 0;
                 }
+                //If an invoiceNum is found
                 else
                 {
+                    //Take the found invoiceNum, and increment by 1 so there won't be a duplicate
                     nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
                 }
+                //Creates the invoice with the next invoice num
                 createInvoiceNum(nextInvoiceNum);
             }
             conn.Close();
+            //Returns the next invoiceNum
             return nextInvoiceNum;
         }
         //Create  the newly found invoice number
@@ -886,21 +930,25 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
+                //If there is no invoice sub num, set it to 0
                 if (reader["invoiceSubNum"] == DBNull.Value)
                 {
                     invoiceSubNum = 0;
                 }
                 else
                 {
+                    //If an invoice sub num is found, increment it
                     invoiceSubNum = Convert.ToInt32(reader["invoiceSubNum"]) + 1;
                 }
             }
             conn.Close();
+            //Return the invoice sub num
             return invoiceSubNum;
         }
-        //Adding items to the invoice  
+        //Adding items to the invoice 
         public void invoiceItem(string insert)
         {
+            //This method works by executing the string that is passed in as a database query
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
@@ -912,6 +960,7 @@ namespace SweetSpotProShop
         //Adding mops to the invoice 
         public void invoiceMOP(string insert)
         {
+            //This method works by executing the string that is passed in as a database query
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
@@ -920,6 +969,7 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
+        //Returns the employee ID from a password
         public int returnEmployeeIDfromPassword(int pWord)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
@@ -935,6 +985,7 @@ namespace SweetSpotProShop
                 empID = Convert.ToInt32(reader["empID"]);
             }
             conn.Close();
+            //Returns the employee ID
             return empID;
         }
         //Returns max sku
@@ -949,19 +1000,21 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
+                //If no sku is found, set it to 0
                 if (reader["largestSku"] == DBNull.Value)
                 {
                     maxSku = 0;
                 }
                 else
                 {
+                    //If a sku is found, increment by 1 to get the next largest sku
                     maxSku = Convert.ToInt32(reader["largestSku"]) + 1;
                 }
             }
             conn.Close();
+            //Returns the new largest sku
             return maxSku;
         }
-
         //Returns max sku from the skuNumber table based on itemType and directs code to store it
         public int maxSku(int itemType)
         {
@@ -975,23 +1028,29 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
+                //If there is no sku found, set it to 0
                 if (reader["largestSku"] == DBNull.Value)
                 {
                     maxSku = 0;
+                    //Stores the max sku along with its itemType
                     storeMaxSku(maxSku, itemType);
                 }
                 else
                 {
+                    //If a sku is found, increment it by 1
                     maxSku = Convert.ToInt32(reader["largestSku"]) + 1;
+                    //Stores the new max sku along with its itemType
                     storeMaxSku(maxSku, itemType);
                 }
             }
             conn.Close();
+            //Returns the new max sku
             return maxSku;
         }
         //Stores the max sku in the skuNumber table
         public void storeMaxSku(int sku, int itemType)
         {
+            //This method stores the max sku along with its item type
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
@@ -1002,7 +1061,6 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
-
         //************************Deleting invoices**********************************
         public void deleteInvoice(int invoiceNum, int invoiceSubNum, string deletionReason)
         {
@@ -1055,6 +1113,7 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
+        //Returns a list of the items in the invoice to update their quantities
         public List<Items> getItemsToReAdd(int invoiceNum, int invoiceSubNum)
         {
             List<Items> items = new List<Items>();
@@ -1073,8 +1132,10 @@ namespace SweetSpotProShop
                     Convert.ToInt32(reader["itemQuantity"])));
             }
             conn.Close();
+            //Returns the list of items
             return items;
         }
+        //Looks in the club table for the sku
         public bool checkInClub(int sku)
         {
             bool isClub = false;
@@ -1101,8 +1162,10 @@ namespace SweetSpotProShop
             }
             //Closing
             con.Close();
+            //Returns a boolean to signal if it is or isn't a club
             return isClub;
         }
+        //Looks in the clothing table for the sku
         public bool checkInClothing(int sku)
         {
             bool isClothing = false;
@@ -1129,8 +1192,10 @@ namespace SweetSpotProShop
             }
             //Closing
             con.Close();
+            //Returns a boolean to signal if it is or isn't clothing
             return isClothing;
         }
+        //Looks in the accessories table for the sku
         public bool checkInAccessories(int sku)
         {
             bool isAccessorie = false;
@@ -1157,8 +1222,10 @@ namespace SweetSpotProShop
             }
             //Closing
             con.Close();
+            //Returns a boolean to signal if it is or isn't an accessory
             return isAccessorie;
         }
+        //Gets the quantity of the item being returned
         public int getQuantity(int sku, string table)
         {
             int quantity = 0;
@@ -1171,18 +1238,22 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
+                //If the item doesn't have a quantity, set to 0
                 if (reader["itemQuantity"] == DBNull.Value)
                 {
                     quantity = 0;
                 }
                 else
                 {
+                    //If the item has a quantity
                     quantity = Convert.ToInt32(reader["itemQuantity"]);
                 }
             }
             conn.Close();
+            //Returns the item's quantity
             return quantity;
         }
+        //This method updates the item's quantity in the databse(clubs, accessories, clothing) by adding the returned items
         public void reAddingItems(int sku, int quantity, string table)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -1195,6 +1266,7 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
+        //This method gets the data from tbl_invoice and transfers it to the deletedInvoice table
         public void getInvoiceData(int invoiceNum, int invoiceSubNum, string deletionReason)
         {
             Invoice i = new Invoice();
@@ -1217,8 +1289,10 @@ namespace SweetSpotProShop
                     Convert.ToString(reader["comments"]));
             }
             conn.Close();
+            //Sends the invoice and the deletion reason to the transfer method for invoices
             transferMainInvoice(i, deletionReason);
         }
+        //This method gets the items in the invoice that is being deleted and transfers each item to the deleted invoice item table
         public void getInvoiceItems(int invoiceNum, int invoiceSubNum)
         {
             List<InvoiceItems> it = new List<InvoiceItems>();
@@ -1236,14 +1310,18 @@ namespace SweetSpotProShop
                 inItem = new InvoiceItems(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]),
                     Convert.ToInt32(reader["sku"]), Convert.ToInt32(reader["itemQuantity"]), Convert.ToDouble(reader["itemCost"]),
                     Convert.ToDouble(reader["itemPrice"]), Convert.ToDouble(reader["itemDiscount"]), Convert.ToBoolean(reader["percentage"]));
+                //Adds the found item to a list of type InvoiceItems
                 it.Add(inItem);
             }
             conn.Close();
+            //Loops through each item found and transfers them to the deleted invoice item table
             foreach (InvoiceItems iItems in it)
             {
+                //Sends the item to the transfer method for items
                 transferInvoiceItem(iItems);
             }
         }
+        //This method get the mops in the invoice that is being deleted and transfers each mop to the deleted invoice mop table
         public void getInvoiceMOPs(int invoiceNum, int invoiceSubNum)
         {
             List<InvoiceMOPs> im = new List<InvoiceMOPs>();
@@ -1260,14 +1338,18 @@ namespace SweetSpotProShop
             {
                 inMOPS = new InvoiceMOPs(Convert.ToInt32(reader["ID"]), Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]),
                     Convert.ToString(reader["mopType"]), Convert.ToDouble(reader["amountPaid"]));
+                //Adds the found mop to a list of type InvoiceMOPs
                 im.Add(inMOPS);
             }
             conn.Close();
+            //Loops through each mop found and transfers them to the deleted invoice mop table
             foreach (InvoiceMOPs iMOPS in im)
             {
+                //Sends the mop to the transfer method for items
                 transferInoviceMOP(iMOPS);
             }
         }
+        //This method transfers the invoice that is being deleted to the deleted invoice table
         public void transferMainInvoice(Invoice i, string deletionReason)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -1313,6 +1395,7 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
+        //This method transfers the item from the deleted invoice to the deleted invoice items table
         public void transferInvoiceItem(InvoiceItems im)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -1341,6 +1424,7 @@ namespace SweetSpotProShop
             conn.Close();
 
         }
+        //This method inserts the mops from the deleted invoice into the deleted invoice mops table
         public void transferInoviceMOP(InvoiceMOPs im)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -1362,6 +1446,7 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
+        //This method deletes the mops that have an invoiceNum and subNum that belongs to the deleted invoice
         public void deleteInvoiceMOP(int invoiceNum, int invoiceSubNum)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -1374,6 +1459,7 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
+        //This method deletes the items that have an invoiceNum and subNum that belongs to the deleted invoice
         public void deleteInvoiceItem(int invoiceNum, int invoiceSubNum)
         {
             SqlConnection conn = new SqlConnection(connectionString);
