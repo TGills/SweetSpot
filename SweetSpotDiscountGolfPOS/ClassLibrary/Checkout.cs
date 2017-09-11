@@ -5,6 +5,7 @@ using System.Web;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //The checkout class is used to define and create easy to access checkout information for sales.
     public class Checkout
     {
         public string methodOfPayment { get; set; }

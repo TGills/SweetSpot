@@ -9,12 +9,15 @@ using SweetSpotProShop;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //This method is used to handle and report an errors that happen during the use of the POS system
     public class ErrorReporting
     {
 
         private String connectionString;
         public ErrorReporting() { connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString; }
 
+        //This methods intended use was to send an automatic email when an error occured.
+        //May revisit at a later point
         public void sendError(string errorMessage)
         {
             SmtpClient SmtpServer = new SmtpClient();
@@ -34,6 +37,8 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             
             SmtpServer.Send(mail);
         }
+
+        //This method is used to log errors in the database
         public void logError(Exception er, int employeeID, string page, string method, System.Web.UI.Page webPage)
         {
             string date = DateTime.Now.ToString("yyyy-MM-dd");

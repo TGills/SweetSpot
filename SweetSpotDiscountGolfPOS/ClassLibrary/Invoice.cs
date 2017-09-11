@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The invoice class is used to keep track or populate the printable invoice webpage with the current invoice's information
     public class Invoice
     {
 
