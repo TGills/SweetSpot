@@ -47,20 +47,23 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //Collects current method and page for error tracking
             string method = "Page_Load";
             Session["currPage"] = "ReportsCashOut.aspx";
             try
             {
+                //checks if the user has logged in
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
+                    //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
-
 
                 //Gathering the start and end dates
                 DateTime[] reportDates = (DateTime[])Session["reportDates"];
                 startDate = reportDates[0];
                 endDate = reportDates[1];
+                //Builds string to display in label
                 if(startDate == endDate)
                 {
                     lblCashoutDate.Text = "Cashout for: " + startDate.ToString("d");
@@ -69,54 +72,45 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     lblCashoutDate.Text = "Cashout for: " + startDate.ToString("d") + " to " + endDate.ToString("d");
                 }
-                //Creating a cashout list and calling a method that grabs all mops and amounts paid
+                //Gathers current employe based on Session id
                 EmployeeManager em = new EmployeeManager();
                 int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
                 Employee emp = em.getEmployeeByID(empNum);
 
                 int locationID = emp.locationID;
+                //Creating a cashout list and calling a method that grabs all mops and amounts paid
                 List<Cashout> lc = reports.cashoutAmounts(startDate, endDate, locationID);
                 List<Cashout> rc = reports.getRemainingCashout(startDate, endDate, locationID);
-                int counter = 0;
+                //int counter = 0;
                 //Looping through the list and adding up the totals
                 foreach (Cashout ch in lc)
                 {
                     if (ch.mop == "Visa")
                     {
-                        cashoutTotal += ch.amount;
                         visaTotal += ch.amount;
                     }
                     else if (ch.mop == "MasterCard")
                     {
-                        cashoutTotal += ch.amount;
                         mcTotal += ch.amount;
                     }
                     else if (ch.mop == "Cash")
                     {
-                        cashoutTotal += ch.amount;
                         cashTotal += ch.amount;
                     }
                     else if (ch.mop == "Gift Card")
                     {
-                        cashoutTotal += ch.amount;
                         giftCertTotal += ch.amount;
                     }
                     else if (ch.mop == "Debit")
                     {
-                        cashoutTotal += ch.amount;
                         debitTotal += ch.amount;
                     }
-
-                    //if (ch.tradeIn != 0)
-                    //{
-                    //    cashoutTotal -= ch.tradeIn; //Adding because it is a negative value //Switched to subtracting
-                    //    tradeinTotal += ch.tradeIn;
-
-                    //}                
+                    cashoutTotal += ch.amount;
                 }
-                tradeinTotal = reports.getTradeInsCashout(startDate, endDate, locationID);
-                cashoutTotal -= tradeinTotal;
-
+                //Gathers total amount of trade ins done through date range
+                tradeinTotal = -1 * reports.getTradeInsCashout(startDate, endDate, locationID);
+                cashoutTotal += tradeinTotal;
+                //Calculates a subtotal, gst, and pst
                 foreach (Cashout rch in rc)
                 {
                     subtotalTotal += rch.saleSubTotal;
@@ -124,13 +118,13 @@ namespace SweetSpotDiscountGolfPOS
                     pstTotal += rch.salePST;
                 }
 
-                tradeinTotal = tradeinTotal * -1;
+                //tradeinTotal = tradeinTotal * -1;
 
                 Cashout cas = new Cashout(tradeinTotal, giftCertTotal, cashTotal,
                     debitTotal, mcTotal, visaTotal, gstTotal, pstTotal, subtotalTotal);
-
+                //Store the cashout in a Session
                 Session["saleCashout"] = cas;
-
+                //Display all totals into labels
                 lblVisaDisplay.Text = visaTotal.ToString("#0.00");
                 lblMasterCardDisplay.Text = mcTotal.ToString("#0.00");
                 lblCashDisplay.Text = cashTotal.ToString("#0.00");
@@ -142,12 +136,17 @@ namespace SweetSpotDiscountGolfPOS
                 lblPSTDisplay.Text = pstTotal.ToString("#0.00");
                 lblPreTaxDisplay.Text = (subtotalTotal + tradeinTotal).ToString("#0.00");
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -157,6 +156,7 @@ namespace SweetSpotDiscountGolfPOS
         //Calculating the cashout
         protected void btnCalculate_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnCalculate_Click";
             try
             {
@@ -209,12 +209,17 @@ namespace SweetSpotDiscountGolfPOS
                     receiptSubTotalTotal, overShort);
                 Session["receiptCashout"] = cas;
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -224,6 +229,7 @@ namespace SweetSpotDiscountGolfPOS
         //Clearing the entered amounts
         protected void btnClear_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnClear_Click";
             try
             {
@@ -235,12 +241,17 @@ namespace SweetSpotDiscountGolfPOS
                 txtTradeIn.Text = "";
                 txtVisa.Text = "";
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -249,15 +260,22 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void printReport(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "printReport";
+            //Current method does nothing
             try
             { }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -266,32 +284,41 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnProcessReport_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnProcessReport_Click";
             try
             {
+                //Sets date and time
                 string date = DateTime.Now.ToString("yyyy-MM-dd");
                 string time = DateTime.Now.ToString("HH:mm:ss");
-
+                //Grabs cashouts from stored sessions
                 Cashout s = (Cashout)Session["saleCashout"];
                 Cashout r = (Cashout)Session["receiptCashout"];
 
                 processed = true;
-
+                //Creates new cashout
                 Cashout cas = new Cashout(date, time, s.saleTradeIn, s.saleGiftCard,
                     s.saleCash, s.saleDebit, s.saleMasterCard, s.saleVisa, s.saleGST, s.salePST, s.saleSubTotal,
                     r.receiptTradeIn, r.receiptGiftCard, r.receiptCash,
                     r.receiptDebit, r.receiptMasterCard, r.receiptVisa, r.receiptGST, r.receiptPST, r.receiptSubTotal, r.overShort,
                     finalized, processed, Convert.ToDouble(lblPreTaxDisplay.Text));
+                //Processes as done
                 reports.insertCashout(cas);
+                //Empties current cashout sessions
                 Session["saleCashout"] = null;
                 Session["receiptCashout"] = null;
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
