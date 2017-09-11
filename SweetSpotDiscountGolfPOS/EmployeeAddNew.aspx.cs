@@ -357,6 +357,7 @@ namespace SweetSpotDiscountGolfPOS
             {
                 //removes employee key that was set so no employee is currently selected
                 Session["empKey"] = null;
+                //Changes page to the settings page
                 Server.Transfer("SettingsHomePage.aspx", false);
             }
             //Exception catch
