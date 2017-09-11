@@ -7,6 +7,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
     public class Location
     {
+        //Used to define and create a location
         public string location { get; set; }
         public string address { get; set; }
         public string city { get; set; }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //Used to define and create a tax
     public class Tax
     {
         public double taxRate { get; set; }
