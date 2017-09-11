@@ -118,7 +118,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnAddCustomer_Click(object sender, EventArgs e)
         {
-            //Collects current method and page for error tracking
+            //Collects current method for error tracking
             string method = "btnAddCustomer_Click";
             try
             {
@@ -136,6 +136,7 @@ namespace SweetSpotDiscountGolfPOS
                 c.province = Convert.ToInt32(ddlProvince.SelectedValue);
                 c.country = Convert.ToInt32(ddlCountry.SelectedValue);
                 c.postalCode = txtPostalCode.Text;
+
                 //Process the add and saves the customer into the key.
                 Session["key"] = ssm.addCustomer(c);
                 Server.Transfer(Request.RawUrl, false);
@@ -159,7 +160,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnEditCustomer_Click(object sender, EventArgs e)
         {
-            //Collects current method and page for error tracking
+            //Collects current method for error tracking
             string method = "btnEditCustomer_Click";
             try
             {
@@ -199,6 +200,7 @@ namespace SweetSpotDiscountGolfPOS
                 txtCity.Text = lblCityDisplay.Text;
                 txtCity.Visible = true;
                 lblCityDisplay.Visible = false;
+
                 //transfers data from label into dropdown for editing
                 ddlProvince.SelectedValue = lm.pronvinceID(lblProvinceDisplay.Text).ToString();
                 string ddlProvinceValue = ddlProvince.SelectedValue.ToString();
@@ -241,7 +243,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnSaveCustomer_Click(object sender, EventArgs e)
         {
-            //Collects current method and page for error tracking
+            //Collects current method for error tracking
             string method = "btnSaveCustomer_Click";
             try
             {
@@ -322,7 +324,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnCancel_Click(object sender, EventArgs e)
         {
-            //Collects current method and page for error tracking
+            //Collects current method for error tracking
             string method = "btnCancel_Click";
             try
             {
@@ -382,7 +384,7 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnBackToSearch_Click";
             try
             {
-                //removes key that was set so no customer is selected
+                //removes key that was set so no customer is currently selected
                 Session["key"] = null;
                 //opens the Customer home page
                 Server.Transfer("CustomerHomePage.aspx", false);
