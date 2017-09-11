@@ -22,27 +22,35 @@ namespace SweetSpotDiscountGolfPOS
         LocationManager lm = new LocationManager();
         protected void Page_Load(object sender, EventArgs e)
         {
+            //Collects current method and page for error tracking
             string method = "Page_Load";
             Session["currPage"] = "InventoryAddNew.aspx";
             try
             {
+                //checks if the user has logged in
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
+                    //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
                 if (Session["Admin"] == null)
                 {
+                    //If user is not an admin then disable the edit item button
                     btnEditItem.Enabled = false;
                 }
+                //Check to see if an item was selected
                 if (Session["itemKey"] != null)
                 {
                     if (!IsPostBack)
                     {
+                        //Using the item number
                         string itemType = Session["itemType"].ToString();
                         int itemSKU = Convert.ToInt32(Session["itemKey"].ToString());
                         lblTypeDisplay.Text = itemType;
+                        //Checks the item type
                         if (itemType == "Clubs")
                         {
+                            //When a club, create class and populate labels
                             c = ssm.singleItemLookUp(itemSKU);
                             lblSKUDisplay.Text = c.sku.ToString();
                             lblCostDisplay.Text = c.cost.ToString();
@@ -65,6 +73,7 @@ namespace SweetSpotDiscountGolfPOS
                         }
                         else if (itemType == "Accessories")
                         {
+                            //When accessories, create class and populate labels
                             a = ssm.getAccessory(itemSKU);
                             lblSKUDisplay.Text = a.sku.ToString();
                             lblCostDisplay.Text = a.cost.ToString();
@@ -83,9 +92,7 @@ namespace SweetSpotDiscountGolfPOS
                             lblShaftDisplay.Text = a.colour.ToString();
 
                             lblCommentsDisplay.Text = a.comments.ToString();
-
-
-
+                            
                             lblClubSpec.Visible = false;
                             lblClubSpecDisplay.Visible = false;
                             lblShaftSpec.Visible = false;
@@ -101,6 +108,7 @@ namespace SweetSpotDiscountGolfPOS
                         }
                         else if (itemType == "Clothing")
                         {
+                            //When clothing, create class and populate labels
                             cl = ssm.getClothing(itemSKU);
                             lblSKUDisplay.Text = cl.sku.ToString();
                             lblCostDisplay.Text = cl.cost.ToString();
@@ -135,6 +143,7 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else
                 {
+                    //When no item was selected display drop downs and text boxes
                     ddlType.Visible = true;
                     lblTypeDisplay.Visible = false;
 
@@ -166,6 +175,7 @@ namespace SweetSpotDiscountGolfPOS
                     //Accessories
                     if (ddlType.SelectedIndex <= 0)
                     {
+                        //adjust labels displaying for accessories
                         lblClubType.Text = "Size: ";
                         txtClubType.Visible = true;
                         lblShaft.Text = "Colour: ";
@@ -189,6 +199,7 @@ namespace SweetSpotDiscountGolfPOS
                     //Clubs
                     else if (ddlType.SelectedIndex == 2)
                     {
+                        //adjust labels displaying for clubs
                         txtClubType.Visible = true;
                         ddlModel.Visible = true;
                         txtShaft.Visible = true;
@@ -215,6 +226,7 @@ namespace SweetSpotDiscountGolfPOS
                     //Clothing
                     else if (ddlType.SelectedIndex == 1)
                     {
+                        //adjust labels displaying for clubs
                         lblClubType.Text = "Size: ";
                         txtClubType.Visible = true;
                         lblShaft.Text = "Colour: ";
@@ -239,7 +251,7 @@ namespace SweetSpotDiscountGolfPOS
 
                     }
 
-
+                    //hides and displays the proper buttons for access
                     btnSaveItem.Visible = false;
                     btnAddItem.Visible = true;
                     pnlDefaultButton.DefaultButton = "btnAddItem";
@@ -248,12 +260,17 @@ namespace SweetSpotDiscountGolfPOS
                     btnBackToSearch.Visible = true;
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -262,14 +279,17 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnAddItem_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnAddItem_Click";
             try
             {
+                //Retrieves the type of item that is getting added
                 int skuNum;
                 string type = idu.typeName(Convert.ToInt32(ddlType.SelectedValue));
                 Session["itemType"] = type;
                 if (ddlType.SelectedIndex == 2)
                 {
+                    //Transfers all info into Club class
                     c.sku = idu.maxSku(1);
                     c.cost = Convert.ToDouble(txtCost.Text);
                     c.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
@@ -287,10 +307,12 @@ namespace SweetSpotDiscountGolfPOS
                     c.used = chkUsed.Checked;
                     c.comments = txtComments.Text;
                     c.typeID = Convert.ToInt32(ddlType.SelectedValue);
+                    //stores club as an object
                     o = c as Object;
                 }
                 else if (ddlType.SelectedIndex == 0)
                 {
+                    //Transfers all info into Accessory class
                     a.sku = idu.maxSku(2);
                     a.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                     a.cost = Convert.ToDouble(txtCost.Text);
@@ -302,10 +324,12 @@ namespace SweetSpotDiscountGolfPOS
                     a.colour = txtShaft.Text;
                     a.accessoryType = txtNumberofClubs.Text;
                     a.comments = txtComments.Text;
+                    //stores accessory as an object
                     o = a as Object;
                 }
                 else if (ddlType.SelectedIndex == 1)
                 {
+                    //Transfers all info into Clothing class
                     cl.sku = idu.maxSku(3);
                     cl.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                     cl.cost = Convert.ToDouble(txtCost.Text);
@@ -318,18 +342,27 @@ namespace SweetSpotDiscountGolfPOS
                     cl.gender = txtClubSpec.Text;
                     cl.style = txtShaftFlex.Text;
                     cl.comments = txtComments.Text;
+                    //stores clothing as an object
                     o = cl as Object;
                 }
+                //adds item into the inventory
                 skuNum = ssm.addItem(o);
+                //store sku into Session
                 Session["itemKey"] = skuNum;
+                //Refreshes current page
                 Server.Transfer(Request.RawUrl, false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -338,9 +371,11 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnEditItem_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnEditItem_Click";
             try
             {
+                //transfers data from labels into textbox for editing
                 txtCost.Text = lblCostDisplay.Text;
                 txtCost.Visible = true;
                 lblCostDisplay.Visible = false;
@@ -363,6 +398,7 @@ namespace SweetSpotDiscountGolfPOS
 
                 if (lblTypeDisplay.Text == "Clubs")
                 {
+                    //transfers specific data if club type item
                     txtClubType.Text = lblClubTypeDisplay.Text;
                     txtClubType.Visible = true;
                     lblClubTypeDisplay.Visible = false;
@@ -403,6 +439,7 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else if (lblTypeDisplay.Text == "Accessories")
                 {
+                    //transfers specific data if accessories type item
                     ddlModel.SelectedValue = idu.modelName(lblModelDisplay.Text).ToString();
                     ddlModel.Visible = true;
                     lblModelDisplay.Visible = false;
@@ -425,6 +462,7 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else if (lblTypeDisplay.Text == "Clothing")
                 {
+                    //transfers specific data if clothing type item
                     txtClubType.Text = lblClubTypeDisplay.Text;
                     txtClubType.Visible = true;
                     lblClubTypeDisplay.Visible = false;
@@ -445,6 +483,7 @@ namespace SweetSpotDiscountGolfPOS
                     txtComments.Visible = true;
                     lblCommentsDisplay.Visible = false;
                 }
+                //hides and displays the proper buttons for access
                 btnSaveItem.Visible = true;
                 pnlDefaultButton.DefaultButton = "btnSaveItem";
                 btnEditItem.Visible = false;
@@ -452,12 +491,17 @@ namespace SweetSpotDiscountGolfPOS
                 btnCancel.Visible = true;
                 btnBackToSearch.Visible = false;
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -466,12 +510,13 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnSaveItem_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnSaveItem_Click";
             try
             {
                 if (lblTypeDisplay.Text == "Clubs")
                 {
-
+                    //if item type is club then save as club class
                     c.sku = Convert.ToInt32(Session["itemKey"].ToString());
                     c.cost = Convert.ToDouble(txtCost.Text);
                     c.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
@@ -489,7 +534,7 @@ namespace SweetSpotDiscountGolfPOS
                     c.comments = txtComments.Text;
                     c.used = chkUsed.Checked;
                     ssm.updateItem(c);
-
+                    //changes all text boxes and dropdowns to labels
                     txtCost.Visible = false;
                     lblCostDisplay.Visible = true;
                     ddlBrand.Visible = false;
@@ -522,6 +567,7 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else if (lblTypeDisplay.Text == "Accessories")
                 {
+                    //if item type is accesory then save as accessory class
                     a.sku = Convert.ToInt32(lblSKUDisplay.Text);
                     a.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                     a.cost = Convert.ToDouble(txtCost.Text);
@@ -535,7 +581,7 @@ namespace SweetSpotDiscountGolfPOS
                     a.comments = txtComments.Text;
                     ssm.updateAccessories(a);
 
-
+                    //changes all text boxes and dropdowns to labels
                     ddlModel.Visible = false;
                     lblModelDisplay.Visible = true;
                     txtNumberofClubs.Visible = false;
@@ -559,6 +605,7 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else if (lblTypeDisplay.Text == "Clothing")
                 {
+                    //if item type is clothing then save as clothing class
                     cl.sku = Convert.ToInt32(lblSKUDisplay.Text);
                     cl.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                     cl.cost = Convert.ToDouble(txtCost.Text);
@@ -572,6 +619,7 @@ namespace SweetSpotDiscountGolfPOS
                     cl.comments = txtComments.Text;
                     ssm.updateClothing(cl);
 
+                    //changes all text boxes and dropdowns to labels
                     txtCost.Visible = false;
                     lblCostDisplay.Visible = true;
                     ddlBrand.Visible = false;
@@ -593,7 +641,7 @@ namespace SweetSpotDiscountGolfPOS
                     txtComments.Visible = false;
                     lblCommentsDisplay.Visible = true;
                 }
-
+                //hides and displays the proper buttons for access
                 btnSaveItem.Visible = false;
                 btnEditItem.Visible = true;
                 pnlDefaultButton.DefaultButton = "btnEditItem";
@@ -603,12 +651,17 @@ namespace SweetSpotDiscountGolfPOS
 
                 Server.Transfer(Request.RawUrl, false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -617,17 +670,24 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnCancel_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnCancel_Click";
             try
             {
+                //no changes saved, refreshes current page
                 Server.Transfer(Request.RawUrl, false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -636,19 +696,27 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnBackToSearch_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnBackToSearch_Click";
             try
             {
+                //removes item key and type that was set so no item is currently selected
                 Session["itemType"] = null;
                 Session["itemKey"] = null;
+                //Changes page to the inventory home page
                 Server.Transfer("InventoryHomePage.aspx", false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -657,17 +725,24 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "ddlType_SelectedIndexChanged";
             try
             {
+                //changes the item type, causes post back
                 Session["itemType"] = ddlType.SelectedIndex;
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);

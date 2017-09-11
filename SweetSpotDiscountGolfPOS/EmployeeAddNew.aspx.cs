@@ -31,7 +31,7 @@ namespace SweetSpotDiscountGolfPOS
 
                 if (Session["Admin"] == null)
                 {
-                    //If user is not an admin then  disable the edit employee button
+                    //If user is not an admin then disable the edit employee button
                     btnEditEmployee.Enabled = false;
                 }
                 //Check to see if an employee was selected
