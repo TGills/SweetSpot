@@ -1,0 +1,1623 @@
+public System.Data.DataTable testingMethod()
+        {            
+            System.Data.DataTable table = new System.Data.DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            //using (var cmd = new SqlCommand("singleEmployee", con))
+            using (var cmd = new SqlCommand("allEmployees", con))
+            using (var da = new SqlDataAdapter(cmd))
+            {
+                //cmd.Parameters.AddWithValue("@empID", 6);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
+            }
+            //foreach (DataRow row in table.Rows)
+            //{
+            //    results = row["firstName"].ToString() + " " + row["lastName"].ToString();
+            //}
+            return table;
+        }
+
+***************************************************************************
+
+create procedure allEmployees
+as
+select * from tbl_employee
+Go
+
+***************************************************************************
+
+create procedure singleEmployee
+@empID int
+as
+select * from tbl_employee where empID = @empID
+Go
+
+***************************************************************************
+
+create procedure getCustomerByCustomerNumber
+@custID varchar(100)
+as
+select * from tbl_customers Where custID = @custID
+Go
+
+***************************************************************************
+
+create procedure getCustomerFromSearch
+@searchField varchar(100)
+as
+select * from tbl_customers Where Concat(firstName,lastName) 
+Like '%Bill%' or Concat(primaryPhoneINT,secondaryPhoneINT) 
+like '%Bill%' order by firstName asc
+Go
+
+***************************************************************************
+
+create procedure insertCustomer
+@firstName varchar(100),
+@lastName varchar(100),
+@primaryAddress varchar(100),
+@secondaryAddress varchar(100),
+@billingAddress varchar(100),
+@City varchar(100),
+@PostalCode varchar(100),
+@Province int,
+@Country int,
+@primaryPhoneNumber varchar(100),
+@secondaryPhoneNumber varchar(100),
+@Email varchar(100)
+as
+Insert Into tbl_customers (firstName, lastName, primaryAddress,
+                secondaryAddress, primaryPhoneINT, secondaryPhoneINT, billingAddress, email,
+                city, provStateID, country, postZip) Values (@FirstName, @LastName, @primaryAddress,
+                @secondaryAddress, @primaryPhoneNumber, @secondaryPhoneNumber, @billingAddress,
+                @Email, @City, @Province, @Country, @PostalCode)
+Go
+
+
+***************************************************************************
+
+create procedure getCustomerID
+@firstName varchar(100),
+@lastName varchar(100),
+@primaryAddress varchar(100),
+@secondaryAddress varchar(100),
+@billingAddress varchar(100),
+@City varchar(100),
+@PostalCode varchar(100),
+@Province int,
+@Country int,
+@primaryPhoneNumber varchar(100),
+@secondaryPhoneNumber varchar(100),
+@Email varchar(100)
+as
+Select custID From tbl_customers Where 
+firstName = @FirstName and 
+lastName = @LastName and 
+primaryAddress = @primaryAddress and 
+secondaryAddress = @secondaryAddress and 
+primaryPhoneINT = @primaryPhoneNumber and 
+secondaryPhoneINT = @secondaryPhoneNumber and 
+billingAddress = @BillingAddress and 
+email = @Email and 
+city = @City and 
+provStateID = @Province and 
+country = @Country and 
+postZip = @PostalCode
+Go
+
+***************************************************************************
+
+create procedure updateCustomer
+@firstName varchar(100),
+@lastName varchar(100),
+@primaryAddress varchar(100),
+@secondaryAddress varchar(100),
+@billingAddress varchar(100),
+@City varchar(100),
+@PostalCode varchar(100),
+@Province int,
+@Country int,
+@primaryPhoneNumber varchar(100),
+@secondaryPhoneNumber varchar(100),
+@Email varchar(100),
+@custID int
+as
+Update tbl_customers Set firstName = @FirstName, lastName = @LastName, primaryAddress = @primaryAddress,
+                secondaryAddress = @secondaryAddress, primaryPhoneINT = @primaryPhoneNumber, secondaryPhoneINT = @secondaryPhoneNumber,
+                billingAddress = @BillingAddress, email = @Email, city = @City, provStateID = @Province, country = @Country,
+                postZip = @PostalCode Where custID = @custID
+Go
+
+***************************************************************************
+
+create procedure getClubFromDesc
+@searchField  varchar(200)
+as
+Select * from tbl_clubs
+where (sku like '%' + @searchField  + '%' or
+modelID in (Select modelID from tbl_model where modelName like '%' + @searchField  + '%') or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField  + '%') or
+concat(clubType, shaft, dexterity) like '%' + @searchField  + '%')
+Go
+
+***************************************************************************
+
+create procedure getClubFromDescExtended
+@searchField  varchar(200)
+as
+Select * from tbl_clubs
+where (sku like '%' + @searchField  + '%' or
+modelID in (Select modelID from tbl_model where modelName like '%' + @searchField  + '%') or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField  + '%') or
+concat(clubType, shaft, dexterity) like '%' + @searchField  + '%') 
+Intersect (Select * from tbl_clubs 
+where (sku like '%' + @searchField  + '%' or 
+modelID in (Select modelID from tbl_model where modelName like '%' + @searchField  + '%') or 
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField  + '%') or 
+concat(clubType, shaft, dexterity) like '%' + @searchField  + '%'))
+Go
+
+***************************************************************************
+
+create procedure getAccessoriesFromDesc
+@searchField  varchar(200)
+as
+Select * from tbl_accessories
+where (sku like '%' + @searchField + '%' or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField + '%') or
+concat(size, colour) like '%' + @searchField + '%')
+Go
+
+***************************************************************************
+
+create procedure getAccessoriesFromDescExtended
+@searchField  varchar(200)
+as
+Select * from tbl_accessories
+where (sku like '%' + @searchField + '%' or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField + '%') or
+concat(size, colour) like '%' + @searchField + '%')
+Intersect (Select * from tbl_accessories where (sku like '%' + @searchField + '%' or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField + '%') or
+concat(size, colour) like '%' + @searchField + '%'))
+Go
+
+***************************************************************************
+
+create procedure getClothingFromDesc
+@searchField  varchar(200)
+as
+Select * from tbl_clothing where (sku like '%' + @searchField + '%' or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField + '%') or
+concat(size, colour, gender, style) like '%' + @searchField + '%')
+Go
+
+***************************************************************************
+
+create procedure getClothingFromDescExtended
+@searchField  varchar(200)
+as
+Select * from tbl_clothing where (sku like '%' + @searchField + '%' or
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField + '%') or
+concat(size, colour, gender, style) like '%' + @searchField + '%')
+Intersect (Select * from tbl_clothing where (sku like '%' + @searchField + '%' or 
+brandID in (Select brandID from tbl_brand where brandName like '%' + @searchField + '%') or 
+concat(size, colour, gender, style) like '%' + @searchField + '%'))
+Go
+
+***************************************************************************
+
+create procedure getTradeInItem
+@sku  int
+as
+Select sku, brandID, modelID, clubType, shaft, numberOfClubs, premium, cost, price, quantity, clubSpec,
+shaftSpec, shaftFlex, dexterity, used, comments From tbl_tempTradeInCartSkus Where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure getSingleClub
+@sku  int
+as
+Select sku, brandID, modelID, typeID, clubType, shaft, numberOfClubs, premium, cost, price, quantity, clubSpec,
+shaftSpec, shaftFlex, dexterity, locationID, used, comments From tbl_clubs Where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure getClubSku
+@brandID int,
+@modelID int, 
+@clubType varchar(200),
+@shaft varchar(200),
+@numberOfClubs varchar(200),
+@premium float,
+@cost float,
+@price float,
+@quantity int,
+@clubSpec varchar(200),
+@shaftSpec varchar(200),
+@shaftFlex varchar(200),
+@dexterity varchar(200),
+@used bit,
+@typeID int,
+@comments varchar(300)
+as
+Select sku From tbl_clubs Where brandID = @brandID and 
+modelID = @modelID and clubType = @clubType and 
+shaft = @shaft and numberOfClubs = @numberOfClubs and 
+premium = @premium and cost = @cost and price = @price and 
+quantity = @quantity and clubSpec = @clubSpec and 
+shaftSpec = @shaftSpec and shaftFlex = @shaftFlex and
+dexterity = @dexterity and  used = @used and 
+typeID = @typeID and comments = @comments
+Go
+
+***************************************************************************
+
+create procedure getAccessorySku
+@brandID int,
+@size varchar(200),
+@colour varchar(200),
+@cost float,
+@price float,
+@quantity int
+as
+Select sku From tbl_accessories Where brandID = @brandID and size = @size and colour = @colour and
+price = @price and cost = @cost and quantity = @quantity
+Go
+
+***************************************************************************
+
+create procedure getClothingSku
+@brandID int,
+@size varchar(200),
+@colour varchar(200),
+@gender varchar(200),
+@style varchar(200),
+@cost float,
+@price float,
+@quantity int
+as
+Select sku From tbl_clothing Where brandID = @brandID and size = @size and colour = @colour and
+gender = @gender and style = @style and price = @price and cost = @cost and quantity = @quantity
+Go
+
+***************************************************************************
+
+create procedure insertClub
+@sku int,
+@brandID int,
+@modelID int, 
+@clubType varchar(200),
+@shaft varchar(200),
+@numberOfClubs varchar(200),
+@premium float,
+@cost float,
+@price float,
+@quantity int,
+@clubSpec varchar(200),
+@shaftSpec varchar(200),
+@shaftFlex varchar(200),
+@dexterity varchar(200),
+@used bit,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+Insert Into tbl_clubs (
+sku, brandID, modelID, clubType, shaft, numberOfClubs,
+premium, cost, price, quantity, clubSpec, shaftSpec, 
+shaftFlex, dexterity, typeID, locationID, used, comments)
+Values (
+@sku, @brandID, @modelID, @clubType, @shaft, @numberOfClubs,
+@premium, @cost, @price, @quantity, @clubSpec, @shaftSpec, 
+@shaftFlex, @dexterity, @typeID,@locationID, @used, @comments)
+Go
+
+***************************************************************************
+
+create procedure insertAccessory
+@sku int,
+@brandID int,
+@modelID int,
+@accessoryType varchar(200),
+@size varchar(200),
+@colour varchar(200),
+@cost float,
+@price float,
+@quantity int,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+Insert Into tbl_accessories (
+sku, size, colour, price, cost, 
+brandID, modelID, accessoryType, 
+quantity, typeID, locationID, comments)
+Values (@sku, @size, @colour, @price, 
+@cost, @brandID, @modelID, @accessoryType,
+@quantity, @typeID, @locationID, @comments)
+Go
+
+***************************************************************************
+
+create procedure insertClothing
+@sku int,
+@brandID int,
+@size varchar(200),
+@colour varchar(200),
+@gender varchar(200),
+@style varchar(200),
+@cost float,
+@price float,
+@quantity int,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+Insert Into tbl_clothing (sku, size, colour,
+gender, style, price, cost, brandID, 
+quantity, typeID, locationID, comments)
+Values (@sku, @size, @colour, @gender,
+@style, @price, @cost, @brandID,
+@quantity, @typeID, @locationID, @comments)
+Go
+
+***************************************************************************
+
+create procedure checkClubForItem
+@sku int
+as
+select count(*) from tbl_clubs where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure checkAccessoriesForItem
+@sku int
+as
+select count(*) from tbl_accessories where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure checkClothingForItem
+@sku int
+as
+select count(*) from tbl_clothing where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure getSingleAccessory
+@sku int
+as
+Select sku, brandID, modelID, accessoryType, size, colour, price, cost, quantity, typeID, locationID, comments From tbl_accessories Where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure getSingleClothing
+@sku int
+as
+Select sku, brandID, size, colour, gender, style, price, cost, quantity, typeID, locationID, comments From tbl_clothing Where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure updateClub
+@sku int,
+@brandID int,
+@modelID int, 
+@clubType varchar(200),
+@shaft varchar(200),
+@numberOfClubs varchar(200),
+@premium float,
+@cost float,
+@price float,
+@quantity int,
+@clubSpec varchar(200),
+@shaftSpec varchar(200),
+@shaftFlex varchar(200),
+@dexterity varchar(200),
+@used bit,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+UPDATE tbl_clubs SET brandID = @brandID, modelID = @modelID, clubType = @clubType, shaft = @shaft,
+numberOfClubs = @numberOfClubs, premium = @premium, cost = @cost, price = @price, quantity = @quantity,
+clubSpec = @clubSpec, shaftSpec = @shaftSpec, shaftFlex = @shaftFlex, dexterity = @dexterity,
+locationID = @locationID, comments = @comments WHERE sku = @sku
+Go
+
+***************************************************************************
+
+create procedure updateAccessory
+@sku int,
+@brandID int,
+@modelID int,
+@accessoryType varchar(200),
+@size varchar(200),
+@colour varchar(200),
+@cost float,
+@price float,
+@quantity int,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+UPDATE tbl_accessories SET size = @size, colour = @colour, 
+price = @price, cost = @cost, brandID = @brandID,
+modelID = @modelID, accessoryType = @accessoryType, 
+quantity = @quantity, locationID = @locationID, comments = @comments WHERE sku = @sku
+Go
+
+***************************************************************************
+
+create procedure updateClothing
+@sku int,
+@brandID int,
+@size varchar(200),
+@colour varchar(200),
+@gender varchar(200),
+@style varchar(200),
+@cost float,
+@price float,
+@quantity int,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+UPDATE tbl_clothing SET size = @size, colour = @colour, 
+gender = @gender, style = @style,
+price = @price, cost = @cost, brandID = @brandID,
+quantity = @quantity, locationID = @locationID, 
+comments = @comments WHERE sku = @sku
+Go
+
+***************************************************************************
+
+create procedure getClubItemTypeID
+@sku int
+as
+SELECT typeID FROM tbl_clubs WHERE sku = @sku
+Go
+
+***************************************************************************
+
+create procedure getAccessoryItemTypeID
+@skuacces int
+as
+Select typeID from tbl_accessories where SKU = @skuacces
+Go
+
+***************************************************************************
+
+create procedure getClothingItemTypeID
+@skucloth int
+as
+Select typeID from tbl_clothing where SKU = @skucloth
+Go
+
+***************************************************************************
+
+create procedure getClubDescription
+@skuCl int
+as
+Select brandID, modelID, clubSpec, clubType, 
+shaftSpec, shaftFlex, dexterity from tbl_clubs where sku = @skuCl
+Go
+
+***************************************************************************
+
+create procedure getAccessoryDescription
+@skuAc int
+as
+Select brandID, modelID, accessoryType, size,
+colour from tbl_accessories where sku = @skuAc
+Go
+
+***************************************************************************
+
+create procedure getClothingDescription
+@skuClo int
+as
+Select brandID, size, colour, gender, style 
+from tbl_clothing where sku = @skuClo
+Go
+
+***************************************************************************
+
+create procedure getInvoiceID
+@saleDate Date
+as
+Select invoiceID FROM Invoice Where saleDate = @saleDate
+Go
+
+***************************************************************************
+
+create procedure getInvoice
+@invoiceNum int
+as
+SELECT invoiceNum, invoiceSubNum, invoiceDate, 
+invoiceTime, custID, empID, locationID, subTotal, discountAmount, 
+tradeinAmount, governmentTax, provincialTax, balanceDue, 
+transactionType, comments FROM tbl_invoice 
+WHERE invoiceNum = @invoiceNum
+Go
+
+***************************************************************************
+
+create procedure getInvoiceBySaleDate
+@givenDate Date,
+@locationID int
+as
+SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, 
+tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_invoice 
+WHERE invoiceDate = @givenDate AND 
+locationID = @locationID AND transactionType = 1 AND invoiceSubNum > 0
+Go
+
+***************************************************************************
+
+create procedure getInvoiceBetweenDates
+@startDate Date,
+@endDate Date,
+@locationID int
+as
+SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, 
+tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_invoice
+WHERE locationID = @locationID and invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate
+Go
+
+***************************************************************************
+
+create procedure getDeletedInvoiceBetweenDates
+@startDate Date,
+@endDate Date,
+@locationID int
+as
+SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, 
+tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_deletedInvoice
+WHERE locationID = @locationID and invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate
+Go
+
+***************************************************************************
+
+create procedure getDeletedInvoiceCustID
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select custID FROM tbl_deletedInvoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getInvoiceCustID
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select custID FROM tbl_Invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getInvoiceItems
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select * FROM tbl_invoiceItem Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getDeletedInvoiceItems
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select * FROM tbl_deletedInvoiceItem Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getDeletedInvoiceCheckoutTotals
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax 
+FROM tbl_deletedInvoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getInvoiceCheckoutTotals
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax 
+FROM tbl_invoice Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getInvoiceMOP
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select mopType, amountPaid FROM tbl_invoiceMOP Where
+invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getDeletedInvoiceMOP
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select mopType, amountPaid FROM tbl_deletedInvoiceMOP Where
+invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getDeletedInvoiceLocationID
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select locationID FROM tbl_deletedInvoice Where 
+invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getInvoiceLocationID
+@invoiceNum int,
+@invoiceSubNum int
+as
+Select locationID FROM tbl_invoice Where 
+invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getTaxes
+@recDate Date,
+@provStateID int
+as
+select tr.taxRate, tbl_taxType.taxName from tbl_taxRate tr
+inner Join tbl_taxType on tr.taxID = tbl_taxType.taxID
+inner join (select taxID, max(taxDate) as MTD from tbl_taxRate where taxDate <= @recDate and provStateID = @provStateID Group By taxID) td
+on tr.taxID = td.taxID and tr.taxDate = td.MTD where provStateID = @provStateID
+Go
+
+***************************************************************************
+
+create procedure getEmployeeFromSearch
+@searchField varchar(100)
+as
+Select * From tbl_employee Where 
+Concat(firstName,lastName) Like '%' + @searchField + '%' or 
+Concat(primaryContactINT,secondaryContactINT) 
+like '%' + @searchField + '%' order by firstName asc
+Go
+
+***************************************************************************
+
+create procedure getEmployeeByID
+@empID int
+as
+Select * From tbl_employee Where empID = @empID
+Go
+
+***************************************************************************
+
+create procedure insertEmployee
+@firstName varchar(100),
+@lastName varchar(100),
+@jobID int,
+@locationID int,
+@email varchar(200),
+@primaryContactINT varchar(200),
+@secondaryContactINT varchar(200),
+@primaryAddress varchar(200),
+@secondaryAddress varchar(200),
+@city varchar(200),
+@province int,
+@country int,
+@postalCode varchar(200)
+as
+Insert Into tbl_employee (firstName, lastName, jobID, locationID, email, primaryContactINT,
+secondaryContactINT, primaryAddress, secondaryAddress, city, provStateID, countryID, postZip) Values
+(@firstName, @lastName, @jobID, @locationID, @email, @primaryContactINT, @secondaryContactINT, @primaryAddress,
+@secondaryAddress, @city, @province, @country, @postalCode)
+Go
+
+***************************************************************************
+
+create procedure getEmployeeID
+@firstName varchar(100),
+@lastName varchar(100),
+@jobID int,
+@locationID int,
+@email varchar(200),
+@primaryContactINT varchar(200),
+@secondaryContactINT varchar(200),
+@primaryAddress varchar(200),
+@secondaryAddress varchar(200),
+@city varchar(200),
+@province int,
+@country int,
+@postalCode varchar(200)
+as
+Select empID From tbl_employee Where firstName = @firstName and lastName = @lastName and jobID = @jobID and
+locationID = @locationID and email = @email and primaryContactINT = @primaryContactINT and secondaryContactINT =
+@secondaryContactINT and primaryAddress = @primaryAddress and secondaryAddress = @secondaryAddress and city = @city
+and provStateID = @province and countryID = @country and postZip = @postalCode
+Go
+
+***************************************************************************
+
+create procedure updateEmployee
+@employeeID int,
+@firstName varchar(100),
+@lastName varchar(100),
+@jobID int,
+@locationID int,
+@email varchar(200),
+@primaryContactINT varchar(200),
+@secondaryContactINT varchar(200),
+@primaryAddress varchar(200),
+@secondaryAddress varchar(200),
+@city varchar(200),
+@province int,
+@country int,
+@postalCode varchar(200)
+as
+Update tbl_employee Set firstName = @firstName, lastName = @lastName, jobID = @jobID, locationID = @locationID,
+email = @email, primaryContactINT = @primaryContactINT, secondaryContactINT = @secondaryContactINT,
+primaryAddress = @primaryAddress, secondaryAddress = @secondaryAddress, city = @city, provStateID = @province,
+countryID = @country, postZip = @postalCode Where empID = @employeeID
+Go
+
+***************************************************************************
+
+create procedure getJobID
+@jobName varchar(200)
+as
+Select jobID from tbl_jobPosition where title = @jobName
+Go
+
+***************************************************************************
+
+create procedure getJobName
+@jobID int
+as
+Select title from tbl_jobPosition where jobID = @jobID
+Go
+
+***************************************************************************
+
+create procedure logError
+@employeeID int,
+@date Date,
+@time Time(7),
+@errorPage varchar(200),
+@errorMethod varchar(200),
+@errorCode varchar(max),
+@errorText varchar(max)
+as
+Insert into tbl_error values(@employeeID, @date, @time,
+@errorPage, @errorMethod, @errorCode, @errorText)
+Go
+
+***************************************************************************
+
+create procedure getModelName
+@modelID int
+as
+Select modelName from tbl_model where modelID = @modelID
+Go
+
+***************************************************************************
+
+create procedure getModelID
+@modelName varchar(300)
+as
+Select modelID from tbl_model where modelName = @modelName
+Go
+
+***************************************************************************
+
+create procedure getBrandName
+@brandID int
+as
+Select brandName from tbl_brand where brandID = @brandID
+Go
+
+***************************************************************************
+
+create procedure getBrandID
+@brandName varchar(300)
+as
+Select brandID from tbl_brand where brandName = @brandName
+Go
+
+***************************************************************************
+
+create procedure getItemTypeDescription
+@typeID int
+as
+Select typeDescription from tbl_itemType where typeID = @typeID
+Go
+
+***************************************************************************
+
+create procedure insertBrand
+@brandName varchar(500)
+as
+INSERT INTO tbl_brand (brandName) OUTPUT Inserted.brandID VALUES(@brandName)
+Go
+
+***************************************************************************
+
+create procedure insertModel
+@modelName varchar(500)
+as
+INSERT INTO tbl_model (modelName) OUTPUT Inserted.modelID VALUES(@modelName)
+Go
+
+***************************************************************************
+
+create procedure getClubTypeID
+@typeName varchar(500)
+as
+Select typeID from tbl_clubType where typeName = @typeName
+Go
+
+***************************************************************************
+
+create procedure getClubTypeDesc
+@typeID varchar(500)
+as
+Select typeName from tbl_clubType where typeID = @typeID
+Go
+
+***************************************************************************
+
+create procedure getTaxRates
+@ProId int
+as
+Select GST from StateProvLT where stateProvID = @ProId
+Go
+
+***************************************************************************
+
+create procedure getPSTTaxRates
+@ProId int
+as
+Select PST from StateProvLT where stateProvID = @ProId
+Go
+
+***************************************************************************
+
+create procedure getAccessoryFromSku
+@skuAcc int
+as
+Select sku, quantity, brandID, accessoryType, size, 
+colour, price, cost, typeID, locationID From tbl_accessories Where SKU = @skuAcc
+Go
+
+***************************************************************************
+
+create procedure getClubFromSku
+@skuClubs int
+as
+Select sku, brandID, modelID, clubType, clubSpec, shaftSpec, shaftFlex,
+numberOfClubs, dexterity, quantity, price, cost, typeID, locationID From tbl_clubs Where SKU = @skuClubs
+Go
+
+***************************************************************************
+
+create procedure getClothingFromSku
+@skuClothing int
+as
+Select sku, brandID, size, colour, gender, style, quantity, price, cost, typeID, locationID From tbl_clothing Where SKU = @skuClothing
+Go
+
+***************************************************************************
+
+create procedure getClubQuantity
+@sku int
+as
+Select quantity from tbl_clubs where SKU = @sku
+Go
+
+***************************************************************************
+
+create procedure getAccessoryQuantity
+@skuacces int
+as
+Select quantity from tbl_accessories where SKU = @skuacces
+Go
+
+***************************************************************************
+
+create procedure getClothingQuantity
+@skucloth int
+as
+Select quantity from tbl_clothing where SKU = @skucloth
+Go
+
+***************************************************************************
+
+create procedure updateClubQuantity
+@sku int,
+@quantity int,
+@typeID int
+as
+UPDATE tbl_clubs SET quantity = @quantity WHERE sku = @sku and typeID = @typeID
+Go
+
+***************************************************************************
+
+create procedure updateClothingQuantity
+@sku int,
+@quantity int,
+@typeID int
+as
+UPDATE tbl_clothing SET quantity = @quantity WHERE sku = @sku and typeID = @typeID
+Go
+
+***************************************************************************
+
+create procedure updateAccessoryQuantity
+@sku int,
+@quantity int,
+@typeID int
+as
+UPDATE tbl_accessories SET quantity = @quantity WHERE sku = @sku and typeID = @typeID
+Go
+
+***************************************************************************
+
+create procedure reserveTradeInSku
+@sku int,
+@locationID int
+as
+Insert into tbl_tempTradeInCartSkus (sku, locationID) values (@sku, @locationID)
+Go
+
+***************************************************************************
+
+create procedure getTradeInMaxSku
+@locationID int
+as
+Select max(sku) as maxsku from tbl_tempTradeInCartSkus where locationID = @locationID
+Go
+
+***************************************************************************
+
+create procedure getTradeInSkuRange
+@locationID int
+as
+Select skuStartAt, skuStopAt from tbl_tradeInSkusForCart where locationID = @locationID
+Go
+
+***************************************************************************
+
+create procedure updateTradeInItem
+@sku int,
+@brandID int,
+@modelID int, 
+@clubType varchar(200),
+@shaft varchar(200),
+@numberOfClubs varchar(200),
+@premium float,
+@cost float,
+@price float,
+@quantity int,
+@clubSpec varchar(200),
+@shaftSpec varchar(200),
+@shaftFlex varchar(200),
+@dexterity varchar(200),
+@used bit,
+@typeID int,
+@locationID int,
+@comments varchar(300)
+as
+Update tbl_tempTradeInCartSkus set 
+brandID = @brandID, modelID = @modelID, clubType = @clubType, 
+shaft = @shaft, numberOfClubs = @numberOfClubs, premium = @premium, 
+cost = @cost, price = @price, quantity = @quantity, 
+clubSpec = @clubSpec, shaftSpec = @shaftSpec, shaftFlex = @shaftFlex, 
+dexterity = @dexterity, typeID = @typeID, locationID = @locationID, 
+used = @used, comments = @comments where sku = @sku
+Go
+
+***************************************************************************
+
+create procedure insertInvoice
+@invoiceNum int,
+@invoiceSubNum int,
+@invoiceDate Date,
+@invoiceTime Time(7),
+@custID int,
+@empID int,
+@locationID int, 
+@subtotal float,
+@shippingAmount float,
+@discountAmount float,
+@tradeinAmount float,
+@governmentTax float,
+@provincialTax float,
+@balanceDue float,
+@transactionType int,
+@comments varchar(500)
+as
+Insert Into tbl_invoice (invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, 
+subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax, balanceDue, 
+transactionType, comments) values(@invoiceNum, @invoiceSubNum, @invoiceDate, @invoiceTime, @custID, 
+@empID, @locationID, @subtotal, @shippingAmount, @discountAmount, @tradeinAmount, @governmentTax, 
+@provincialTax, @balanceDue, @transactionType, @comments)
+Go
+
+***************************************************************************
+
+create procedure getInvoiceMaxNum
+as
+Select Max(invoiceNum) as invoiceNum from tbl_InvoiceNumbers
+Go
+
+***************************************************************************
+
+create procedure reserveInvoiceNum
+@invNum int
+as
+Insert into tbl_InvoiceNumbers(invoiceNum) values(@invNum)
+Go
+
+***************************************************************************
+
+create procedure getInovoiceMaxSubNum
+@invoiceNum int
+as
+Select Max(invoiceSubNum) as invoiceSubNum from tbl_invoice Where invoiceNum = @invoiceNum
+Go
+
+***************************************************************************
+
+create procedure getEmployeeIDFromPassword
+@password int
+as
+Select empID from tbl_userInfo where password = @password
+Go
+
+***************************************************************************
+
+create procedure getClubMaxSku
+as
+Select Max(sku) as largestSku from tbl_club
+Go
+
+***************************************************************************
+
+create procedure getClothingMaxSku
+as
+Select Max(sku) as largestSku from tbl_clothing
+Go
+
+***************************************************************************
+
+create procedure getAccessoriesMaxSku
+as
+Select Max(sku) as largestSku from tbl_accessories
+Go
+
+***************************************************************************
+
+create procedure getMaxSku
+@itemType int
+as
+Select Max(sku) as largestSku from tbl_skuNumbers where itemType = @itemType
+Go
+
+***************************************************************************
+
+create procedure insertMaxSku
+@sku int,
+@itemType int
+as
+insert into tbl_skuNumbers values(@sku, @itemType)
+Go
+
+***************************************************************************
+
+create procedure insertDeletedInvoice
+@invoiceNum int, 
+@invoiceSubNum int, 
+@invoiceDate Date, 
+@invoiceTime Time(7), 
+@custID int,
+@empID int, 
+@locationID int, 
+@subtotal float, 
+@shippingAmount float, 
+@discountAmount float, 
+@tradeinAmount float, 
+@governmentTax float, 
+@provincialTax float, 
+@balanceDue float, 
+@transactionType int, 
+@comments varchar(max), 
+@deletionReason varchar(max)
+as
+insert into tbl_deletedInvoice values( 
+@invoiceNum, @invoiceSubNum, @invoiceDate, 
+@invoiceTime, @custID, @empID, 
+@locationID, @subtotal, @shippingAmount, 
+@discountAmount, @tradeinAmount, @governmentTax, 
+@provincialTax, @balanceDue, @transactionType, 
+@comments, @deletionReason)
+Go
+
+***************************************************************************
+
+create procedure insertDeletedInvoiceItem
+@invoiceNum int, 
+@invoiceSubNum int, 
+@sku int, 
+@itemQuantity int, 
+@itemCost float, 
+@itemPrice float, 
+@itemDiscount float, 
+@percentage bit
+as
+insert into tbl_deletedInvoiceItem values( 
+@invoiceNum, 
+@invoiceSubNum, 
+@sku, 
+@itemQuantity, 
+@itemCost, 
+@itemPrice, 
+@itemDiscount, 
+@percentage)
+Go
+
+***************************************************************************
+
+create procedure insertDeletedInvoiceMOP
+@ID int, 
+@invoiceNum int, 
+@invoiceSubNum int, 
+@mopType int, 
+@amountPaid float
+as
+insert into tbl_deletedInvoiceMOP values(
+@ID, 
+@invoiceNum, 
+@invoiceSubNum, 
+@mopType, 
+@amountPaid)
+Go
+
+***************************************************************************
+
+create procedure deleteInvoiceMOP
+@invoiceNum int,
+@invoiceSubNum int
+as
+delete tbl_invoiceMOP where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure deleteInvoiceItem
+@invoiceNum int,
+@invoiceSubNum int
+as
+delete tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure deleteInvoice
+@invoiceNum int,
+@invoiceSubNum int
+as
+delete tbl_invoice where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum
+Go
+
+***************************************************************************
+
+create procedure getProvinceName
+@provID int
+as
+Select provName from tbl_provState where provStateID = @provID
+Go
+
+***************************************************************************
+
+create procedure getProvinceID
+@provName varchar(100)
+as
+Select provStateID from tbl_provState where provName = @provName
+Go
+
+***************************************************************************
+
+create procedure getCountryName
+@countryID int
+as
+Select countryDesc from tbl_country where countryID = @countryID
+Go
+
+***************************************************************************
+
+create procedure getCountryID
+@countryName varchar(100)
+as
+Select countryID from tbl_country where countryDesc = @countryName
+Go
+
+***************************************************************************
+
+create procedure getCountryIDFromProvinceID
+@provID int
+as
+Select countryID from tbl_provState where provStateID = @provID
+Go
+
+***************************************************************************
+
+create procedure getLocationName
+@locationID int
+as
+Select locationName from tbl_location where locationID = @locationID
+Go
+
+***************************************************************************
+
+create procedure getLocationID
+@locationName varchar(300)
+as
+Select locationID from tbl_location where locationName like @locationName
+Go
+
+***************************************************************************
+
+create procedure getLocationIDFromCity
+@cityName varchar(300)
+as
+Select locationID from tbl_location where city = @cityName
+Go
+
+***************************************************************************
+
+create procedure getLocationFromCity
+@cityName varchar(300)
+as
+Select locationName, 
+address, city, provStateID, 
+postZip, PrimaryPhoneINT 
+from tbl_location where city = @cityName
+Go
+
+***************************************************************************
+
+create procedure getCityFromLocationID
+@locationID int
+as
+Select city from tbl_location where locationID  = @locationID
+Go
+
+***************************************************************************
+
+create procedure getCashoutTotals
+@startDate Date,
+@endDate Date,
+@locationID int
+as
+Select tbl_invoiceMOP.mopType, tbl_invoiceMOP.amountPaid, tbl_invoice.tradeinAmount, 
+tbl_invoice.subTotal, tbl_invoice.governmentTax, tbl_invoice.provincialTax from tbl_invoiceMOP 
+INNER JOIN tbl_invoice ON tbl_invoiceMOP.invoiceNum = tbl_invoice.invoiceNum AND 
+tbl_invoiceMOP.invoiceSubNum = tbl_invoice.invoiceSubNum
+where tbl_invoice.invoiceDate between @startDate and @endDate and 
+tbl_invoice.locationID = @locationID
+Go
+
+***************************************************************************
+
+create procedure getCashoutOtherTotals
+@startDate Date,
+@endDate Date,
+@locationID int
+as
+Select subTotal, governmentTax, provincialTax from  tbl_invoice
+where invoiceDate between @startDate and @endDate and locationID = @locationID
+Go
+
+***************************************************************************
+
+create procedure getCashoutTradeInTotals
+@startDate Date,
+@endDate Date,
+@locationID int
+as
+Select tradeinAmount from  tbl_invoice
+where invoiceDate between @startDate and @endDate and locationID = @locationID
+Go
+
+***************************************************************************
+
+create procedure insertCashout
+@cashoutDate Date,
+@cashoutTime Time(7),
+@saleTradeIn float, 
+@saleGiftCard float, 
+@saleCash float,
+@saleDebit float, 
+@saleMasterCard float, 
+@saleVisa float, 
+@receiptTradeIn float, 
+@receiptGiftCard float, 
+@receiptCash float, 
+@receiptDebit float,
+@receiptMasterCard float, 
+@receiptVisa float, 
+@preTax float,
+@governmentTax float,
+@provincialTax float,
+@overShort float, 
+@finalized bit, 
+@processed bit
+as
+Select tradeinAmount from  tbl_invoice
+Insert into tbl_cashout values(
+@cashoutDate, @cashoutTime, @saleTradeIn, 
+@saleGiftCard, @saleCash, @saleDebit, 
+@saleMasterCard, @saleVisa, @receiptTradeIn, 
+@receiptGiftCard, @receiptCash, @receiptDebit,
+@receiptMasterCard, @receiptVisa, @preTax,
+@governmentTax, @provincialTax, @overShort, 
+@finalized, @processed)
+Go
+
+***************************************************************************
+
+create procedure getClubsAll
+as
+Select tradeinAmount from  tbl_invoice
+select tbl_clubs.sku, 
+(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_clubs.modelID ) as modelName , 
+(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clubs.brandID ) as brandName , 
+tbl_clubs.clubType, tbl_clubs.shaft, tbl_clubs.numberOfClubs, tbl_clubs.premium, tbl_clubs.cost, tbl_clubs.price,
+tbl_clubs.quantity, tbl_clubs.clubSpec, tbl_clubs.shaftSpec, tbl_clubs.shaftFlex, tbl_clubs.dexterity, 
+(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clubs.typeID ) as itemType , 
+(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clubs.locationID) as locationName, 
+tbl_clubs.used, tbl_clubs.comments from tbl_clubs
+Go
+
+***************************************************************************
+
+create procedure getAccessoriesAll
+as
+select tbl_accessories.sku, tbl_accessories.size, tbl_accessories.colour, tbl_accessories.price, tbl_accessories.cost, 
+(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_accessories.modelID ) as modelName , 
+(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_accessories.brandID ) as brandName ,
+tbl_accessories.accessoryType, tbl_accessories.quantity, 
+(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_accessories.typeID ) as itemType , 
+(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_accessories.locationID) as locationName, 
+tbl_accessories.comments 
+from tbl_accessories
+Go
+
+***************************************************************************
+
+create procedure getClothingAll
+as
+select tbl_clothing.sku, tbl_clothing.size, tbl_clothing.colour, tbl_clothing.gender, tbl_clothing.style, tbl_clothing.price, tbl_clothing.cost,  
+(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clothing.brandID ) as brandName , 
+tbl_clothing.quantity, 
+(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clothing.typeID ) as itemType ,  
+(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clothing.locationID) as locationName,  
+tbl_clothing.comments from tbl_clothing
+Go
+
+***************************************************************************
+
+create procedure getInvoiceAll
+as
+SELECT * FROM tbl_invoice
+Go
+
+***************************************************************************
+
+create procedure getInvoiceItemAll
+as
+Select * from tbl_invoiceItem
+Go
+
+***************************************************************************
+
+create procedure getInvoiceMOPAll
+as
+Select * from tbl_invoiceMOP
+Go
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+***************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
