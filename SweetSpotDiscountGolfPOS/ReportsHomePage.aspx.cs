@@ -27,16 +27,20 @@ namespace SweetSpotDiscountGolfPOS
         //List<Invoice> invoice;
         protected void Page_Load(object sender, EventArgs e)
         {
+            //Collects current method and page for error tracking
             string method = "Page_Load";
             Session["currPage"] = "ReportsHomePage";
             try
             {
+                //checks if the user has logged in
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
+                    //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
                 if (!IsPostBack)
                 {
+                    //Sets the calendar and text boxes start and end dates
                     calStartDate.SelectedDate = DateTime.Today;
                     calEndDate.SelectedDate = DateTime.Today;
                     txtStartDate.Text = DateTime.Today.ToShortDateString();
@@ -45,43 +49,56 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 if (Session["Admin"] == null)
                 {
+                    //User is not an admin
                     lblReport.Text = "You are not authorized to view reports";
                     lblReport.Visible = true;
                     lblReport.ForeColor = System.Drawing.Color.Red;
                     //calStart.Visible = false;
                     //calEnd.Visible = false;
+                    //Disables buttons
                     btnRunReport.Visible = false;
                     txtEndDate.Visible = false;
                     txtStartDate.Visible = false;
                     pnlDefaultButton.Visible = false;
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
                 //Server.Transfer(prevPage, false);
             }
         }
-
         protected void calStart_SelectionChanged(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "calStart_SelectionChanged";
             try
             {
+                //Resets date in text box to match the calendar
                 txtStartDate.Text = calStartDate.SelectedDate.ToShortDateString();
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -90,17 +107,24 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void calEnd_SelectionChanged(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "calEnd_SelectionChanged";
             try
             {
+                //Resets date in text box to match the calendar
                 txtEndDate.Text = calEndDate.SelectedDate.ToShortDateString();
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -109,11 +133,13 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnSubmit_Click";
             try
             {
                 if (txtStartDate.Text == "" || txtEndDate.Text == "")
                 {
+                    //One of the date boxes is empty
                     lbldate.Visible = true;
                     lbldate.Text = "Please Select a Start and End date";
                     lbldate.ForeColor = System.Drawing.Color.Red;
@@ -121,10 +147,12 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else
                 {
-                    DateTime[] reportDates = new DateTime[2];
-                    reportDates[0] = calStartDate.SelectedDate;
-                    reportDates[1] = calEndDate.SelectedDate;
-                    Session["reportDates"] = reportDates;
+                    //Stores report dates into Session
+                    Session["reportDates"] = new DateTime[2] { calStartDate.SelectedDate, calEndDate.SelectedDate };
+                    //DateTime[] reportDates = new DateTime[2];
+                    //reportDates[0] = calStartDate.SelectedDate;
+                    //reportDates[1] = calEndDate.SelectedDate;
+                    //Session["reportDates"] = reportDates;
 
                     //  if(txtStartDate.Text == txtEndDate.Text)
                     //  {
@@ -134,14 +162,20 @@ namespace SweetSpotDiscountGolfPOS
 
                     //}
                 }
+                //Changes to the Reports Cash Out page
                 Server.Transfer("ReportsCashOut.aspx", false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -150,46 +184,50 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnExportInvoices_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnExportInvoices_Click";
             try
             {
+                //Sets up database connection
                 string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
                 SqlConnection sqlCon = new SqlConnection(connectionString);
+                //Selects everything form the invoice table
                 sqlCon.Open();
                 SqlDataAdapter im = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
-                System.Data.DataTable dtim = new System.Data.DataTable();
+                DataTable dtim = new DataTable();
                 im.Fill(dtim);
                 DataColumnCollection dcimHeaders = dtim.Columns;
                 sqlCon.Close();
-
+                //Selects everything form the invoice item table
                 sqlCon.Open();
                 SqlDataAdapter ii = new SqlDataAdapter("SELECT * FROM tbl_invoiceItem", sqlCon);
-                System.Data.DataTable dtii = new System.Data.DataTable();
+                DataTable dtii = new DataTable();
                 ii.Fill(dtii);
                 DataColumnCollection dciiHeaders = dtii.Columns;
                 sqlCon.Close();
-
+                //Selects everything form the invoice mop table
                 sqlCon.Open();
                 SqlDataAdapter imo = new SqlDataAdapter("SELECT * FROM tbl_invoiceMOP", sqlCon);
-                System.Data.DataTable dtimo = new System.Data.DataTable();
+                DataTable dtimo = new DataTable();
                 imo.Fill(dtimo);
                 DataColumnCollection dcimoHeaders = dtimo.Columns;
                 sqlCon.Close();
-
+                //Sets path and file name to download report to
                 string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 string pathDownload = (pathUser + "\\Downloads\\");
                 FileInfo newFile = new FileInfo(pathDownload + "InvoiceReport.xlsx");
                 using (ExcelPackage xlPackage = new ExcelPackage(newFile))
                 {
+                    //Creates a seperate sheet for each data table
                     ExcelWorksheet invoiceMain = xlPackage.Workbook.Worksheets.Add("Invoice Main");
                     ExcelWorksheet invoiceItems = xlPackage.Workbook.Worksheets.Add("Invoice Items");
                     ExcelWorksheet invoiceMOPS = xlPackage.Workbook.Worksheets.Add("Invoice MOPS");
                     // write to sheet
 
                     //Initiating Everything   
-                    System.Data.DataTable exportInvoiceTable = r.initiateInvoiceTable();
-                    System.Data.DataTable exportInvoiceItemTable = r.initiateInvoiceItemTable();
-                    System.Data.DataTable exportInvoiceMOPTable = r.initiateInvoiceMOPTable();
+                    DataTable exportInvoiceTable = r.initiateInvoiceTable();
+                    DataTable exportInvoiceItemTable = r.initiateInvoiceItemTable();
+                    DataTable exportInvoiceMOPTable = r.initiateInvoiceMOPTable();
 
                     //Export main invoice
                     for (int i = 1; i < exportInvoiceTable.Rows.Count; i++)
@@ -243,12 +281,17 @@ namespace SweetSpotDiscountGolfPOS
                     Response.End();
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -257,7 +300,9 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnTesting_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnTesting_Click";
+            //Method currently not used
             try
             {
                 //string variable = " ";
@@ -283,12 +328,20 @@ namespace SweetSpotDiscountGolfPOS
                 //    Response.End();
                 //}
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
                 //Server.Transfer(prevPage, false);
             }
         }
@@ -296,24 +349,34 @@ namespace SweetSpotDiscountGolfPOS
         //Viewing invoices
         protected void btnInvoiceBetweenDates_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnInvoiceBetweenDates_Click";
             try
             {
                 Session["isDeleted"] = false;
+                //Gathers start and end dates
                 DateTime startDate = calStartDate.SelectedDate;
                 DateTime endDate = calEndDate.SelectedDate;
+                //Gathers selected location
                 string locationID = ddlLocation.SelectedValue;
+                //Calls query to return list of all invoices between dates
                 List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_invoice", locationID);
                 grdInvoicesBetweenDates.Columns[8].Visible = true;
+                //Binds invoice list to gridview
                 grdInvoicesBetweenDates.DataSource = i;
                 grdInvoicesBetweenDates.DataBind();
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -322,25 +385,34 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnReturnInvoice_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnReturnInvoice_Click";
             try
             {
                 Session["isDeleted"] = false;
+                //Retreives invoice number and splits it
                 string invoiceNumber = txtInvoiceNum.Text;
                 char[] splitchar = { '-' };
                 string[] invoiceSplit = invoiceNumber.Split(splitchar);
                 int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
                 int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+                //Calls query to return invoice based on number
                 List<Invoice> i = ssm.getInvoice(invoiceNum);
+                //Binds the invoice to grid view
                 grdInvoicesBetweenDates.DataSource = i;
                 grdInvoicesBetweenDates.DataBind();
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -349,24 +421,34 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnDeletedInvoiceBetweenDates_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnDeletedInvoiceBetweenDates_Click";
             try
             {
                 Session["isDeleted"] = true;
+                //Gathers start and end dates
                 DateTime startDate = calStartDate.SelectedDate;
                 DateTime endDate = calEndDate.SelectedDate;
+                //Gathers selected location
                 string locationID = ddlLocation.SelectedValue;
+                //Calls query to return list of all invoices between dates
                 List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_deletedInvoice", locationID);
                 grdInvoicesBetweenDates.Columns[8].Visible = false;
+                //Binds invoice list to gridview
                 grdInvoicesBetweenDates.DataSource = i;
                 grdInvoicesBetweenDates.DataBind();
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -375,6 +457,7 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void lbtnInvoiceNumber_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "lbtnInvoiceNumber_Click";
             try
             {
@@ -387,33 +470,34 @@ namespace SweetSpotDiscountGolfPOS
                 int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
                 int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
                 Boolean isDeleted = Convert.ToBoolean(Session["isDeleted"]);
-                if (isDeleted == false)
+                //determines the table to use for queries
+                string table = "i";
+                if (isDeleted)
                 {
-                    Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_invoice");
-                    Session["Invoice"] = invoice;
-                    Session["useInvoice"] = true;
-                    Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_invoiceItem");
-                    Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_invoice");
-                    Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_invoiceMOP");
+                    table = "deletedI";
                 }
-                else if (isDeleted == true)
-                {
-                    Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
-                    Session["Invoice"] = invoice;
-                    Session["useInvoice"] = true;
-                    Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceItem");
-                    Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_deletedInvoice");
-                    Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_deletedInvoiceMOP");
-                }
+                //Stores required info into Sessions
+                Session["key"] = ssm.invoice_getCustID(invoiceNum, invoiceSubNum, "tbl_" + table + "nvoice");
+                Session["Invoice"] = invoice;
+                Session["useInvoice"] = true;
+                Session["ItemsInCart"] = ssm.invoice_getItems(invoiceNum, invoiceSubNum, "tbl_" + table + "nvoiceItem");
+                Session["CheckOutTotals"] = ssm.invoice_getCheckoutTotals(invoiceNum, invoiceSubNum, "tbl_" + table + "nvoice");
+                Session["MethodsOfPayment"] = ssm.invoice_getMOP(invoiceNum, invoiceSubNum, "tbl_" + table + "nvoiceMOP");
                 Session["TranType"] = 1;
+                //Changes to printable invoice page
                 Server.Transfer("PrintableInvoice.aspx", false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -422,27 +506,33 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
         {
+            //Collects current method for error tracking
             string method = "OnRowDeleting";
             try
             {
                 string deleteReason = hidden.Value;
-                //string deleteReason = test.InnerHtml.ToString();
+                //Checks deleted reason
                 if (deleteReason.Equals("Code:CancelDelete"))
                 {
 
                 }
                 else if (!deleteReason.Equals("Code:CancelDelete") && !deleteReason.Equals(""))
                 {
+                    //Gathers current row index
                     int index = e.RowIndex;
+                    //determins the invoice
                     Label lblInvoice = (Label)grdInvoicesBetweenDates.Rows[index].FindControl("lblInvoiceNumber");
                     string invoice = lblInvoice.Text;
+                    //splits the invoice number
                     char[] splitchar = { '-' };
                     string[] invoiceSplit = invoice.Split(splitchar);
                     int invoiceNum = Convert.ToInt32(invoiceSplit[0]);
                     int invoiceSubNum = Convert.ToInt32(invoiceSplit[1]);
+                    //Calls query to delete the selected invoice
                     string deletionReason = deleteReason;
                     idu.deleteInvoice(invoiceNum, invoiceSubNum, deletionReason);
                     MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
+                    //Refreshes current page
                     Server.Transfer(Request.RawUrl);
                 }
                 //Page.ClientScript.RegisterStartupScript(GetType(), "CallMyFunction", "userInput()", true);
@@ -465,12 +555,17 @@ namespace SweetSpotDiscountGolfPOS
                 //MessageBox.ShowMessage("Invoice " + invoice + " has been deleted", this);
                 //Server.Transfer(Request.RawUrl);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
