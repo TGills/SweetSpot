@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The accessories class is used to define and create an easy to access information for accessories. 
     public class Accessories
-    {
+    {        
         public int sku { get; set; }
         public int brandID { get; set; }
         public string size { get; set; }

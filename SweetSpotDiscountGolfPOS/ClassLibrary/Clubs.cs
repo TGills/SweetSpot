@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The clubs class is used to define and create easy to access information for clubs.
     public class Clubs
     {
 

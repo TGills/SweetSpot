@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The employee manager class is used to get information about an employee or employees
     class EmployeeManager
     {
 
@@ -62,6 +63,7 @@ namespace SweetShop
                 }
 
                 con.Close();
+                //Returns a full employee
                 return employee;
             }
             catch (Exception e)
@@ -71,6 +73,7 @@ namespace SweetShop
             }
         }
 
+        //This method returns an employee based on a given employee ID
         public Employee getEmployeeByID(int empID)
         {
             try
@@ -109,6 +112,7 @@ namespace SweetShop
                 }
 
                 con.Close();
+                //Returns a full employee
                 return employee;
             }
             catch (Exception e)
@@ -117,7 +121,8 @@ namespace SweetShop
                 return null;
             }
         }
-        //returns employeeID after adding employee to table created by Nathan
+
+        //Returns employeeID after adding employee to table created by Nathan
         public int addEmployee(Employee em)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -148,9 +153,11 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
 
+            //Returns the employee ID of the newly created employee
             return returnEmployeeNumber(em);
         }
-        //returns employeeID created by Nathan
+
+        //Returns employeeID created by Nathan
         public int returnEmployeeNumber(Employee em)
         {
 
@@ -186,8 +193,10 @@ namespace SweetShop
                 empNum = Convert.ToInt32(reader["empID"]);
             }
             con.Close();
+            //Returns the employee ID 
             return empNum;
         }
+
         //Update Employee Nathan and Tyler Created
         public void updateEmployee(Employee em)
         {
@@ -223,6 +232,7 @@ namespace SweetShop
             con.Close();
         }
 
+        //This method returns the jobID of a given job
         public int jobType(string jobName)
         {
 
@@ -241,11 +251,13 @@ namespace SweetShop
                 job = j;
             }
             conn.Close();
+            //Returns the job ID
             return job;
         }
+
+        //Returns the job name when given a job ID
         public string jobName(int jobNum)
         {
-
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
 
@@ -261,6 +273,7 @@ namespace SweetShop
                 job = j;
             }
             conn.Close();
+            //Returns the job name
             return job;
         }
 

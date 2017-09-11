@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //This class is a relic from the previous developers. *****NOT USED
     public class InvSale
     {
         public int invoiceID { get; set; }

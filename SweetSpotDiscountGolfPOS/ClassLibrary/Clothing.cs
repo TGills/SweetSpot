@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The clothing class is used to define and create easy to access information for clothing.
     public class Clothing
     {
         public int sku { get; set; }

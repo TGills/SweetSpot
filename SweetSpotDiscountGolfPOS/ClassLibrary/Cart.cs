@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The cart class is used to define and create easy to access cart information for sales. 
     public class Cart
     {
         public int sku { get; set; }
@@ -17,6 +18,7 @@ namespace SweetShop
         public bool percentage { get; set; }
         public bool tradeIn { get; set; }
         public int typeID { get; set; }
+
         public double returnAmount { get; set; }
         public Cart() { }
 
@@ -46,6 +48,7 @@ namespace SweetShop
             tradeIn = t;
             typeID = id;
         }
+
 
         public Cart(int s, string de, int q, double pr, double c, double d, bool p)
         {

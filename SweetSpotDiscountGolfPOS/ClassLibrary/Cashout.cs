@@ -5,6 +5,7 @@ using System.Web;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //The cashout class is used to define and create easy to access cashout information for the cashout report.
     public class Cashout
     {
         public string mop { get; set; }

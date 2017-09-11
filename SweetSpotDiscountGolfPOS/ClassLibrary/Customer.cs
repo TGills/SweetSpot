@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //The customer class is used to define what a customer is
     public class Customer
     {
         public int customerId { get; set; }

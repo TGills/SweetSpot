@@ -9,6 +9,9 @@ using System.Threading;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //The custom message box class was ment to be used as a way to get user input but javascript is currently being used.
+
+        //Might revisit it at a later point
     public class CustomMessageBox
     {
         public string InputBox(string title, string promptText)

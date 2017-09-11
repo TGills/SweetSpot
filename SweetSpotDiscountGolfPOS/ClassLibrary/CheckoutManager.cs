@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //The checkout manager class is used to define and create easy to access checkout manager information for sales.
     public class CheckoutManager
     {
         public double dblTotal { get; set; }

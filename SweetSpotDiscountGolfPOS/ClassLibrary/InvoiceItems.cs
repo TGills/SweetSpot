@@ -5,6 +5,8 @@ using System.Web;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //The invoice items class is used to define and keep track of what an invoice item is.
+    //Used in storing the items from a sale in the database
     public class InvoiceItems
     {
         public int invoiceNum { get; set; }
