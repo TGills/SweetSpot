@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //Used to define and create a sale
     public class Sale
     {
         public int invoiceId { get; set; }

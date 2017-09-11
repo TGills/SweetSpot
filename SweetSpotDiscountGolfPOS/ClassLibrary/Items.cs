@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //Used to define and create an item
     public class Items
     {
         public int sku { get; set; }

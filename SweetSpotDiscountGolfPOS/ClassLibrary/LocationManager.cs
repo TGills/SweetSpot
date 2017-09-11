@@ -7,9 +7,11 @@ using System.Web;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //Used to gather information about locations
     public class LocationManager
     {
         string connectionString;
+        //Connection string
         public LocationManager()
         {
            connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
@@ -32,6 +34,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 provStateName = name;
             }
             conn.Close();
+            //Returns province/state name
             return provStateName;
         }
         //Province/State ID based on Province/State name
@@ -52,6 +55,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 provStateID = n;
             }
             conn.Close();
+            //Returns province/state ID
             return provStateID;
         }
         //Country name based on country ID
@@ -72,6 +76,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 countryName = name;
             }
             conn.Close();
+            //Returns country name
             return countryName;
         }
         //Country ID based on country name
@@ -92,6 +97,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 countryID = n;
             }
             conn.Close();
+            //Returns country ID
             return countryID;
         }
         //CountryID based on provinceID
@@ -112,6 +118,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 countryID = n;
             }
             conn.Close();
+            //Returns country ID
             return countryID;
         }
         //Location name based on location ID
@@ -132,6 +139,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 locationN = name;
             }
             conn.Close();
+            //Returns location name
             return locationN;
         }
         //Location ID based on location name
@@ -152,8 +160,10 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 locID = n;
             }
             conn.Close();
+            //Returns location ID
             return locID;
         }
+        //Location ID based on City
         public int locationIDfromCity(string locationName)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -171,8 +181,10 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 locID = n;
             }
             conn.Close();
+            //REturns location ID
             return locID;
         }
+        //Get location for invoice based on City
         public Location returnLocationForInvoice(string cityName)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -190,6 +202,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                     reader["postZip"].ToString(), reader["PrimaryPhoneINT"].ToString());
             }
             conn.Close();
+            //Returns object location
             return locationN;
         }
         //Gets city based on location id
@@ -209,6 +222,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                 cityName = reader["city"].ToString();
             }
             conn.Close();
+            //Returns city name
             return cityName;
         }
     }

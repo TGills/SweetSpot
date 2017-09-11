@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SweetShop
 {
+    //Used to define and create user info
     class tbl_userinfo
     {
         public int empid { get; set; }

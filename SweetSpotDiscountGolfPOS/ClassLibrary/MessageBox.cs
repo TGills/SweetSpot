@@ -7,13 +7,17 @@ using System.Windows.Forms;
 
 namespace SweetSpotProShop
 {
+    //This class is used to create a popup message box
     public class MessageBox
     {
+        //This method creates a popup box with an alert based message
         public static void ShowMessage(string MessageText, Page MyPage)
         {
             MyPage.ClientScript.RegisterStartupScript(MyPage.GetType(),
                 "MessageBox", "alert('" + MessageText.Replace("'", "\'") + "');", true);
         }
+
+        //This method was to be used to get user input. Javascript is being used instead
         public string inputBoxV2(string title, string promptText)
         {
             Form prompt = new Form();
