@@ -184,24 +184,6 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.GridView grdCartItems;
         
         /// <summary>
-        /// grdInvoicedItems control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView grdInvoicedItems;
-        
-        /// <summary>
-        /// grdReturningItems control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView grdReturningItems;
-        
-        /// <summary>
         /// lblSubtotal control.
         /// </summary>
         /// <remarks>

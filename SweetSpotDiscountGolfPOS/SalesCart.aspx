@@ -78,13 +78,13 @@
                 <br />
                 <asp:Label ID="lblDate" runat="server" Text="Date:"></asp:Label>
                 <asp:Label ID="lblDateDisplay" runat="server" Text=""></asp:Label>
-                <%--<asp:Label ID="lblExists" runat="server" Text="Label" Visible="True"></asp:Label>--%>
+                
                 <hr />
             </div>
             <div>
                 <asp:TextBox ID="txtSearch" runat="server"></asp:TextBox>
                 <asp:Button ID="btnInventorySearch" runat="server" Width="150" Text="Inventory Search" OnClick="btnInventorySearch_Click" />
-                <%--<asp:RequiredFieldValidator ID="valInventorySearched" runat="server" ErrorMessage="Search criteria Must be entered" ControlToValidate="txtSearch"></asp:RequiredFieldValidator>--%>
+               
             </div>
             <hr />
             <asp:GridView ID="grdInventorySearched" runat="server" AutoGenerateColumns="False" OnRowCommand="grdInventorySearched_RowCommand">
@@ -117,9 +117,7 @@
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
-            <%--<asp:Button ID="btnadd" runat="server" OnClick="btnadd_Click" Text="Add to Cart" />
-            <asp:Button ID="btnDelete" runat="server" OnClick="btnDelete_Click" Text="Delete" />
-            <asp:Label ID="lblDelete" runat="server" Text="Label"></asp:Label>--%>
+            
             <hr />
             <h3>Cart</h3>
             <hr />
@@ -176,67 +174,6 @@
                     <asp:TemplateField HeaderText="Type ID" Visible="false">
                         <ItemTemplate>
                             <asp:Label ID="lblTypeID" Text='<%# Eval("typeID") %>' runat="server"/>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                </Columns>
-            </asp:GridView>
-            <asp:GridView ID="grdInvoicedItems" runat="server" Visible="false" AutoGenerateColumns="false" OnRowDeleting="grdInvoicedItems_RowDeleting" >
-                <Columns>
-                    <asp:TemplateField HeaderText="Return Item">
-                        <ItemTemplate>
-                            <asp:LinkButton ID="lkbReturnItem" Text="Return Item" CommandName="Delete" CommandArgument='<%#Eval("sku") %>' runat="server" CausesValidation="false"></asp:LinkButton>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:BoundField DataField="sku" ReadOnly="true" HeaderText="SKU" />
-                    <asp:BoundField DataField="quantity" ReadOnly="true" HeaderText="Quantity" />
-                    <asp:BoundField DataField="description" ReadOnly="true" HeaderText="Description" />
-                    <asp:TemplateField HeaderText="Paid">
-                        <ItemTemplate>
-                            <%# Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToInt32(Eval("price")))-(Convert.ToInt32(Eval("discount")))).ToString("#0.00") : ((Convert.ToInt32(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToInt32(Eval("price"))))).ToString("#0.00") %>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Discount Applied">
-                        <ItemTemplate>
-                            <asp:CheckBox ID="ckbPercentage" Checked='<%# Convert.ToBoolean(Eval("percentage")) %>' runat="server" Text="Discount by Percent" Enabled="false"/>
-                            <div id="divReturnAmountDiscount" class="txt" runat="server">
-                                <asp:Label ID="lblReturnAmountDisplay" runat="server" Text='<%# Eval("discount") %>' Enabled="false"></asp:Label>
-                            </div>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Type ID" Visible="true">
-                        <ItemTemplate>
-                            <asp:Label ID="lblReturnTypeID" Text='<%# Eval("typeID") %>' runat="server"/>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                </Columns>
-            </asp:GridView>
-            <hr />
-            <asp:GridView ID="grdReturningItems" runat="server" Visible="false" AutoGenerateColumns="false" OnRowDeleting="grdReturningItems_RowDeleting" >
-                <Columns>
-                    <asp:TemplateField HeaderText="Cancel Return">
-                        <ItemTemplate>
-                            <asp:LinkButton ID="lkbCancelItem" Text="Cancel Return" CommandName="Delete" CommandArgument='<%#Eval("sku") %>' runat="server" CausesValidation="false"></asp:LinkButton>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:BoundField DataField="sku" ReadOnly="true" HeaderText="SKU" />
-                    <asp:BoundField DataField="quantity" ReadOnly="true" HeaderText="Quantity" />
-                    <asp:BoundField DataField="description" ReadOnly="true" HeaderText="Description" />
-                    <asp:TemplateField HeaderText="Paid">
-                        <ItemTemplate>
-                            <%# Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToInt32(Eval("price")))-(Convert.ToInt32(Eval("discount")))).ToString("#0.00") : ((Convert.ToInt32(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToInt32(Eval("price"))))).ToString("#0.00") %>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Discount Applied">
-                        <ItemTemplate>
-                            <asp:CheckBox ID="ckbRIPercentage" Checked='<%# Convert.ToBoolean(Eval("percentage")) %>' runat="server" Text="Discount by Percent" Enabled="false"/>
-                            <div id="divRIReturnAmountDiscount" class="txt" runat="server">
-                                <asp:Label ID="lblRIReturnAmountDisplay" runat="server" Text='<%# Eval("discount") %>' Enabled="false"></asp:Label>
-                            </div>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Type ID" Visible="true">
-                        <ItemTemplate>
-                            <asp:Label ID="lblReturnedTypeID" Text='<%# Eval("typeID") %>' runat="server"/>
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
