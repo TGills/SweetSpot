@@ -533,7 +533,7 @@ namespace SweetSpotDiscountGolfPOS
                     c.dexterity = txtDexterity.Text;
                     c.comments = txtComments.Text;
                     c.used = chkUsed.Checked;
-                    ssm.updateItem(c);
+                    ssm.updateClub(c);
                     //changes all text boxes and dropdowns to labels
                     txtCost.Visible = false;
                     lblCostDisplay.Visible = true;

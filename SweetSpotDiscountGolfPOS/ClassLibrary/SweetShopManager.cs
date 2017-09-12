@@ -45,11 +45,8 @@ namespace SweetShop
                 //cmd.Parameters.AddWithValue("searchField2", searchField);
                 con.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-
                 //New List for Customer
-
                 List<Customer> customer = new List<Customer>();
-
                 //Begin reading
                 while (reader.Read())
                 {
@@ -66,12 +63,11 @@ namespace SweetShop
                         Convert.ToInt32(reader["provStateID"]),
                         Convert.ToInt32(reader["country"]),
                         reader["postZip"].ToString());
-
+                    //Adds the customer
                     customer.Add(c);
-
                 }
-
                 con.Close();
+                //Returns the customer(s)
                 return customer;
             }
             catch (Exception e)
@@ -80,7 +76,6 @@ namespace SweetShop
                 return null;
             }
         }
-
         //Retreive Customer from custID Nathan and Tyler created
         public Customer GetCustomerbyCustomerNumber(int custNum)
         {
@@ -94,10 +89,8 @@ namespace SweetShop
                 cmd.Parameters.AddWithValue("custNum", custNum);
                 con.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-
                 //New Customer
                 Customer customer = new Customer();
-
                 //Begin reading
                 while (reader.Read())
                 {
@@ -114,11 +107,11 @@ namespace SweetShop
                         Convert.ToInt32(reader["provStateID"]),
                         Convert.ToInt32(reader["country"]),
                         reader["postZip"].ToString());
-
+                    //Sets the customer
                     customer = c;
                 }
-
                 con.Close();
+                //Returns customer
                 return customer;
             }
             catch (Exception e)
@@ -127,14 +120,12 @@ namespace SweetShop
                 return null;
             }
         }
-
-        //Add Customer Nathan and Tyler created
+        //Add Customer Nathan and Tyler created. Returns customer ID
         public int addCustomer(Customer c)
         {
             //New command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-
             cmd.CommandText = "Insert Into tbl_customers (firstName, lastName, primaryAddress,"
                 + " secondaryAddress, primaryPhoneINT, secondaryPhoneINT, billingAddress, email,"
                 + " city, provStateID, country, postZip) Values (@FirstName, @LastName, @primaryAddress,"
@@ -158,15 +149,12 @@ namespace SweetShop
             //Execute Insert
             cmd.ExecuteNonQuery();
             con.Close();
-
+            //Returns customer ID
             return returnCustomerNumber(c);
-
         }
-
-        //Nathan and Tyler created
+        //Nathan and Tyler created. Returns customer ID
         public int returnCustomerNumber(Customer c)
         {
-
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
@@ -185,26 +173,23 @@ namespace SweetShop
             cmd.Parameters.AddWithValue("PostalCode", c.postalCode);
             con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
-
             //New Customer number
             int custNum = 0;
-
             //Begin reading
             while (reader.Read())
             {
                 custNum = Convert.ToInt32(reader["custID"]);
             }
             con.Close();
+            //Returns customer ID
             return custNum;
         }
-
         //Update Customer Nathan and Tyler Created
         public void updateCustomer(Customer c)
         {
             //New command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-
             cmd.CommandText = "Update tbl_customers Set firstName = @FirstName, lastName = @LastName, primaryAddress = @primaryAddress,"
                 + " secondaryAddress = @secondaryAddress, primaryPhoneINT = @primaryPhoneNumber, secondaryPhoneINT = @secondaryPhoneNumber,"
                 + " billingAddress = @BillingAddress, email = @Email, city = @City, provStateID = @Province, country = @Country,"
@@ -222,56 +207,66 @@ namespace SweetShop
             cmd.Parameters.AddWithValue("Province", c.province);
             cmd.Parameters.AddWithValue("Country", c.country);
             cmd.Parameters.AddWithValue("PostalCode", c.postalCode);
-
             //Declare and open connection
             cmd.Connection = con;
             con.Open();
-
             //Execute Update
             cmd.ExecuteNonQuery();
             con.Close();
         }
 
         /*******Item Utilities************************************************************************************/
+        //Returns a list of items from a search
         public List<Items> returnSearchFromAllThreeItemSets(string searchedText, string loc)
         {
+            //Different lists for the items
             List<Items> searchClubs = new List<Items>();
             List<Items> searchClothing = new List<Items>();
             List<Items> searchAccessories = new List<Items>();
             List<Items> searchedItems = new List<Items>();
+            //Gets all items that match the searched text
             searchClubs = GetItemfromSearch(searchedText, "Clubs", loc);
             searchClothing = GetItemfromSearch(searchedText, "Accessories", loc);
             searchAccessories = GetItemfromSearch(searchedText, "Clothing", loc);
+            //Looping through the clubs
             foreach (var item in searchClubs)
             {
+                //Adds to the list
                 searchedItems.Add(item);
             }
+            //Looping through the clothing
             foreach (var item in searchClothing)
             {
+                //Adds to the list
                 searchedItems.Add(item);
             }
+            //Looping through the accessories
             foreach (var item in searchAccessories)
             {
+                //Adds to the list
                 searchedItems.Add(item);
             }
+            //Returns the searched items in a list
             return searchedItems;
-
         }
-
         //Robust search through inventory Nathan and Tyler created for specific location
         public List<Items> GetItemfromSearch(string itemSearched, string itemType, string loc)
         {
+            //Array used to store the search elements
             ArrayList strText = new ArrayList();
             int intLocation = lm.locationIDfromCity(loc);
             int numFields = itemSearched.Split(' ').Length;
 
+            //If there is more than one search element
             if (numFields > 1)
             {
+                //Looping through the search elements, and adding them to the array
                 for (int i = 0; i < numFields; i++)
                 {
                     strText.Add(itemSearched.Split(' ')[i]);
                 }
             }
+            //Otherwise search the single search element
             else
             {
                 strText.Add(itemSearched);
@@ -290,11 +285,12 @@ namespace SweetShop
             con.Open();
             for (int i = 0; i < numFields; i++)
             {
-                //removed itemLocation because client does not want
+                //Removed itemLocation because client no longer wants it. All locations can now view all items
                 if (itemType == "Clubs")
                 {
                     if (i == 0)
                     {
+                        //Do the first search here, and then intersect everything else
                         cmd.CommandText = "Select * from tbl_" + itemType + " where (sku like '%" + strText[i] + "%' or "
                                         + " modelID in (Select modelID from tbl_model where modelName like '%" + strText[i] + "%') or "
                                         + " brandID in (Select brandID from tbl_brand where brandName like '%" + strText[i] + "%') or "
@@ -302,6 +298,9 @@ namespace SweetShop
                     }
                     else
                     {
+                        //The INTERSECT operator is used to return the records that are in common between two SELECT statements or data sets. 
+                        //If a record exists in one query and not in the other, it will be omitted from the INTERSECT results. 
+                        //It is the intersection of the two SELECT statements.
                         cmd.CommandText = cmd.CommandText + " Intersect (Select * from tbl_" + itemType + " where (sku like '%" + strText[i] + "%' or "
                                         + " modelID in (Select modelID from tbl_model where modelName like '%" + strText[i] + "%') or "
                                         + " brandID in (Select brandID from tbl_brand where brandName like '%" + strText[i] + "%') or "
@@ -313,12 +312,16 @@ namespace SweetShop
                 {
                     if (i == 0)
                     {
+                        //Do the first search here, and then intersect everything else
                         cmd.CommandText = "Select * from tbl_" + itemType + " where (sku like '%" + strText[i] + "%' or "
                                     + " brandID in (Select brandID from tbl_brand where brandName like '%" + strText[i] + "%') or "
                                     + " concat(size, colour) like '%" + strText[i] + "%')";
                     }
                     else
                     {
+                        //The INTERSECT operator is used to return the records that are in common between two SELECT statements or data sets. 
+                        //If a record exists in one query and not in the other, it will be omitted from the INTERSECT results. 
+                        //It is the intersection of the two SELECT statements.
                         cmd.CommandText = cmd.CommandText + "Intersect (Select * from tbl_" + itemType + " where (sku like '%" + strText[i] + "%' or "
                                     + " brandID in (Select brandID from tbl_brand where brandName like '%" + strText[i] + "%') or "
                                     + " concat(size, colour) like '%" + strText[i] + "%'))";
@@ -329,12 +332,16 @@ namespace SweetShop
                 {
                     if (i == 0)
                     {
+                        //Do the first search here, and then intersect everything else
                         cmd.CommandText = "Select * from tbl_" + itemType + " where (sku like '%" + strText[i] + "%' or "
                                     + " brandID in (Select brandID from tbl_brand where brandName like '%" + strText[i] + "%') or "
                                     + " concat(size, colour, gender, style) like '%" + strText[i] + "%')";
                     }
                     else
                     {
+                        //The INTERSECT operator is used to return the records that are in common between two SELECT statements or data sets. 
+                        //If a record exists in one query and not in the other, it will be omitted from the INTERSECT results. 
+                        //It is the intersection of the two SELECT statements.
                         cmd.CommandText = cmd.CommandText + "Intersect (Select * from tbl_" + itemType + " where (sku like '%" + strText[i] + "%' or "
                                     + " brandID in (Select brandID from tbl_brand where brandName like '%" + strText[i] + "%') or "
                                     + " concat(size, colour, gender, style) like '%" + strText[i] + "%'))";
@@ -388,10 +395,11 @@ namespace SweetShop
                 item.Add(j);
             }
             con.Close();
+            //Returns the list of items
             return item;
         }
-
         //Robust search through inventory Nathan and Tyler created
+        //Same as above method with the exception of not having string loc
         public List<Items> GetItemfromSearch(string itemSearched, string itemType)
         {
             ArrayList strText = new ArrayList();
@@ -535,23 +543,19 @@ namespace SweetShop
         //Trade-in specific club from inventory lookup
         public Clubs tradeInItemLookUp(int sku)
         {
+            //Looks for a trade in item by sku, and returns all info based on it
             //New Command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "Select sku, brandID, modelID, clubType, shaft, numberOfClubs, premium, cost, price, quantity, clubSpec,"
                 + " shaftSpec, shaftFlex, dexterity, used, comments From tbl_tempTradeInCartSkus Where sku = @sku";
             cmd.Parameters.AddWithValue("sku", sku);
-
             //Open Database Connection
             cmd.Connection = con;
             con.Open();
-
             SqlDataReader reader = cmd.ExecuteReader();
-
             //Item List
-
             Clubs clubs = new Clubs();
-
             while (reader.Read())
             {
                 clubs.sku = Convert.ToInt32(reader["sku"]);
@@ -572,29 +576,26 @@ namespace SweetShop
                 clubs.comments = reader["comments"].ToString();
             }
             con.Close();
+            //The trade in item is being returned
             return clubs;
         }
 
         //Select specific club from inventory Nathan and Tyler created
         public Clubs singleItemLookUp(int sku)
         {
+            //Searches for a club based on sku
             //New Command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "Select sku, brandID, modelID, typeID, clubType, shaft, numberOfClubs, premium, cost, price, quantity, clubSpec,"
                 + " shaftSpec, shaftFlex, dexterity, locationID, used, comments From tbl_clubs Where sku = @sku";
             cmd.Parameters.AddWithValue("sku", sku);
-
             //Open Database Connection
             cmd.Connection = con;
             con.Open();
-
             SqlDataReader reader = cmd.ExecuteReader();
-
             //Item List
-
             Clubs clubs = new Clubs();
-
             while (reader.Read())
             {
                 clubs.sku = Convert.ToInt32(reader["sku"]);
@@ -617,12 +618,14 @@ namespace SweetShop
                 clubs.comments = reader["comments"].ToString();
             }
             con.Close();
+            //Returns the club
             return clubs;
         }
 
         //Adds new Item to tables Nathan created
         public int addItem(Object o)
         {
+            //This method checks to see what type the object o is, and sends it to the proper method for insertion
             if (o is Clubs)
             {
                 Clubs c = o as Clubs;
@@ -638,12 +641,14 @@ namespace SweetShop
                 Clothing cl = o as Clothing;
                 addClothing(cl);
             }
+            //Returns the sku of the new item
             return returnItemNumber(o);
         }
 
         //Looks to see if the item already exists
         public void checkForItem(Object o)
         {
+            //This method checks to see what type the object o is, and sends it to the proper method for checking
             if (o is Clubs)
             {
                 Clubs c = o as Clubs;
@@ -731,6 +736,7 @@ namespace SweetShop
                 sku = Convert.ToInt32(reader["sku"]);
             }
             con.Close();
+            //Returns the sku of the item
             return sku;
         }
 
@@ -741,6 +747,8 @@ namespace SweetShop
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
 
+            //Might not need this if statement anymore due to changes in how the skus are generated **LOOK INTO
+            //Used to distinguish if the item was added via imports or the website
             if (c.sku < 10000000)
             {
                 cmd.CommandText = "Insert Into tbl_clubs (sku, brandID, modelID, clubType, shaft, numberOfClubs,"
@@ -788,7 +796,8 @@ namespace SweetShop
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
 
-
+            //Might not need this if statement anymore due to changes in how the skus are generated **LOOK INTO
+            //Used to distinguish if the item was added via imports or the website
             if (a.sku < 30000000)
             {
                 cmd.CommandText = "Insert Into tbl_accessories (sku, size, colour, price, cost, brandID, modelID, accessoryType, quantity, typeID, locationID, comments)"
@@ -825,6 +834,9 @@ namespace SweetShop
             //New command
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
+
+            //Might not need this if statement anymore due to changes in how the skus are generated **LOOK INTO
+            //Used to distinguish if the item was added via imports or the website
             if (c.sku < 50000000)
             {
                 cmd.CommandText = "Insert Into tbl_clothing (sku, size, colour, gender, style, price, cost, brandID, quantity, typeID, locationID, comments)"
@@ -860,6 +872,8 @@ namespace SweetShop
         //Get item type
         public int getItemType(int sku)
         {
+            //Bool's used to signify the item type of an item
+            //Based on sku
             bool isClub = checkClubForItem(sku);
             bool isAccessory = checkAccessoryForItem(sku);
             bool isClothing = checkClothingForItem(sku);
@@ -881,6 +895,8 @@ namespace SweetShop
                 return 0;
             }
         }
+
+        //Checks tbl_clubs for the sku. Used to see if the item is a club
         public bool checkClubForItem(int sku)
         {
             bool isClub = false;
@@ -907,9 +923,10 @@ namespace SweetShop
             }
             //Closing
             con.Close();
-
+            //Returns true or false
             return isClub;
         }
+        //Checks tbl_accessories for the sku. Used to see if the item is an accessory
         public bool checkAccessoryForItem(int sku)
         {
             bool isAccessory = false;
@@ -936,9 +953,10 @@ namespace SweetShop
             }
             //Closing
             con.Close();
-
+            //Returns true or false
             return isAccessory;
         }
+        //Checks tbl_clothing for the sku. Used to see if the item is clothing
         public bool checkClothingForItem(int sku)
         {
             bool isClothing = false;
@@ -965,7 +983,7 @@ namespace SweetShop
             }
             //Closing
             con.Close();
-
+            //Returns true or false
             return isClothing;
         }
 
@@ -982,13 +1000,14 @@ namespace SweetShop
             con.Open();
             //Execute search
             cmd.ExecuteNonQuery();
+            //This returns a 1 or higher if something is found
             int itemExists = (int)cmd.ExecuteScalar();
 
             //If item exists
             if (itemExists > 0)
             {
                 //update
-                updateItem(c);
+                updateClub(c);
             }
             //If item doesn't exist
             else
@@ -1056,14 +1075,17 @@ namespace SweetShop
             con.Close();
         }
 
+
+        //Converts a dbnull to string
         public string convertDBNullToString(Object o)
         {
             if (o is DBNull)
                 o = "";
-
+            //Returns a blank string
             return o.ToString();
 
         }
+        //Converts a dbnull to a double
         public double convertDBNullToDouble(Object o)
         {
             double dbl = 0.0;
@@ -1071,7 +1093,7 @@ namespace SweetShop
                 dbl = 0.0;
             else
                 dbl = Convert.ToDouble(o);
-
+            //Returns a double equaling 0.0 
             return dbl;
 
         }
@@ -1109,6 +1131,7 @@ namespace SweetShop
                 a.comments = reader["comments"].ToString();
             }
             con.Close();
+            //Returns the accessory
             return a;
         }
         //Returns single clothing Nathan created
@@ -1144,9 +1167,10 @@ namespace SweetShop
                 c.comments = reader["comments"].ToString();
             }
             con.Close();
+            //Returns the clothing
             return c;
         }
-
+        //**RELIC METHOD
         public void addItem(Clubs c)
         {
             //New command
@@ -1189,6 +1213,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
+        //**RELIC MTHOD
         public void updateItemInvoice(Clubs c)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1226,8 +1251,8 @@ namespace SweetShop
             con.Close();
         }
 
-        //Update item in inventory updated Nathan
-        public void updateItem(Clubs c)
+        //Update club in inventory updated Nathan 
+        public void updateClub(Clubs c)
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
@@ -1258,7 +1283,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-        //Update item in inventory created Nathan
+        //Update accessory in inventory created Nathan
         public void updateAccessories(Accessories a)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1283,7 +1308,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-        //Update item in inventory created Nathan
+        //Update clothing in inventory created Nathan
         public void updateClothing(Clothing cl)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1308,6 +1333,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
+        //Checks to see if an item is used
         public bool isTradein(int sku)
         {
             bool trade = false;
@@ -1326,13 +1352,17 @@ namespace SweetShop
                 }
             }
             con.Close();
+            //Returns true or false
             return trade;
         }
+
+        //Determines what type an item is
         public int whatTypeIsItem(int sku)
         {
 
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
+            //Check clubs
             cmd.CommandText = "SELECT typeID FROM tbl_clubs WHERE sku = @sku";
             cmd.Parameters.AddWithValue("sku", sku);
             cmd.Connection = con;
@@ -1343,9 +1373,10 @@ namespace SweetShop
             {
                 intType = Convert.ToInt32(reader["typeID"]);
             }
-            if (!reader.HasRows)
+            if (!reader.HasRows) //Couldn't find anything 
             {
                 reader.Close();
+                //Check accessories
                 cmd.CommandText = "Select typeID from tbl_accessories where SKU = @skuacces";
                 cmd.Parameters.AddWithValue("skuacces", sku);
                 SqlDataReader readerAccesories = cmd.ExecuteReader();
@@ -1354,9 +1385,10 @@ namespace SweetShop
                 {
                     intType = Convert.ToInt32(readerAccesories["typeID"]);
                 }
-                if (!readerAccesories.HasRows)
+                if (!readerAccesories.HasRows) //Couldn't find anything
                 {
                     readerAccesories.Close();
+                    //Check clothing
                     cmd.CommandText = "Select typeID from tbl_clothing where SKU = @skucloth";
                     cmd.Parameters.AddWithValue("skucloth", sku);
                     SqlDataReader readerclothing = cmd.ExecuteReader();
@@ -1367,8 +1399,11 @@ namespace SweetShop
                     }
                 }
             }
+            //Returns the item type ID
             return intType;
         }
+
+        //Returns the description of the searched item
         public string getDescription(int sku, int type)
         {
             //Current: Brand Name, Model, Club Type, Shaft, Number of Clubs, Dexterity
@@ -1378,19 +1413,19 @@ namespace SweetShop
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
             con.Open();
-
-            if (type == 1)
+            //***********CONVERT ALL TO HAVE SUBQUERIES TO GET NAMES
+            if (type == 1) //Club
             {
                 // cmd.CommandText = "Select brandID, modelID, clubType, shaft, numberOfClubs, dexterity from tbl_clubs where sku = @skuCl";
                 cmd.CommandText = "Select brandID, modelID, clubSpec, clubType, shaftSpec, shaftFlex, dexterity from tbl_clubs where sku = @skuCl";
                 cmd.Parameters.AddWithValue("@skuCl", sku);
             }
-            else if (type == 2)
+            else if (type == 2) //Accessory
             {
                 cmd.CommandText = "Select brandID, modelID, accessoryType, size, colour from tbl_accessories where sku = @skuAc";
                 cmd.Parameters.AddWithValue("@skuAc", sku);
             }
-            else if (type == 3)
+            else if (type == 3) //Clothing
             {
                 cmd.CommandText = "Select brandID, size, colour, gender, style from tbl_clothing where sku = @skuClo";
                 cmd.Parameters.AddWithValue("@skuClo", sku);
@@ -1400,24 +1435,30 @@ namespace SweetShop
 
             while (reader.Read())
             {
-                if (type == 1)
+                //Club
+                if (type == 1) 
                 {
                     desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + " " + idu.modelType(Convert.ToInt32(reader["modelID"])).ToString() + " "
                         + reader["clubSpec"].ToString() + " " + reader["clubType"].ToString() + " "
                         + reader["shaftSpec"].ToString() + " " + reader["shaftFlex"].ToString() + " " + reader["dexterity"].ToString();
                 }
-                else if (type == 2)
+                //Accessory
+                else if (type == 2) 
                 {
-                    desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + idu.modelType(Convert.ToInt32(reader["modelID"])).ToString() + " " + reader["accessoryType"] + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
+                    desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + idu.modelType(Convert.ToInt32(reader["modelID"])).ToString() 
+                        + " " + reader["accessoryType"] + " " + reader["size"].ToString() + " " + reader["colour"].ToString();
                 }
-                else if (type == 3)
+                //Clothing
+                else if (type == 3) 
                 {
                     desc = idu.brandType(Convert.ToInt32(reader["brandID"])).ToString() + " " + reader["size"].ToString() + " " + reader["colour"].ToString() + " "
                         + reader["gender"].ToString() + " " + reader["style"].ToString();
                 }
             }
+            //Returns the description
             return desc;
         }
+        //Updates the item quantity
         public void updateItemQuantity(int quantity, int sku)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1446,7 +1487,7 @@ namespace SweetShop
         }
 
         /*******Invoice Utilities************************************************************************************/
-
+        //**RELIC METHOD
         public int getInvoiceID(DateTime saleDate)
         {
             SqlConnection conn = new SqlConnection(connectionString);
@@ -1460,11 +1501,10 @@ namespace SweetShop
             int invoiceID = 0;
             while (reader.Read())
             {
-
                 invoiceID = Convert.ToInt32(reader["invoiceID"]);
-
             }
             conn.Close();
+            //Returns the invoice ID
             return invoiceID;
         }
         //Get Invoice by invoiceID and return the invoice object
@@ -1480,7 +1520,6 @@ namespace SweetShop
             con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             List<Invoice> i = new List<Invoice>();
-
             while (reader.Read())
             {
                 i.Add(new Invoice(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]), Convert.ToDateTime(reader["invoiceDate"]),
@@ -1489,11 +1528,13 @@ namespace SweetShop
                     Convert.ToDouble(reader["provincialTax"]), Convert.ToDouble(reader["balanceDue"]), Convert.ToInt32(reader["transactionType"]), reader["comments"].ToString()));
             }
             con.Close();
+            //Returns the invoice
             return i;
         }
         //Nathan built for home page sales display
         public List<Invoice> getInvoiceBySaleDate(DateTime givenDate, int locationID)
         {
+            //Gets a list of all invoices based on date and location. Stores in a list
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, "
@@ -1522,12 +1563,17 @@ namespace SweetShop
                 i.Add(inv);
             }
             con.Close();
+            //Returns a list of invoices
             return i;
         }
+
+        //Returns a list of invoices that fit the search criteria
         public List<Invoice> multiTypeSearchInvoices(string searchCriteria, Nullable<DateTime> searchDate)
         {
+            //Gets a list of customers that match the search criteria
             List<Customer> c = GetCustomerfromSearch(searchCriteria);
             List<int> customerNum = new List<int>();
+            //Loops through the customers and gets their customer ID
             foreach (var cust in c)
             {
                 customerNum.Add(cust.customerId);
@@ -1539,9 +1585,11 @@ namespace SweetShop
                 + "tradeinAmount, governmentTax, provincialTax, balanceDue, transactionType, comments FROM tbl_invoice "
                 + "WHERE (";
             int firstCust = Enumerable.First(customerNum);
+            //Loops through the customer IDs
             foreach (var num in customerNum)
             {
-                if (num.Equals(firstCust))
+                //Adding more "where" statements 
+                if (num.Equals(firstCust)) 
                 {
                     selectStatement += "custID = " + num;
                 }
@@ -1550,11 +1598,14 @@ namespace SweetShop
                     selectStatement += "or custID = " + num;
                 }
             }
+            //Doesn't always have a value, but when it does...
             if (searchDate.HasValue)
             {
+                //Comparing the invoice date to the searched date
                 selectStatement += ") and invoiceDate = @searchDate";
                 cmd.Parameters.AddWithValue("@searchDate", searchDate);
             }
+            //Closing the select statement
             else
             {
                 selectStatement += ")";
@@ -1587,9 +1638,12 @@ namespace SweetShop
                 i.Add(inv);
             }
             con.Close();
+            //Returns a list of invoices that match the search criteria
             return i;
 
         }
+
+        
         public List<Cart> returningItems(int invoiceNumber, int invoiceSub)
         {
             List<Cart> retItems = new List<Cart>();
@@ -1607,6 +1661,7 @@ namespace SweetShop
             Cart cartItem;
             while (reader.Read())
             {
+                //Checking item type
                 int intType = whatTypeIsItem(Convert.ToInt32(reader["sku"]));
                 bool bolTrade = false;
                 if (intType == 1)
@@ -1689,6 +1744,8 @@ namespace SweetShop
         //    cmd.ExecuteNonQuery();
         //    con.Close();
         //}
+
+        //**RELIC METHOD
         public void addInvoice(Invoice i)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1762,6 +1819,7 @@ namespace SweetShop
                 i.Add(inv);
             }
             con.Close();
+            //Returns the list of invoices
             return i;
         }
 
@@ -1782,6 +1840,7 @@ namespace SweetShop
                 custID = Convert.ToInt32(reader["custID"]);
             }
             conn.Close();
+            //Returns customer ID
             return custID;
         }
         //Get Items
@@ -1805,6 +1864,7 @@ namespace SweetShop
                     Convert.ToBoolean(reader["percentage"])));
             }
             conn.Close();
+            //Returns list of the items
             return items;
         }
         //Get Checkout Totals
@@ -1860,7 +1920,7 @@ namespace SweetShop
 
             }
             conn.Close();
-
+            //Returns checkout totals
             return ckm;
         }
         //Get Methods of Payment
@@ -1881,7 +1941,7 @@ namespace SweetShop
                 mops.Add(new Checkout(reader["mopType"].ToString(), Convert.ToDouble(reader["amountPaid"])));
             }
             conn.Close();
-
+            //Returns the methods of payment
             return mops;
         }
         //Gets Location id from invoice
@@ -1902,6 +1962,7 @@ namespace SweetShop
             }
             conn.Close();
             string loc = lm.locationCity(locID);
+            //Returns the location 
             return loc;
         }
         //Gets the reason why the invoice was deleted
@@ -1921,12 +1982,12 @@ namespace SweetShop
                 reason = reader["deletionReason"].ToString();
             }
             conn.Close();
+            //Returns the reason the invoice was deleted
             return reason;
         }
 
-
         /*******Sale Utilities************************************************************************************/
-
+        //**RELIC METHOD
         //Get sale by invoiceID
         public void getSaleByInvoiceIDAndSKU(int invoiceID, int SKU)
         {
@@ -1942,7 +2003,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-
+        //**RELIC METHOD
         public void addSale(Sale s)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1958,7 +2019,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-
+        //**RELIC METHOD
         public void returnUpdatedQuantity(int sku, int quantityInOrder)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -1974,7 +2035,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-
+        //**RELIC METHOD
         //Delete sale of specific item on an invoice
         public void deleteSale(int invoiceID, int sku)
         {
@@ -1994,7 +2055,7 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-
+        //**RELIC METHOD
         //Get Sale object for a specific item on an invoice
         public List<Sale> getSale(int invoiceID, int sku)
         {
@@ -2023,7 +2084,7 @@ namespace SweetShop
             //return sale object
             return s;
         }
-
+        //**RELIC METHOD
         //Get Sale object for a specific item on an invoice
         public Sale getSaleByInvAndSKU(int invoiceID, int sku)
         {
@@ -2078,6 +2139,7 @@ namespace SweetShop
                 tax.Add(t);
             }
             con.Close();
+            //Returns the list of taxes
             return tax;
         }
 
@@ -2122,8 +2184,13 @@ namespace SweetShop
         //    return t;
         //}
 
-        //*******Report Utilities************************************************************************************/
 
+
+
+
+
+        //*******Report Utilities************************************************************************************/
+        //**RELIC METHOD
         //Export customer table to excel file in users Downloads folder
         public void exportCustomers()
         {
@@ -2158,7 +2225,7 @@ namespace SweetShop
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
         }
-
+        //**RELIC METHOD
         //Export Inventory Sales to excel file in users Downloads folder
         public void exportInvoices(DateTime startDate, DateTime endDate)
         {
@@ -2194,7 +2261,7 @@ namespace SweetShop
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
         }
-
+        //**RELIC METHOD
         //Export items table to excel file in users Downloads folder
         public void exportItems()
         {
@@ -2229,7 +2296,7 @@ namespace SweetShop
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
         }
-
+        //**RELIC METHOD
         //Export Invoice table to excel 
         public void exportInvoices()
         {
@@ -2267,7 +2334,7 @@ namespace SweetShop
         }
 
         //************************************Inventory Sales Utilities********************************************/
-
+        //**RELIC METHOD
         //This method will select all invoices involved in a sale between the specified dates and encapsulated them in a list.
         public List<InvSale> selectAllInventorySales(DateTime startDate, DateTime endDate)
         {
@@ -2307,6 +2374,9 @@ namespace SweetShop
             return ivs;
 
         }
+
+
+
 
         public double returnDiscount(List<Cart> itemsSold)
         {
@@ -2382,7 +2452,9 @@ namespace SweetShop
             return totalTotalAmount;
         }
 
+
         //Transfering the trade in item to the clubs table
+        //Not being used 12.9.17
         public void transferTradeInStart(List<Cart> Clubs)
         {
             SqlConnection conn = new SqlConnection(connectionString);
