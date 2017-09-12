@@ -18,6 +18,7 @@ using OfficeOpenXml;
 
 namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
+    //This is a mess...
     public class Reports
     {
         string connectionString;
@@ -35,14 +36,14 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         private System.Data.DataTable exportInvoiceTable;
         private System.Data.DataTable exportInvoiceItemTable;
         private System.Data.DataTable exportInvoiceMOPTable;
-
+        //Connection String
         public Reports()
         {
             connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
         }
-
         //*******************CASHOUT UTILITIES*******************************************************
-        //Cashout
+        
+        //This method connects to the database and gets the totals for the MOPs based on location and dates
         public List<Cashout> cashoutAmounts(DateTime startDate, DateTime endDate, int locationID)
         {
             SqlConnection con = new SqlConnection(connectionString);
@@ -54,28 +55,25 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             cmd.Parameters.AddWithValue("@startDate", startDate);
             cmd.Parameters.AddWithValue("@endDate", endDate);
             cmd.Parameters.AddWithValue("@locationID", locationID);
-
             cmd.Connection = con;
             con.Open();
-
             SqlDataReader reader = cmd.ExecuteReader();
-
             while (reader.Read())
             {
                 Cashout cs = new Cashout(
                     Convert.ToString(reader["mopType"]),
                     Convert.ToDouble(reader["amountPaid"]),
-                    Convert.ToDouble(reader["tradeinAmount"]));
-                    
-
+                    Convert.ToDouble(reader["tradeinAmount"]));                    
+                //Adding the mops to the list of type cashout
                 cashout.Add(cs);
             }
             con.Close();
+            //Returns the list of type cashout
             return cashout;
         }
+        //Used to get the subTotal, government tax, and provincial tax from the invoices based on a location ID and dates
         public List<Cashout> getRemainingCashout(DateTime startDate, DateTime endDate, int locationID)
         {
-
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "Select subTotal, governmentTax, provincialTax from  tbl_invoice" +                
@@ -83,27 +81,23 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             cmd.Parameters.AddWithValue("@startDate", startDate);
             cmd.Parameters.AddWithValue("@endDate", endDate);
             cmd.Parameters.AddWithValue("@locationID", locationID);
-
             cmd.Connection = con;
             con.Open();
-
             SqlDataReader reader = cmd.ExecuteReader();
-
-
             while (reader.Read())
             {
                 Cashout cs = new Cashout(
                     Convert.ToDouble(reader["governmentTax"]),
                     Convert.ToDouble(reader["provincialTax"]),
                     Convert.ToDouble(reader["subTotal"]));
-
-
+                //Adding the totals to a list of type cashout
                 remainingCashout.Add(cs);
             }
             con.Close();
-
+            //Return the list of type cashout
             return remainingCashout;
         }
+        //This method gets the trade in amounts from the invoices based on a location ID and dates
         public double getTradeInsCashout(DateTime startDate, DateTime endDate, int locationID)
         {
             double tradeintotal = 0;
@@ -114,19 +108,15 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             cmd.Parameters.AddWithValue("@startDate", startDate);
             cmd.Parameters.AddWithValue("@endDate", endDate);
             cmd.Parameters.AddWithValue("@locationID", locationID);
-
             cmd.Connection = con;
             con.Open();
-
             SqlDataReader reader = cmd.ExecuteReader();
-
-
             while (reader.Read())
             {
                 tradeintotal += Convert.ToDouble(reader["tradeinAmount"]);                
             }
             con.Close();
-
+            //Returns the total value of the trade ins
             return tradeintotal;
         }
         //Insert the cashout into the database
@@ -153,6 +143,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
+            //This is a mess...
             cmd.CommandText = "Insert into tbl_cashout values('" +
                cas.date + "', '" + cas.time + "', " + cas.saleTradeIn + ", " + cas.saleGiftCard + ", " +
                cas.saleCash + ", "  + cas.saleDebit + ", " + cas.saleMasterCard + ", " +
@@ -204,177 +195,220 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             con.Close();
         }
-
         //********************IMPORTING***************************************************************
+
+        //This method is the giant import method
         public void importItems(FileUpload fup)
         {
+            //List of clubs
             List<Clubs> listClub = new List<Clubs>();
+            //List of clothing
             List<Clothing> listClothing = new List<Clothing>();
+            //List of accessories
             List<Accessories> listAccessories = new List<Accessories>();
+            //^ I don't think these are actually used anymore
+
 
             //check if there is actually a file being uploaded
             if (fup.HasFile)
             {
                 //load the uploaded file into the memorystream
                 using (MemoryStream stream = new MemoryStream(fup.FileBytes))
-
-
+                //Lets the server know to use the excel package
                 using (ExcelPackage xlPackage = new ExcelPackage(stream))
                 {
-
                     // get the first worksheet in the workbook
                     ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
+                    //Gets the row count
                     var rowCnt = worksheet.Dimension.End.Row;
+                    //Gets the column count
                     var colCnt = worksheet.Dimension.End.Column;
-
-
                     //Beginning the loop for data gathering
-                    for (int i = 2; i < rowCnt; i++)
+                    for (int i = 2; i < rowCnt; i++) //Starts on 2 because excel starts at 1, and line 1 is headers
                     {
                         string itemType;
+                        //Attempts to get the item type
                         try
                         {
-                            itemType = (worksheet.Cells[i, 5].Value).ToString();
+                            itemType = (worksheet.Cells[i, 5].Value).ToString(); //Column 5 = itemType
                         }
                         catch (Exception ex)
                         {
                             itemType = "";
                         }
 
-
+                        //If the row is not null, and there is a value in column 5, proceed
                         if (worksheet.Row(i) != null && worksheet.Cells[i, 5].Value != null)
                         {
+                            //Does nothing if itemType is null
                             if (itemType == null) { }
+                            //Does nothing if itemType is blank
                             else if (itemType.Equals("")) { }
                             //***************ACCESSORIES*********
+                            //If the itemType is accessories or Accessories, the item is an accessory
                             else if (itemType.Equals("Accessories") || itemType.Equals("accessories"))
                             {
                                 //***************SKU***************
-                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null))
-                                {
+                                //If there is a sku in column 3, proceed
+                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null)) //Column 3 = Sku
+                                { 
+                                    //Sets the accessory sku to the value in column 3
                                     a.sku = Convert.ToInt32(worksheet.Cells[i, 3].Value);
                                 }
                                 else
                                 {
+                                    //Should NEVER happen, but is used as a safety/catch 
                                     a.sku = 0;
                                 }
                                 //***************BRAND ID***************
+                                //Gets the brand name from the itemType. 
+                                //If it an accessory, its brand will always be accessory
                                 int bName = idu.brandName(itemType.ToString());
                                 if (!bName.Equals(null))
                                 {
+                                    //Will equal the brandID of accessory
                                     a.brandID = bName;
                                 }
                                 else
                                 {
+                                    //Should NEVER happen, but is included as a safety/catch
                                     a.brandID = 1;
                                 }
                                 //***************MODEL ID***************                                
                                 try
                                 {
                                     string mName;
-                                    mName = (worksheet.Cells[i, 6].Value).ToString();
+                                    mName = (worksheet.Cells[i, 6].Value).ToString(); //Column 6 = modelName
+                                    //If the model name is null, set the ID to 1
                                     if (mName == null)
                                     {
+                                        //Shouldn't happen. Should come out as ""
                                         a.modelID = 1;
                                     }
                                     else
                                     {
+                                        //Gets the modelID from the value in column 6
                                         int mID = idu.modelName(mName);
+                                        //Check if it is null
                                         if (!mID.Equals(null))
+                                            //Hardcoded because the DB refused to allow 360 as a model name
                                             if (mName == "360") { a.modelID = 17; }
+                                            //Setting the model ID to what is returned from idu.modelName
                                             else { a.modelID = mID; }
-
                                         else
+                                            //Should NEVER happen, but is included as a safety/catch
                                             a.modelID = 1;
                                     }
                                 }
                                 catch (Exception e)
                                 {
+                                    //1427: N/A
                                     a.modelID = 1427;
                                 }
                                 //***************ACCESSORY TYPE***************
                                 try
                                 {
-                                    if ((string)(worksheet.Cells[i, 7].Value) != null)
+                                    //Checks to see if column 7 has a value
+                                    if ((string)(worksheet.Cells[i, 7].Value) != null) //Column 7 = accessoryType
                                     {
+                                        //Setting the accessory's accessory type to the value in column 7
                                         a.accessoryType = (string)(worksheet.Cells[i, 7].Value);
                                     }
                                     else
                                     {
+                                        //Won't happen very often but can be triggered by a blank cell. In that case, this sets it to be blank
                                         a.accessoryType = "";
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //Sets the accessory type to be blank if an error occurs.
                                     a.accessoryType = "";
                                 }
                                 //***************COST***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null))
+                                    //Checks if column 12 has a value
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null)) //Column 12 = cost
                                     {
+                                        //Sets the accessory's cost to the value in column 12
                                         a.cost = Convert.ToDouble(worksheet.Cells[i, 12].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes no cost is given so I set it to 0 in the DB
                                         a.cost = 0;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //Sets the cost to 0 if an error is thrown
                                     a.cost = 0;
                                 }
                                 //***************PRICE***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    //Checks if column 15 has a value
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null)) //Column 15 = price
                                     {
+                                        //Sets the accessory's price to the value in column 15
                                         a.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes a price is not given so it gets set to 0 in the DB
                                         a.price = 0;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //Sometimes a price is not given and caught so it gets set to 0 in the DB
                                     a.price = 0;
                                 }
                                 //***************QUANTITY***************
                                 try
                                 {
-                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    //Checks to see if there is a value in column 13
+                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null)) //Column 13 = quantity
                                     {
+                                        //Sets the accessory's quantity to the value in column 13
                                         a.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
                                     }
                                     else
                                     {
+                                        //If the quantity is not given or is blank, setting it to 0
                                         a.quantity = 0;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, setting the quantity to 0
                                     a.quantity = 0;
                                 }
                                 //***************COMMENTS***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 16].Value).Equals(null))
+                                    //Checking if there is a value in column 16
+                                    if (!(worksheet.Cells[i, 16].Value).Equals(null)) //Column 16 = comments
                                     {
+                                        //Setting the accessory's comments to the value in column 16
                                         a.comments = (string)(worksheet.Cells[i, 16].Value);
                                     }
                                     else
                                     {
+                                        //When comments are not present, they are set to "" in the DB
                                         a.comments = "";
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //Whenan error occurs, sets the comments to ""
                                     a.comments = "";
                                 }
                                 //***************LOCATIONID***************
                                 try
                                 {
+                                    //NEEDS TO BE REWORKED
                                     if (!(worksheet.Cells[i, 2].Value).Equals(null))
                                     {
                                         if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
@@ -398,134 +432,168 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 }
 
 
-                                a.typeID = 2;
-                                a.size = "";
-                                a.colour = "";
+                                a.typeID = 2;  //Accessory type ID = 2
+                                a.size = "";   //NOT BEING USED
+                                a.colour = ""; //NOT BEING USED
 
+                                //Adds the accessory to the list of type accessory
                                 listAccessories.Add(a);
                                 o = a as Object;
                             }
                             //***************APPAREL*************
+                            //Apparel is used instead of clothing due to the clients previous DB
                             else if (itemType.Equals("Apparel") || itemType.Equals("apparel"))
                             {
                                 //***************SKU***************
-                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null))
+                                //Checks to see if column 3 has a value
+                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null)) //Column 3 = sku
                                 {
+                                    //Sets the clothing sku to the value in column 3
                                     cl.sku = Convert.ToInt32(worksheet.Cells[i, 3].Value);
                                 }
                                 else
                                 {
+                                    //Should NEVER happen, but is a good catch
                                     cl.sku = 0;
                                 }
-                                //***************BRAND ID***************                                
+                                //***************BRAND ID***************   
+                                //Gets the brand name from the itemType. 
+                                //If it clothing, its brand will always be clothing
                                 int bName = idu.brandName(itemType.ToString());
                                 if (!bName.Equals(null))
                                 {
+                                    //Will equal the brandID of accessory
                                     cl.brandID = bName;
                                 }
                                 else
                                 {
+                                    //Something really broke if this happens
                                     cl.brandID = 1;
                                 }
                                 //***************COST***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null))
+                                    //Checks to see if there is a value in column 12
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null)) //Column 12 = cost
                                     {
+                                        //Sets the clothing cost to the value in column 12
                                         cl.cost = Convert.ToDouble(worksheet.Cells[i, 12].Value);
                                     }
                                     else
                                     {
+                                        //Sometime cost is not give so I set it to 0
                                         cl.cost = 0;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, setting the value to 0
                                     cl.cost = 0;
                                 }
                                 //***************PRICE***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    //Checks to see if there is a value in column 15
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null)) //Column 15 = price
                                     {
+                                        //Sets the clothing price to the value in column 15
                                         cl.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes a price is not given so I set it to 0
                                         cl.price = 0;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, the price is set to 0
                                     cl.price = 0;
                                 }
                                 //***************QUANTITY***************
                                 try
                                 {
-                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    //Checks to see if there is a value in column 13
+                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null)) //Column 13 = quantity
                                     {
+                                        //Sets the clothing quantity to the value in column 13
                                         cl.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes a quantity is not given so I set it to 0
                                         cl.quantity = 0;
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, the quantity is set to 0
                                     cl.quantity = 0;
                                 }
                                 //***************GENDER***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 6].Value).Equals(null))
+                                    //Checks to see if there isa value in column 6
+                                    if (!(worksheet.Cells[i, 6].Value).Equals(null)) //Column 6 = gender
                                     {
+                                        //Sets the clothing gender to the value in column 6
                                         cl.gender = (string)(worksheet.Cells[i, 6].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes the gender is not given so I set it to ""
                                         cl.gender = "";
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, the gender is set to ""
                                     cl.gender = "";
                                 }
                                 //***************STYLE***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 7].Value).Equals(null))
+                                    //Checks to see if there is a value in column 7
+                                    if (!(worksheet.Cells[i, 7].Value).Equals(null)) //Column 7 = style
                                     {
+                                        //Set the clothing style to the value in column 7
                                         cl.style = (string)(worksheet.Cells[i, 7].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes the style is not given so I set it to ""
                                         cl.style = "";
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, set the style to ""
                                     cl.style = "";
                                 }
                                 //***************COMMENTS***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 16].Value).Equals(null))
+                                    //Checks to see if there is a value in column 16
+                                    if (!(worksheet.Cells[i, 16].Value).Equals(null)) //Column 16 = comments
                                     {
+                                        //Sets the clothing comments to the value in column 16
                                         cl.comments = (string)(worksheet.Cells[i, 16].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes the comments are not given so I set it to ""
                                         cl.comments = "";
                                     }
                                 }
                                 catch (Exception ex)
                                 {
+                                    //If an error occurs, set the comments to ""
                                     cl.comments = "";
                                 }
                                 //***************LOCATIONID***************
                                 try
                                 {
+                                    //NEEDS TO BE REWORKED
                                     if (!(worksheet.Cells[i, 2].Value).Equals(null))
                                     {
                                         if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
@@ -548,29 +616,33 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                     cl.locID = 1;
                                 }
 
-                                cl.typeID = 3; //Type can be directly assigned
-                                cl.size = "";
-                                cl.colour = "";
-
+                                cl.typeID = 3;  //The type ID for clothing is always 3
+                                cl.size = "";   //Not used
+                                cl.colour = ""; //Not used
+                                //Adds the clothing to the list of type clothing
+                                listClothing.Add(cl);
                                 o = cl as Object;
                             }
                             //***************CLUBS***************
                             else
                             {
                                 //***************SKU***************
-                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null))
+                                //Checks to see if column 3 has a value
+                                if (!Convert.ToInt32(worksheet.Cells[i, 3].Value).Equals(null)) //Column 3 = Sku
                                 {
+                                    //Sets the club sku to the value in column 3
                                     c.sku = Convert.ToInt32(worksheet.Cells[i, 3].Value);
                                 }
                                 else
                                 {
+                                    //Should NEVER happen but is used as a catch
                                     c.sku = 0;
                                 }
                                 //***************BRAND ID***************
                                 int bName = idu.brandName(itemType.ToString());
                                 if (!bName.Equals(null))
                                 {
-                                    c.brandID = bName;
+                                    c.brandID = bName; //Brand ID will be a type of club
                                 }
                                 else
                                 {
@@ -580,7 +652,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 try
                                 {
                                     string mName;
-                                    mName = (worksheet.Cells[i, 6].Value).ToString();
+                                    mName = (worksheet.Cells[i, 6].Value).ToString(); //Column 6 = model name
                                     if (mName == null)
                                     {
                                         c.modelID = 1;
@@ -589,6 +661,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                     {
                                         int mID = idu.modelName(mName);
                                         if (!mID.Equals(null))
+                                            //Database doesn't like 360 so hardcoded in 
                                             if (mName == "360") { c.modelID = 17; }
                                             else { c.modelID = mID; }
 
@@ -598,17 +671,19 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 }
                                 catch (Exception e)
                                 {
+                                    //1427 = N/A
                                     c.modelID = 1427;
                                 }
                                 //***************COST***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null))
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 12].Value).Equals(null)) //Column 12 = cost
                                     {
                                         c.cost = Convert.ToDouble(worksheet.Cells[i, 12].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.cost = 0;
                                     }
                                 }
@@ -619,12 +694,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************PRICE***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null))
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 15].Value).Equals(null)) //Column 15 = price
                                     {
                                         c.price = Convert.ToDouble(worksheet.Cells[i, 15].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.price = 0;
                                     }
                                 }
@@ -635,12 +711,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************QUANTITY***************
                                 try
                                 {
-                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null))
+                                    if (!Convert.ToInt32(worksheet.Cells[i, 13].Value).Equals(null)) //Column 13 = quantity
                                     {
                                         c.quantity = Convert.ToInt32(worksheet.Cells[i, 13].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.quantity = 0;
                                     }
                                 }
@@ -651,12 +728,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************COMMENTS***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 16].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 16].Value).Equals(null)) //Column 16 = comments
                                     {
                                         c.comments = (string)(worksheet.Cells[i, 16].Value);
                                     }
                                     else
                                     {
+                                        //Sometime not given
                                         c.comments = "";
                                     }
                                 }
@@ -667,12 +745,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************PREMIUM***************
                                 try
                                 {
-                                    if (!Convert.ToDouble(worksheet.Cells[i, 11].Value).Equals(null))
+                                    if (!Convert.ToDouble(worksheet.Cells[i, 11].Value).Equals(null)) //Column 11 = premium
                                     {
                                         c.premium = Convert.ToDouble(worksheet.Cells[i, 11].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.premium = 0;
                                     }
                                 }
@@ -683,12 +762,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************CLUB TYPE***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 7].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 7].Value).Equals(null)) //Column 7 = clubType
                                     {
                                         c.clubType = (string)(worksheet.Cells[i, 7].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.clubType = "";
                                     }
                                 }
@@ -699,12 +779,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************SHAFT***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 8].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 8].Value).Equals(null)) //Column 8 = shaft
                                     {
                                         c.shaft = (string)(worksheet.Cells[i, 8].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.shaft = "";
                                     }
                                 }
@@ -715,12 +796,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************NUMBER OF CLUBS***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 9].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 9].Value).Equals(null)) //Column 9 = numberOfClubs
                                     {
                                         c.numberOfClubs = (string)(worksheet.Cells[i, 9].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.numberOfClubs = "";
                                     }
                                 }
@@ -731,12 +813,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************CLUB SPEC***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 18].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 18].Value).Equals(null)) //Column 18 = clubSpec
                                     {
                                         c.clubSpec = (string)(worksheet.Cells[i, 18].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.clubSpec = "";
                                     }
                                 }
@@ -747,12 +830,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************SHAFT SPEC***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 19].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 19].Value).Equals(null)) //Column 19 = shaftSpec
                                     {
                                         c.shaftSpec = (string)(worksheet.Cells[i, 19].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.shaftSpec = "";
                                     }
                                 }
@@ -763,12 +847,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************SHAFT FLEX***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 20].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 20].Value).Equals(null)) //Column 20 = shaftFlex
                                     {
                                         c.shaftFlex = (string)(worksheet.Cells[i, 20].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.shaftFlex = "";
                                     }
                                 }
@@ -779,12 +864,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************DEXTERITY***************
                                 try
                                 {
-                                    if (!(worksheet.Cells[i, 21].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 21].Value).Equals(null)) //Column 21 = dexterity
                                     {
                                         c.dexterity = (string)(worksheet.Cells[i, 21].Value);
                                     }
                                     else
                                     {
+                                        //Sometimes not given
                                         c.dexterity = "";
                                     }
                                 }
@@ -795,6 +881,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 //***************LOCATIONID***************
                                 try
                                 {
+                                    //NEEDS TO BE REWORKED
                                     if (!(worksheet.Cells[i, 2].Value).Equals(null))
                                     {
                                         if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
@@ -819,17 +906,20 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
 
 
-                                c.typeID = 1;
-                                c.used = false;//
+                                c.typeID = 1;    //The type ID of a club is always 1
+                                c.used = false;  //Not used
+                                //Adds the club to the list of type club
                                 listClub.Add(c);
                                 o = c as Object;
                             }
+                            //Looks for the item in the database
                             ssm.checkForItem(o);
                         }
                     }
                 }
             }
         }
+        //This method was meant to import the previous customers, but is filled with errors and is not being used
         public void importCustomers(FileUpload fup)
         {
             Excel.Application xlApp = new Excel.Application();
@@ -911,9 +1001,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
 
         }
-
         //********************EXPORTING***************************************************************
-        //Export clubs table to excel file in users Downloads folder
+
+        //Export clubs table to excel file in users Downloads folder        
         public void exportClubs()
         {
             SqlConnection sqlCon = new SqlConnection(connectionString);
@@ -946,7 +1036,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\ClubsInventory-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
-        }
+        } //**Incorrect format
         //Export clothing table to excel file in users Downloads folder
         public void exportClothing()
         {
@@ -980,7 +1070,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\ClothingInventory-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
-        }
+        } //**Incorrect format
         //Export accessories table to excel file in users Downloads folder
         public void exportAccessories()
         {
@@ -1014,10 +1104,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\AccessoriesInventory-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
-        }
+        } //**Incorrect format
         //Export all items in inventory
         public System.Data.DataTable exportAllItems()
         {
+            //This is the table that has all of the information lined up the way Caspio needs it to be
             exportTable = new System.Data.DataTable();
 
             exportTable.Columns.Add("Vendor", typeof(string));
@@ -1048,16 +1139,16 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             exportAllAdd_Clubs();
             exportAllAdd_Accessories();
             exportAllAdd_Clothing();
-
+            //Returns the table
             return exportTable;
         }
-        //****NEED TO ADD SUB QUEREY
         //Puts the clubs in the export table
         public void exportAllAdd_Clubs()
         {
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
+            //This query gathers all required information. No other methods needed
             cmd.CommandText = "select tbl_clubs.sku, " +
                                     "(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_clubs.modelID ) as modelName , " +
                                     "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clubs.brandID ) as brandName , " +
@@ -1103,6 +1194,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
+            //This query gathers all required information. No other methods needed
             cmd.CommandText = "select tbl_accessories.sku, tbl_accessories.size, tbl_accessories.colour, tbl_accessories.price, tbl_accessories.cost, " +
                                     "(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_accessories.modelID ) as modelName , " +
                                     "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_accessories.brandID ) as brandName ," +
@@ -1140,6 +1232,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
+            //This query gathers all required information. No other methods needed
             cmd.CommandText = "select tbl_clothing.sku, tbl_clothing.size, tbl_clothing.colour, tbl_clothing.gender, tbl_clothing.style, tbl_clothing.price, tbl_clothing.cost,  " +
                                     "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clothing.brandID ) as brandName , " +
                                     "tbl_clothing.quantity, " +
@@ -1169,8 +1262,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             conn.Close();
         }
-
-        //Export sales/invoices to excel
+        //Export ALL sales/invoices to excel
         public void exportAllSalesToExcel()
         {
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID,
@@ -1182,6 +1274,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             //ID, invoiceNum, invoiceSubNum, mopType, amountPaid
 
+            //Gets the invoice data and puts it in a table
             SqlConnection sqlCon = new SqlConnection(connectionString);
             sqlCon.Open();
             SqlDataAdapter im = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
@@ -1189,16 +1282,16 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             im.Fill(dtim);
             DataColumnCollection dcimHeaders = dtim.Columns;
             sqlCon.Close();
-
+            //Gets the invoice item data and puts it in a table
             sqlCon.Open();
-            SqlDataAdapter ii = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+            SqlDataAdapter ii = new SqlDataAdapter("SELECT * FROM tbl_invoiceItem", sqlCon);
             System.Data.DataTable dtii = new System.Data.DataTable();
             ii.Fill(dtii);
             DataColumnCollection dciiHeaders = dtii.Columns;
             sqlCon.Close();
-
+            //Gets the invoice mop data and puts it in a table
             sqlCon.Open();
-            SqlDataAdapter imo = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+            SqlDataAdapter imo = new SqlDataAdapter("SELECT * FROM tbl_invoiceMOP", sqlCon);
             System.Data.DataTable dtimo = new System.Data.DataTable();
             imo.Fill(dtimo);
             DataColumnCollection dcimoHeaders = dtimo.Columns;
@@ -1276,6 +1369,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             //ExcelApp.ActiveWorkbook.Saved = true;
             //ExcelApp.Quit();
         }
+        //Initiates the invoice table
         public System.Data.DataTable initiateInvoiceTable()
         {
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID,
@@ -1301,6 +1395,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             return exportInvoiceTable;
         }
+        //Initiates the invoice item table
         public System.Data.DataTable initiateInvoiceItemTable()
         {
             //invoiceNum, invoiceSubNum, sku, itemQuantity, itemCost,
@@ -1318,6 +1413,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             return exportInvoiceItemTable;
         }
+        //Initiates the invoice mop table
         public System.Data.DataTable initiateInvoiceMOPTable()
         {
             //ID, invoiceNum, invoiceSubNum, mopType, amountPaid
@@ -1331,6 +1427,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 
             return exportInvoiceMOPTable;
         }
+        //Gets the invoice data and puts it in a table
         public void exportSales_Invoice()
         {
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID,
@@ -1365,6 +1462,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             conn.Close();
         }
+        //Gets the invoice item data and puts it in a table
         public void exportSales_Items()
         {
             //invoiceNum, invoiceSubNum, sku, itemQuantity, itemCost,
@@ -1390,6 +1488,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             conn.Close();
         }
+        //Gets the invoice mop data and puts it in a table
         public void exportSales_MOP()
         {
             //ID, invoiceNum, invoiceSubNum, mopType, amountPaid
