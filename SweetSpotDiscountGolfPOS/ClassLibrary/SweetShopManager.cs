@@ -1642,10 +1642,10 @@ namespace SweetShop
             return i;
 
         }
-
         
         public List<Cart> returningItems(int invoiceNumber, int invoiceSub)
         {
+            //The list where the invoice items will go
             List<Cart> retItems = new List<Cart>();
 
             SqlConnection con = new SqlConnection(connectionString);
@@ -1664,6 +1664,7 @@ namespace SweetShop
                 //Checking item type
                 int intType = whatTypeIsItem(Convert.ToInt32(reader["sku"]));
                 bool bolTrade = false;
+                //If it is a club, check if it is a trade in
                 if (intType == 1)
                     bolTrade = isTradein(Convert.ToInt32(reader["sku"]));
 
@@ -1676,12 +1677,13 @@ namespace SweetShop
                 Convert.ToBoolean(reader["percentage"]),
                 bolTrade,
                 intType);
-
+                //Adding the item to the returnItem list
                 retItems.Add(cartItem);
             }
             reader.Close();
             List<Cart> remaingItemsAvailForRet = new List<Cart>();
 
+            //Compares the returned item quantities with those of the original invoice. It takes the difference to find out how many are left and able to be returned
             cmd.CommandText = "select tbl_invoiceItem.invoiceNum, tbl_invoiceItem.sku, sum(distinct tbl_invoiceItem.itemQuantity) - "
                             + "case when sum(tbl_invoiceItemReturns.itemQuantity) is null or sum(tbl_invoiceItemReturns.itemQuantity) = '' "
                             + "then 0 else sum(tbl_invoiceItemReturns.itemQuantity) end as itemQuantity from tbl_invoiceItem "
@@ -1697,18 +1699,22 @@ namespace SweetShop
             {
                 cartItem = new Cart(Convert.ToInt32(reader["sku"]), "", Convert.ToInt32(reader["itemQuantity"]),
                 0, 0, 0, false, false, 0);
-
+                //These are the items that can still be returned
                 remaingItemsAvailForRet.Add(cartItem);
             }
+            //Looping through the original items in the invoice
             List<Cart> finalItems = new List<Cart>();
             foreach (var rCart in retItems)
             {
                 bool bolAlreadyRet = false;
+                //Looping through the items that can be returned for each item in the invoice
                 foreach (var arCart in remaingItemsAvailForRet)
                 {
+                    //Comparing sku's to see if the returned items and invoice items sku matches
                     if (rCart.sku == arCart.sku)
                     {
                         bolAlreadyRet = true;
+
                         if (arCart.quantity > 0)
                         {
                             cartItem = new Cart(rCart.sku, rCart.description, arCart.quantity,
@@ -1723,6 +1729,7 @@ namespace SweetShop
                 }
             }
             con.Close();
+            //The items that can be returned
             return finalItems;
         }
         //public void updateReturnToInvoice(int invoiceID, double gstRefund, double pstRefund, double retailPrice, double totalRefund)
@@ -1822,7 +1829,6 @@ namespace SweetShop
             //Returns the list of invoices
             return i;
         }
-
         //Get customer ID
         public int invoice_getCustID(int invoiceNum, int invoiceSubNum, string table)
         {
@@ -1985,7 +1991,6 @@ namespace SweetShop
             //Returns the reason the invoice was deleted
             return reason;
         }
-
         /*******Sale Utilities************************************************************************************/
         //**RELIC METHOD
         //Get sale by invoiceID
@@ -2113,9 +2118,7 @@ namespace SweetShop
             //return sale object
             return s;
         }
-
         /*******Tax Utilities************************************************************************************/
-
         public List<Tax> getTaxes(int provStateID, DateTime recDate)
         {
             //New command
@@ -2142,7 +2145,6 @@ namespace SweetShop
             //Returns the list of taxes
             return tax;
         }
-
         //    public void updateTax(int regionID, double gst, double pst)
         //{
         //    SqlConnection con = new SqlConnection(connectionString);
@@ -2332,7 +2334,6 @@ namespace SweetShop
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
         }
-
         //************************************Inventory Sales Utilities********************************************/
 
         //**RELIC METHOD
@@ -2375,9 +2376,6 @@ namespace SweetShop
             return ivs;
 
         }
-
-
-
         //Returns the total discount of the cart
         public double returnDiscount(List<Cart> itemsSold)
         {
@@ -2462,8 +2460,6 @@ namespace SweetShop
             //Returns the total amount of the cart
             return totalTotalAmount;
         }
-
-
         //Transfering the trade in item to the clubs table
         //Not being used 12.9.17
         public void transferTradeInStart(List<Cart> Clubs)
