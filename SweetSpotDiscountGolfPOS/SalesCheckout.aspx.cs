@@ -38,12 +38,15 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //Collects current method and page for error tracking
             string method = "Page_Load";
             Session["currPage"] = "SalesCheckout.aspx";
             try
             {
+                //checks if the user has logged in
                 if (Convert.ToBoolean(Session["loggedIn"]) == false)
                 {
+                    //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
                 if (!Page.IsPostBack)
@@ -52,45 +55,45 @@ namespace SweetSpotDiscountGolfPOS
                     List<Tax> t = new List<Tax>();
                     List<Cart> cart = new List<Cart>();
                     CalculationManager cm = new CalculationManager();
-                    if (Convert.ToInt32(Session["TranType"]) == 2)
-                    {
-                        btnRemoveGov.Enabled = false;
-                        btnRemoveProv.Enabled = false;
-                        cart = (List<Cart>)Session["returnedCart"];
-                        lblBalance.Text = "Due to Customer:";
-                        lblAmountPaid.Text = "Owing to Customer:";
-                        lblRemainingBalanceDue.Text = "Remaining Due to Customer:";
-                    }
-                    else
-                    {
-                        cart = (List<Cart>)Session["ItemsInCart"];
-                    }
+                    //Retrieves items in the cart from Session
+                    cart = (List<Cart>)Session["ItemsInCart"];
+                    //Retrieves date from session
                     DateTime recDate = Convert.ToDateTime(Session["strDate"]);
+                    //Retrieves shipping
                     bool bolShipping = Convert.ToBoolean(Session["shipping"]);
+                    //Checks if shipping was charged 
                     if (bolShipping)
                     {
+                        //Retrieves customer number from Session
                         int custNum = (int)Convert.ToInt32(Session["key"].ToString());
+                        //Uses customer number to fill a customer class
                         Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
+                        //Based on customer province and date get taxes
                         t = ssm.getTaxes(c.province, recDate);
                         lblShipping.Visible = true;
                         lblShippingAmount.Visible = true;
+                        //Retrieve shipping amount from Session
                         dblShippingAmount = Convert.ToDouble(Session["ShippingAmount"].ToString());
                     }
                     else
                     {
-                        //**Will need to be enabled not shipping 
+                        //Query returns taxes based on current location
                         t = ssm.getTaxes(cm.returnLocationID(Convert.ToString(Session["Loc"])), recDate);
+                        //Sets shipping amouunt to 0
                         lblShipping.Visible = false;
                         lblShippingAmount.Visible = false;
                         dblShippingAmount = 0;
                     }
+                    //Retrieves location id from Session
                     int location = Convert.ToInt32(Session["locationID"]);
-
+                    //Creates checkout manager based on current items in cart
                     ckm = new CheckoutManager(cm.returnTotalAmount(cart, location), cm.returnDiscount(cart), cm.returnTradeInAmount(cart, location), dblShippingAmount, true, true, 0, 0, 0);
+                    //Loops through each tax
                     foreach (var T in t)
                     {
                         switch (T.taxName)
                         {
+                            //If tax is GST calculate and make visible
                             case "GST":
                                 lblGovernment.Visible = true;
                                 ckm.dblGst = cm.returnGSTAmount(T.taxRate, ckm.dblSubTotal + ckm.dblShipping);
@@ -98,6 +101,7 @@ namespace SweetSpotDiscountGolfPOS
                                 lblGovernmentAmount.Visible = true;
                                 btnRemoveGov.Visible = true;
                                 break;
+                            //If tax is PST calculate and make visible
                             case "PST":
                                 lblProvincial.Visible = true;
                                 ckm.dblPst = cm.returnPSTAmount(T.taxRate, ckm.dblSubTotal);
@@ -105,6 +109,7 @@ namespace SweetSpotDiscountGolfPOS
                                 lblProvincialAmount.Visible = true;
                                 btnRemoveProv.Visible = true;
                                 break;
+                            //If tax is HST calculate and make visible
                             case "HST":
                                 lblProvincial.Visible = false;
                                 lblGovernment.Text = "HST";
@@ -114,6 +119,7 @@ namespace SweetSpotDiscountGolfPOS
                                 btnRemoveProv.Visible = false;
                                 btnRemoveGov.Text = "HST";
                                 break;
+                            //If tax is RST calculate and make visible
                             case "RST":
                                 lblProvincial.Visible = true;
                                 lblProvincial.Text = "RST";
@@ -123,6 +129,7 @@ namespace SweetSpotDiscountGolfPOS
                                 btnRemoveProv.Visible = true;
                                 btnRemoveProv.Text = "RST";
                                 break;
+                            //If tax is QST calculate and make visible
                             case "QST":
                                 lblProvincial.Visible = true;
                                 lblProvincial.Text = "QST";
@@ -134,24 +141,29 @@ namespace SweetSpotDiscountGolfPOS
                                 break;
                         }
                     }
+                    //Add taxes to balance due and remaining balance
                     ckm.dblBalanceDue += ckm.dblGst + ckm.dblPst;
                     ckm.dblRemainingBalance += ckm.dblGst + ckm.dblPst;
-
+                    //Checks if there are any stored methods of payment
                     if (Session["MethodsofPayment"] != null)
                     {
+                        //Retrieve Mops from session
                         mopList = (List<Checkout>)Session["MethodsofPayment"];
+                        //Loops through each mop
                         foreach (var mop in mopList)
                         {
+                            //Adds amount of each mop to the amount paid total
                             dblAmountPaid += mop.amountPaid;
                         }
+                        //Binds mops to grid view
                         gvCurrentMOPs.DataSource = mopList;
                         gvCurrentMOPs.DataBind();
+                        //Update the amount paid and the remaining balance
                         ckm.dblAmountPaid = dblAmountPaid;
                         ckm.dblRemainingBalance = ckm.dblBalanceDue - ckm.dblAmountPaid;
                     }
 
                     //***Assign each item to its Label.
-
                     lblTotalInCartAmount.Text = "$ " + ckm.dblTotal.ToString("#0.00");
                     lblTotalInDiscountsAmount.Text = "$ " + ckm.dblDiscounts.ToString("#0.00");
                     lblTradeInsAmount.Text = "$ " + ckm.dblTradeIn.ToString("#0.00");
@@ -161,149 +173,29 @@ namespace SweetSpotDiscountGolfPOS
                     lblProvincialAmount.Text = "$ " + ckm.dblPst.ToString("#0.00");
                     lblBalanceAmount.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
                     lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
+                    //Stores totals in the checkout manager
                     Session["CheckOutTotals"] = ckm;
+                    //Updates the amount paying with the remaining balance
                     txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
-                    //    //Assigning session brought from the cart to variables
-                    //    int custNum = (int)(Convert.ToInt32(Session["key"].ToString()));
-                    //    bool shipping = Convert.ToBoolean(Session["shipping"]);
-                    //    cart = (List<Cart>)Session["ItemsInCart"];
-                    //    double dblShippingAmount = Convert.ToDouble(Session["ShippingAmount"].ToString());
-                    //    Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
-                    //    //End of assigning
-
-                    //    if (shipping == false)
-                    //    {
-                    //        //**Need to change to location for taxes
-                    //        t = ssm.getTaxes(c.province);
-                    //        lblShipping.Visible = false;
-                    //        lblShippingAmount.Visible = false;
-                    //        //txtShippingAmount.Visible = false;
-                    //    }
-                    //    else if (shipping == true)
-                    //    {
-                    //        t = ssm.getTaxes(c.province);
-                    //        lblShipping.Visible = true;
-                    //        lblShippingAmount.Visible = true;
-                    //        //txtShippingAmount.Visible = true;
-                    //    }
-
-                    //    lblTotalInCartAmount.Text = "$ " + cm.returnTotalAmount(cart).ToString("#0.00");
-                    //    lblTotalInDiscountsAmount.Text = "$ " + cm.returnDiscount(cart).ToString("#0.00");
-                    //    lblTradeInsAmount.Text = "$ " + cm.returnTradeInAmount(cart).ToString("#0.00");
-                    //    subtotal = cm.returnSubtotalAmount(cart);
-                    //    lblSubTotalAmount.Text = "$ " + subtotal.ToString("#0.00");                
-                    //    lblShippingAmount.Text = "$ " + dblShippingAmount.ToString("#0.00");
-
-                    //    foreach (var T in t)
-                    //    {
-                    //        switch (T.taxName)
-                    //        {
-                    //            case "GST":
-                    //                lblGovernment.Visible = true;
-                    //                gst = cm.returnGSTAmount(T.taxRate, cart);
-                    //                lblGovernmentAmount.Text = "$ " + gst.ToString("#0.00");
-                    //                btnRemoveGov.Visible = true;
-                    //                break;
-                    //            case "PST":
-                    //                lblProvincial.Visible = true;
-                    //                pst = Math.Round((T.taxRate * subtotal), 2);
-                    //                lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
-                    //                btnRemoveProv.Visible = true;
-                    //                break;
-                    //            case "HST":
-                    //                lblProvincial.Visible = false;
-                    //                lblGovernment.Text = "HST";
-                    //                gst = Math.Round((T.taxRate * subtotal), 2);
-                    //                lblGovernmentAmount.Text = "$ " + gst.ToString("#0.00");
-                    //                btnRemoveProv.Visible = false;
-                    //                btnRemoveGov.Text = "HST";
-                    //                break;
-                    //            case "RST":
-                    //                lblProvincial.Visible = true;
-                    //                lblProvincial.Text = "RST";
-                    //                pst = Math.Round((T.taxRate * subtotal), 2);
-                    //                lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
-                    //                btnRemoveProv.Visible = true;
-                    //                btnRemoveProv.Text = "RST";
-                    //                break;
-                    //            case "QST":
-                    //                lblProvincial.Visible = true;
-                    //                lblProvincial.Text = "QST";
-                    //                pst = Math.Round((T.taxRate * subtotal), 2);
-                    //                lblProvincialAmount.Text = "$ " + pst.ToString("#0.00");
-                    //                btnRemoveProv.Visible = true;
-                    //                btnRemoveProv.Text = "QST";
-                    //                break;
-                    //        }
-                    //    }
-                    //    dblAmountPaid = 0;
-                    //    //Checking if there are MOP's
-                    //    if (Session["MethodsofPayment"] != null)
-                    //    {
-                    //        ck = (List<Checkout>)Session["MethodsofPayment"];
-                    //        foreach (var mop in ck)
-                    //        {
-                    //            dblAmountPaid += mop.amountPaid;
-                    //        }
-                    //        gvCurrentMOPs.DataSource = ck;
-                    //        gvCurrentMOPs.DataBind();
-                    //    }
-                    //    //End of checking MOP's
-
-                    //    ckm = new CheckoutManager(cm.returnTotalAmount(cart), cm.returnDiscount(cart), cm.returnTradeInAmount(cart), dblShippingAmount, noGST, noPST, gst, pst,(cm.returnSubtotalAmount(cart)-dblAmountPaid));
-                    //    balancedue = ckm.dblGst + ckm.dblPst + ckm.dblShipping + ckm.dblTotal - (ckm.dblDiscounts + ckm.dblTradeIn);
-                    //    lblBalanceAmount.Text = "$ " + balancedue.ToString("#0.00");
-                    //    lblRemainingBalanceDueDisplay.Text = "$ " + balancedue.ToString("#0.00");
-                    //    Session["CheckOutTotals"] = ckm;
-                    //}
-                    //if (txtShippingAmount.Text == null || txtShippingAmount.Text == "")
-                    //{
-                    //    txtShippingAmount.Text = "0";
-                    //}
-                    //shippingCost = Convert.ToDouble(txtShippingAmount.Text);
-                    //ckm = (CheckoutManager)Session["CheckOutTotals"];
-                    //ckm.dblShipping = shippingCost;
-                    //balancedue = ckm.dblGst + ckm.dblPst + ckm.dblShipping + ckm.dblTotal - (ckm.dblDiscounts + ckm.dblTradeIn);
-                    //lblBalanceAmount.Text = "$ " + balancedue.ToString("#0.00");
-                    //Session["CheckOutTotals"] = ckm;
-                    //if (Session["MethodsofPayment"] == null)
-                    //{
-                    //    lblRemainingBalanceDueDisplay.Text = "$ " + balancedue.ToString("#0.00");
-                    //}
-                    //else
-                    //{
-                    //    ck = (List<Checkout>)Session["MethodsofPayment"];
-                    //    gvCurrentMOPs.DataSource = ck;
-                    //    gvCurrentMOPs.DataBind();
-                    //    foreach (var mop in ck)
-                    //    {
-                    //        dblAmountPaid += mop.amountPaid;
-                    //    }
-                    //    if (!ckm.blGst)
-                    //    {
-                    //        dblRemaining += ckm.dblGst;
-                    //    }
-                    //    if (!ckm.blPst)
-                    //    {
-                    //        dblRemaining += ckm.dblPst;
-                    //    }
-                    //    dblRemaining += ckm.dblTotal + ckm.dblShipping - (ckm.dblDiscounts + ckm.dblTradeIn);
-                    //    lblRemainingBalanceDueDisplay.Text = "$ " + (dblRemaining - dblAmountPaid).ToString("#0.00");
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
                 //Server.Transfer(prevPage, false);
             }
         }
-
         //American Express
         //protected void mopAmericanExpress_Click(object sender, EventArgs e)
         //{
@@ -316,33 +208,43 @@ namespace SweetSpotDiscountGolfPOS
         //        string methodOfPayment = "American Express";
         //        populateGridviewMOP(amountPaid, methodOfPayment);
         //    }
-            
+
         //}
         //Cash
         protected void mopCash_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "mopCash_Click";
             try
-            {                              
+            {
+                //Retrieves checkout totals from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
-                
-                
-                //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+                //Collects the amount paying as string
                 string boxResult = txtAmountPaying.Text;
+                //Checks that string is not empty
                 if (boxResult != "")
                 {
+                    //Converts amount to double
                     amountPaid = Convert.ToDouble(boxResult);
+                    //Calls client side script to display change due to customer
                     ClientScript.RegisterStartupScript(GetType(), "hwa", "userInput(" + amountPaid + ")", true);
+                    //Collects mop type
                     string methodOfPayment = "Cash";
+                    //Calls procedure to add it to a grid view
                     populateGridviewMOP(amountPaid, methodOfPayment);
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -374,25 +276,36 @@ namespace SweetSpotDiscountGolfPOS
         //MasterCard
         protected void mopMasterCard_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "mopMasterCard_Click";
             try
             {
+                //Retrieves checkout totals from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
-                //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+                //Collects the amount paying as string
                 string boxResult = txtAmountPaying.Text;
+                //Checks that string is not empty
                 if (boxResult != "")
                 {
+                    //Converts amount to double
                     amountPaid = Convert.ToDouble(boxResult);
+                    //Collects mop type
                     string methodOfPayment = "MasterCard";
+                    //Calls procedure to add it to a grid view
                     populateGridviewMOP(amountPaid, methodOfPayment);
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -402,25 +315,36 @@ namespace SweetSpotDiscountGolfPOS
         //Debit
         protected void mopDebit_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "mopDebit_Click";
             try
             {
+                //Retrieves checkout totals from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
-                //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+                //Collects the amount paying as string
                 string boxResult = txtAmountPaying.Text;
+                //Checks that string is not empty
                 if (boxResult != "")
                 {
+                    //Converts amount to double
                     amountPaid = Convert.ToDouble(boxResult);
+                    //Collects mop type
                     string methodOfPayment = "Debit";
+                    //Calls procedure to add it to a grid view
                     populateGridviewMOP(amountPaid, methodOfPayment);
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -430,25 +354,36 @@ namespace SweetSpotDiscountGolfPOS
         //Visa
         protected void mopVisa_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "mopVisa_Click";
             try
             {
+                //Retrieves checkout totals from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
-                //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+                //Collects the amount paying as string
                 string boxResult = txtAmountPaying.Text;
+                //Checks that string is not empty
                 if (boxResult != "")
                 {
+                    //Converts amount to double
                     amountPaid = Convert.ToDouble(boxResult);
+                    //Collects mop type
                     string methodOfPayment = "Visa";
+                    //Calls procedure to add it to a grid view
                     populateGridviewMOP(amountPaid, methodOfPayment);
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -458,25 +393,36 @@ namespace SweetSpotDiscountGolfPOS
         //Gift Card
         protected void mopGiftCard_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "mopGiftCard_Click";
             try
             {
+                //Retrieves checkout totals from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
-                //string boxResult = Microsoft.VisualBasic.Interaction.InputBox("Enter Amount Paid", "Cash", ckm.dblRemainingBalance.ToString("#0.00"), -1, -1);
+                //Collects the amount paying as string
                 string boxResult = txtAmountPaying.Text;
+                //Checks that string is not empty
                 if (boxResult != "")
                 {
+                    //Converts amount to double
                     amountPaid = Convert.ToDouble(boxResult);
+                    //Collects mop type
                     string methodOfPayment = "Gift Card";
+                    //Calls procedure to add it to a grid view
                     populateGridviewMOP(amountPaid, methodOfPayment);
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -487,32 +433,43 @@ namespace SweetSpotDiscountGolfPOS
         //Populating gridview with MOPs
         protected void populateGridviewMOP(double amountPaid, string methodOfPayment)
         {
+            //Collects current method for error tracking
             string method = "populateGridviewMOP";
             try
             {
                 gridID = 0;
+                //Checks if there are any current mops used
                 if (Session["MethodsofPayment"] != null)
                 {
+                    //Retrieves current mops from Session
                     mopList = (List<Checkout>)Session["MethodsofPayment"];
+                    //Loops through each mop
                     foreach (var mop in mopList)
                     {
+                        //Sets grid id to be the largest current id in table
                         if (mop.tableID > gridID)
                             gridID = mop.tableID;
                     }
-
                 }
+                //Sets a temp checkout with the new Mop
                 Checkout tempCK = new Checkout(methodOfPayment, amountPaid, gridID + 1);
+                //Retrieves totals for check out from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
-                //ck = ckm.methodsOfPayment(methodOfPayment, amountPaid, ck);
+                //Adds new mop to the current mop list
                 mopList.Add(tempCK);
+                //Loops through each mop
                 foreach (var mop in mopList)
                 {
+                    //Adds the total amount paid fropm each mop type
                     dblAmountPaid += mop.amountPaid;
                 }
+                //Updates the amount paid and remaining balance in the checkout manager
                 ckm.dblAmountPaid = dblAmountPaid;
                 ckm.dblRemainingBalance -= amountPaid;
-
-
+                //Binds the moplist to the gridview
+                gvCurrentMOPs.DataSource = mopList;
+                gvCurrentMOPs.DataBind();
+                //Center the mop grid view
                 foreach (GridViewRow row in gvCurrentMOPs.Rows)
                 {
                     foreach (TableCell cell in row.Cells)
@@ -520,18 +477,23 @@ namespace SweetSpotDiscountGolfPOS
                         cell.Attributes.CssStyle["text-align"] = "center";
                     }
                 }
-                gvCurrentMOPs.DataSource = mopList;
-                gvCurrentMOPs.DataBind();
+                //Store moplist into session
                 Session["MethodsofPayment"] = mopList;
+                //Sets the remaining balance due
                 lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
                 txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -541,41 +503,60 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void OnRowDeleting(object sender, GridViewDeleteEventArgs e)
         {
+            //Collects current method for error tracking
             string method = "OnRowDeleting";
             try
             {
+                //Retrieves index of selected row
                 int index = e.RowIndex;
+                //Retrieves the checkout manager from Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
+                //Gathers the mop info based on the index
                 int mopRemovingID = Convert.ToInt32(((Label)gvCurrentMOPs.Rows[index].Cells[3].FindControl("lblTableID")).Text);
                 double paidAmount = Convert.ToDouble(gvCurrentMOPs.Rows[index].Cells[2].Text);
-
+                //Retrieves Mop list from Session
                 List<Checkout> tempMopList = (List<Checkout>)Session["MethodsofPayment"];
+                //Loops through each mop in list
                 foreach (var mop in tempMopList)
                 {
+                    //Checks if the mop id do not match
                     if (mop.tableID != mopRemovingID)
                     {
+                        //Not selected mop add back into the mop list
                         mopList.Add(mop);
+                        //Calculate amount paid
                         dblAmountPaid += mop.amountPaid;
                     }
                     else
                     {
+                        //Add removed mops paid amount back into the remaining balance
                         ckm.dblRemainingBalance += paidAmount;
                     }
+                    //updtae the new amount paid total
                     ckm.dblAmountPaid = dblAmountPaid;
                 }
+                //Clear the selected index
                 gvCurrentMOPs.EditIndex = -1;
+                //Store updated mops in Session
                 Session["MethodsofPayment"] = mopList;
+                //Bind the session to the grid view
                 gvCurrentMOPs.DataSource = mopList;
                 gvCurrentMOPs.DataBind();
+                //Display remaining balance
                 lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
                 txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -583,48 +564,65 @@ namespace SweetSpotDiscountGolfPOS
             }
         }
 
-        //For some reason, its only subtracting one, and not the other
         protected void btnRemoveGovTax(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnRemoveGovTax";
             try
             {
+                //Retrieves the checkout manager from the Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
+                //Sets variable to the current status of GST true/false
                 chargeGST = ckm.blGst;
+                //Sets tax amount to 0
                 taxAmount = 0;
+                //Checks if the current status is true
                 if (chargeGST)
                 {
                     //chargeGST is now false so remove GST
                     chargeGST = false;
                     ckm.blGst = chargeGST;
                     lblGovernmentAmount.Text = "$ 0.00";
+                    //Sets tax amount to a negative version of GST
                     taxAmount = -(ckm.dblGst);
-                    btnRemoveGov.Text = "Add GST"; //*** Need to figure out proper name of tax
+                    //Changes button name
+                    btnRemoveGov.Text = "Add GST";
                 }
                 else
                 {
                     //chargeGST is now True so add GST
                     chargeGST = true;
                     ckm.blGst = chargeGST;
+                    //Sets label to the GST amount
                     lblGovernmentAmount.Text = "$ " + ckm.dblGst.ToString("#0.00");
+                    //Sets tax amount to a positive version of GST
                     taxAmount = ckm.dblGst;
+                    //Changes button name
                     btnRemoveGov.Text = "Remove GST";
                 }
-
+                //Adds the tax amount to the balance due
                 ckm.dblBalanceDue += taxAmount;
+                //Displays new balance due amount
                 lblBalanceAmount.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
+                //Adds the tax amount to the Remaining balance
                 ckm.dblRemainingBalance += taxAmount;
+                //Displays the remaining balance
                 lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
                 txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
-
+                //Stores the checkout manager
                 Session["CheckOutTotals"] = ckm;
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -633,19 +631,26 @@ namespace SweetSpotDiscountGolfPOS
         }
         protected void btnRemoveProvTax(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnRemoveProvTax";
             try
             {
+                //Retrieves the checkout manager from the Session
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
+                //Sets variable to the current status of PST true/false
                 chargePST = ckm.blPst;
+                //Sets tax amount to 0
                 taxAmount = 0;
+                //Checks if the current status is true
                 if (chargePST)
                 {
                     //chargePST is now false so remove PST
                     chargePST = false;
                     ckm.blPst = chargePST;
                     lblProvincialAmount.Text = "$ 0.00";
+                    //Sets tax amount to a negative version of PST
                     taxAmount = -(ckm.dblPst);
+                    //Changes button name
                     btnRemoveProv.Text = "Add PST"; //*** Need to figure out proper name of tax
                 }
                 else
@@ -653,24 +658,36 @@ namespace SweetSpotDiscountGolfPOS
                     //chargePST is now True so add PST
                     chargePST = true;
                     ckm.blPst = chargePST;
+                    //Sets label to the PST amount
                     lblProvincialAmount.Text = "$ " + ckm.dblPst.ToString("#0.00");
+                    //Sets tax amount to a positive version of PST
                     taxAmount = ckm.dblPst;
+                    //Changes button name
                     btnRemoveProv.Text = "Remove PST";
                 }
-
+                //Adds the tax amount to the balance due
                 ckm.dblBalanceDue += taxAmount;
+                //Displays new balance due amount
                 lblBalanceAmount.Text = "$ " + ckm.dblBalanceDue.ToString("#0.00");
+                //Adds the tax amount to the Remaining balance
                 ckm.dblRemainingBalance += taxAmount;
+                //Displays the remaining balance
                 lblRemainingBalanceDueDisplay.Text = "$ " + ckm.dblRemainingBalance.ToString("#0.00");
                 txtAmountPaying.Text = ckm.dblRemainingBalance.ToString("#0.00");
+                //Stores the checkout manager
                 Session["CheckOutTotals"] = ckm;
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -680,34 +697,25 @@ namespace SweetSpotDiscountGolfPOS
         //Other functionality
         protected void btnCancelSale_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnCancelSale_Click";
             try
             {
-                int tranType = Convert.ToInt32(Session["TranType"]);
-                if (tranType == 1)
+                //Checks session to see if it's null
+                if (Session["ItemsInCart"] != null)
                 {
-                    if (Session["ItemsInCart"] != null)
-                    {
-                        itemsInCart = (List<Cart>)Session["ItemsInCart"];
-                    }
-                    foreach (var cart in itemsInCart)
-                    {
-                        int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
-                        idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
-                    }
+                    //Retrieves items in the cart from Session
+                    itemsInCart = (List<Cart>)Session["ItemsInCart"];
                 }
-                else if (tranType == 2)
+                //Loops through each item in the cart
+                foreach (var cart in itemsInCart)
                 {
-                    if (Session["returnedCart"] != null)
-                    {
-                        itemsInCart = (List<Cart>)Session["returnedCart"];
-                    }
-                    foreach (var cart in itemsInCart)
-                    {
-                        int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
-                        idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY - cart.quantity));
-                    }
+                    //Queries the database to return the remainig quantity of the sku
+                    int remainingQTY = idu.getquantity(cart.sku, cart.typeID);
+                    //Updates the quantity in stock adding the quantity in the cart
+                    idu.updateQuantity(cart.sku, cart.typeID, (remainingQTY + cart.quantity));
                 }
+                //Nullifies each of the sessions 
                 Session["returnedCart"] = null;
                 Session["key"] = null;
                 Session["shipping"] = null;
@@ -722,14 +730,20 @@ namespace SweetSpotDiscountGolfPOS
                 Session["TranType"] = null;
                 Session["searchReturnInvoices"] = null;
                 Session["strDate"] = null;
+                //Changes to the Home page
                 Server.Transfer("HomePage.aspx", false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -739,18 +753,26 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void btnReturnToCart_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnReturnToCart_Click";
             try
             {
+                //Sets session to true
                 Session["returnedToCart"] = true;
+                //Changes to Sales Cart page
                 Server.Transfer("SalesCart.aspx", false);
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -760,15 +782,22 @@ namespace SweetSpotDiscountGolfPOS
 
         protected void btnLayaway_Click(object sender, EventArgs e)
         {
+            //Collects current method for error tracking
             string method = "btnLayaway_Click";
             try
-            { }
+            { //Currently not being used
+            }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
@@ -777,21 +806,24 @@ namespace SweetSpotDiscountGolfPOS
         }
 
         protected void btnFinalize_Click(object sender, EventArgs e)
-        {//Transaction type 1
-
+        {
+            //Collects current method for error tracking
             string method = "btnFinalize_Click";
             try
             {
+                //Checks the amount paid and the bypass check box
                 if (!txtAmountPaying.Text.Equals("0.00") && chbxDoesNotEqualZero.Checked == false)
                 {
+                    //Displays message
                     MessageBox.ShowMessage("Remaining Balance Does NOT Equal 0. Check box to proceed", this);
                 }
                 else
                 {
                     //Gathering needed information for the invoice
-                    //Cart
+                    //Retrieves transaction type from Session
                     tranType = Convert.ToInt32(Session["TranType"]);
                     List<Cart> cart = new List<Cart>();
+                    //Determines the Cart to be used based on transaction
                     if (tranType == 1) { cart = (List<Cart>)Session["ItemsInCart"]; }
                     else if (tranType == 2) { cart = (List<Cart>)Session["returnedCart"]; }
 
@@ -808,11 +840,10 @@ namespace SweetSpotDiscountGolfPOS
                     //MOP
                     mopList = (List<Checkout>)Session["MethodsofPayment"];
 
-
-                    //CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
+                    //Stores all the Sales data to the database
                     idu.mainInvoice(ckm, cart, mopList, c, emp, tranType, (Session["Invoice"]).ToString(), txtComments.Text);
 
-                    //ssm.transferTradeInStart((List<Cart>)Session["ItemsInCart"]);
+                    //Nullifies all related sessions
                     Session["useInvoice"] = false;
                     Session["returnedToCart"] = null;
                     Session["shipping"] = null;
@@ -822,15 +853,21 @@ namespace SweetSpotDiscountGolfPOS
                     Session["ShippingAmount"] = null;
                     Session["searchReturnInvoices"] = null;
                     Session["strDate"] = null;
+                    //Changes page to printable invoice
                     Server.Transfer("PrintableInvoice.aspx", false);
                 }
             }
+            //Exception catch
             catch (Exception ex)
             {
+                //Log employee number
                 int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
                 er.logError(ex, employeeID, currPage, method, this);
-                string prevPage = Convert.ToString(Session["prevPage"]);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
                 MessageBox.ShowMessage("An Error has occured and been logged. "
                     + "If you continue to receive this message please contact "
                     + "your system administrator", this);
