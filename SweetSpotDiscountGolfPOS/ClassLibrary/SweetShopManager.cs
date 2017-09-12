@@ -2334,6 +2334,7 @@ namespace SweetShop
         }
 
         //************************************Inventory Sales Utilities********************************************/
+
         //**RELIC METHOD
         //This method will select all invoices involved in a sale between the specified dates and encapsulated them in a list.
         public List<InvSale> selectAllInventorySales(DateTime startDate, DateTime endDate)
@@ -2377,13 +2378,14 @@ namespace SweetShop
 
 
 
-
+        //Returns the total discount of the cart
         public double returnDiscount(List<Cart> itemsSold)
         {
             double singleDiscoount = 0;
             double totalDiscount = 0;
             foreach (var cart in itemsSold)
             {
+                //If it is a percent discount compared to a dollar amount
                 if (cart.percentage)
                 {
                     singleDiscoount = cart.quantity * (cart.price * (cart.discount / 100));
@@ -2394,8 +2396,10 @@ namespace SweetShop
                 }
                 totalDiscount += singleDiscoount;
             }
+            //Returns the total discount rounded to 2 decimal places
             return Math.Round(totalDiscount, 2);
         }
+        //Returns the total trade in amount of the cart
         public double returnTradeInAmount(List<Cart> itemsSold)
         {
             double singleTradeInAmount = 0;
@@ -2410,8 +2414,10 @@ namespace SweetShop
                     totalTradeinAmount += singleTradeInAmount;
                 }
             }
+            //Returns the total trade in amount of the cart
             return totalTradeinAmount;
         }
+        //Returns the total subtotal of the cart
         public double returnSubtotalAmount(List<Cart> itemsSold)
         {
             double totalSubtotalAmount = 0;
@@ -2422,8 +2428,10 @@ namespace SweetShop
             totalSubtotalAmount = totalSubtotalAmount + totalTotalAmount;
             totalSubtotalAmount = totalSubtotalAmount - totalDiscountAmount;
             totalSubtotalAmount = totalSubtotalAmount - (totalTradeInAmount * (-1));
+            //Returns the total subtotal amount of the cart
             return totalSubtotalAmount;
         }
+        //Returns the total refund subtotal of the cart
         public double returnRefundSubtotalAmount(List<Cart> itemsSold)
         {
             double singleRefundSubtotalAmount = 0;
@@ -2433,8 +2441,10 @@ namespace SweetShop
                 singleRefundSubtotalAmount = cart.quantity * cart.returnAmount;
                 totalRefundSubtotalAmount += singleRefundSubtotalAmount;
             }
+            //Returns the total refund subtotal of the cart
             return totalRefundSubtotalAmount;
         }
+        //Returns the total amount of the cart
         public double returnTotalAmount(List<Cart> itemsSold)
         {
             ItemDataUtilities idu = new ItemDataUtilities();
@@ -2449,6 +2459,7 @@ namespace SweetShop
                     totalTotalAmount += singleTotalAmount;
                 }
             }
+            //Returns the total amount of the cart
             return totalTotalAmount;
         }
 
