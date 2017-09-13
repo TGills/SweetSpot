@@ -723,9 +723,6 @@ namespace SweetSpotDiscountGolfPOS
                 Session["ItemsInCart"] = null;
                 Session["CheckOutTotals"] = null;
                 Session["MethodsofPayment"] = null;
-                Session["Grid"] = null;
-                Session["SKU"] = null;
-                Session["Items"] = null;
                 Session["Invoice"] = null;
                 Session["TranType"] = null;
                 Session["searchReturnInvoices"] = null;
@@ -758,7 +755,6 @@ namespace SweetSpotDiscountGolfPOS
             try
             {
                 //Sets session to true
-                Session["returnedToCart"] = true;
                 //Changes to Sales Cart page
                 Server.Transfer("SalesCart.aspx", false);
             }
@@ -845,11 +841,7 @@ namespace SweetSpotDiscountGolfPOS
 
                     //Nullifies all related sessions
                     Session["useInvoice"] = false;
-                    Session["returnedToCart"] = null;
                     Session["shipping"] = null;
-                    Session["Grid"] = null;
-                    Session["SKU"] = null;
-                    Session["Items"] = null;
                     Session["ShippingAmount"] = null;
                     Session["searchReturnInvoices"] = null;
                     Session["strDate"] = null;

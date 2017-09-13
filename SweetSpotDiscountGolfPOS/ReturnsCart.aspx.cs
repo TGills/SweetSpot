@@ -129,9 +129,6 @@ namespace SweetSpotDiscountGolfPOS
                 Session["ItemsInCart"] = null;
                 Session["CheckOutTotals"] = null;
                 Session["MethodsofPayment"] = null;
-                Session["Grid"] = null;
-                Session["SKU"] = null;
-                Session["Items"] = null;
                 Session["Invoice"] = null;
                 Session["searchReturnInvoices"] = null;
                 Session["TranType"] = null;

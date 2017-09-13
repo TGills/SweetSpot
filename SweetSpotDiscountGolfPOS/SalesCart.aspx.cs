@@ -64,9 +64,13 @@ namespace SweetSpotDiscountGolfPOS
                         //Retrieves location from Session
                         string loc = Convert.ToString(Session["Loc"]);
                         //Get the next invoice number, sets in texyt box and stores in session
-                        invNum = idu.getNextInvoiceNum();
-                        lblInvoiceNumberDisplay.Text = loc + "-" + invNum + "-1";
-                        Session["Invoice"] = lblInvoiceNumberDisplay.Text;
+                        if (Session["Invoice"] == null)
+                        {
+                            invNum = idu.getNextInvoiceNum();
+                            lblInvoiceNumberDisplay.Text = loc + "-" + invNum + "-1";
+                            Session["Invoice"] = lblInvoiceNumberDisplay.Text;
+                        }
+                        else { lblInvoiceNumberDisplay.Text = Session["Invoice"].ToString(); }
                         //Checks the cart to see if there are any items in it
                         if (Session["ItemsInCart"] != null)
                         {
@@ -175,9 +179,6 @@ namespace SweetSpotDiscountGolfPOS
                 Session["ItemsInCart"] = null;
                 Session["CheckOutTotals"] = null;
                 Session["MethodsofPayment"] = null;
-                Session["Grid"] = null;
-                Session["SKU"] = null;
-                Session["Items"] = null;
                 //Changes page to Customer Home page to select a customer
                 Server.Transfer("CustomerHomePage.aspx", false);
             }
@@ -238,8 +239,6 @@ namespace SweetSpotDiscountGolfPOS
                 //Binds list to the grid view
                 grdInventorySearched.DataSource = invoiceItems;
                 grdInventorySearched.DataBind();
-                //pass invoice items to Session
-                Session["Items"] = invoiceItems;
                 //Clears search text box
                 txtSearch.Text = "";
             }
@@ -285,9 +284,12 @@ namespace SweetSpotDiscountGolfPOS
                     //Checks to see if sku in duplicate cart = the selected sku
                     if (cart.sku != sku)
                     { //when sku doesn't match add sku back into the cart
-                        itemsInCart.Add(cart); }
-                    else {//When the skus match add the quantity from cart back into stock
-                        idu.removeQTYfromInventoryWithSKU(cart.sku, cart.typeID, (remainingQTY + quantity)); }
+                        itemsInCart.Add(cart);
+                    }
+                    else
+                    {//When the skus match add the quantity from cart back into stock
+                        idu.removeQTYfromInventoryWithSKU(cart.sku, cart.typeID, (remainingQTY + quantity));
+                    }
                 }
                 //Remove the indexed pointer
                 grdCartItems.EditIndex = -1;
@@ -537,9 +539,6 @@ namespace SweetSpotDiscountGolfPOS
                 Session["ItemsInCart"] = null;
                 Session["CheckOutTotals"] = null;
                 Session["MethodsofPayment"] = null;
-                Session["Grid"] = null;
-                Session["SKU"] = null;
-                Session["Items"] = null;
                 Session["Invoice"] = null;
                 Session["searchReturnInvoices"] = null;
                 Session["TranType"] = null;

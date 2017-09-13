@@ -354,8 +354,6 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnStartSale_Click";
             try
             {
-                //Sets verification of new sale
-                Session["returnedFromCart"] = false;
                 //Sets transaction type as sale
                 Session["TranType"] = 1;
                 //opens the sales cart page

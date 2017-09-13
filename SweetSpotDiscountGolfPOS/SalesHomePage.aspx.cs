@@ -60,8 +60,6 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnQuickSale_Click";
             try
             {
-                //Sets Session to false
-                Session["returnedFromCart"] = false;
                 //Sets transaction type to sale
                 Session["TranType"] = 1;
                 //Sets customer id to guest cust
