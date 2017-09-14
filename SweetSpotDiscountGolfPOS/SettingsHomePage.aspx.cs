@@ -161,14 +161,56 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnLoadItems_Click";
             try
             {
+                int error = 0;
                 //Verifies file has been selected
                 if (fupItemSheet.HasFile)
                 {
-                    //Calls method to import the requested file
-                    r.importItems(fupItemSheet);
+                    //load the uploaded file into the memorystream
+                    using (MemoryStream stream = new MemoryStream(fupItemSheet.FileBytes))
+                    //Lets the server know to use the excel package
+                    using (ExcelPackage xlPackage = new ExcelPackage(stream))
+                    {
+                        //Gets the first worksheet in the workbook
+                        ExcelWorksheet worksheet = xlPackage.Workbook.Worksheets[1];
+                        //Gets the row count
+                        var rowCnt = worksheet.Dimension.End.Row;
+                        //Gets the column count
+                        var colCnt = worksheet.Dimension.End.Column;
+                        //Beginning the loop for data gathering
+                        for (int i = 2; i <= rowCnt; i++) //Starts on 2 because excel starts at 1, and line 1 is headers
+                        {
+                            //Array of the cells that will need to be checked
+                            int[] cells = { 3, 10, 11, 12, 13, 14, 15 };
+                            foreach (int column in cells)
+                            {
+                                //If there is no value in the column, proceed
+                                if (worksheet.Cells[i, column].Value == null)
+                                {
+                                    worksheet.Cells[i, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                    worksheet.Cells[i, column].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                    error = 1;
+                                }
+                            }
+                        }
+                        //xlPackage.SaveAs(new FileInfo(@"c:\temp\myFile.xls"));
+                        if (error == 1)
+                        {
+                            //Sets the attributes and writes file
+                            Response.Clear();
+                            Response.AddHeader("content-disposition", "attachment; filename=" + fupItemSheet.FileName + "_ErrorsFound" + ".xlsx");
+                            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                            Response.BinaryWrite(xlPackage.GetAsByteArray());
+                            Response.End();
+                        }
+                        else
+                        {
+                            //Calls method to import the requested file
+                            r.importItems(fupItemSheet);
+                        }
+                    }
+                    //Show that it is done
+                    MessageBox.ShowMessage("Importing Complete", this);
                 }
-                //Show that it is done
-                MessageBox.ShowMessage("Importing Complete", this);
             }
             //Exception catch
             catch (Exception ex)
