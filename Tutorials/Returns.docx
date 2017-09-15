@@ -1,0 +1,21 @@
+How to do a Return
+1. Select the Sales header 
+2. Switch the selection to Invoice 
+a. Customer works the same way. 
+3. Search using JUST the invoice number, not sub number 
+E.g. 608 instead of 608-1
+5. Hit the search button and the invoice will show up in a list below. 
+a. If you search by customer name, a list of all invoices for that customer will be there. 
+6. After locating the invoice that you want to return, click on the invoice number. 
+a. It will be blue 
+7. You will be taken to the return screen. 
+a. Here you can view all items that are on the invoice. It works similar to the cart where the top list is filled with items, and you “add” them to the return cart. 
+b. Before you click Return Item, note that it is defaulted to return the item at full price. You can change that by entering the desired amount in the textbox under the header Amount to Refund in the list. 
+8. After the items that need to be returned are in the second list, click Reimburse Customer to be taken to the second part of the return process. 
+a. If the customer changes their mind or you have put something that shouldn’t be returned into the return cart, you can click on the blue text that reads Cancel Return beside the item to take it off the return cart. 
+9. Similar to the checkout screen, you can now select which method you want to use to refund the customer. 
+a. You can use multiple refund methods. 
+b. If the refund method is incorrect, you can remove it by clicking Remove Refund Method. 
+10. Once the refund remaining refund is 0, you can process the refund by clicking on Process Refund. 
+a. Much like the sales process, you can return to the cart by clicking Return to Cart to make any adjustments that you need. 
+
