@@ -4,6 +4,7 @@ using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -13,6 +14,7 @@ namespace SweetSpotDiscountGolfPOS
     public partial class InventoryHomePage : System.Web.UI.Page
     {
         ErrorReporting er = new ErrorReporting();
+        CurrentUser cu = new CurrentUser();
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
@@ -20,24 +22,26 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "InventoryHomePage";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
 
-                if (Session["Admin"] == null)
+                if (cu.jobID != 0)
                 {
                     //If user is not an admin then disable the add new item button
                     btnAddNewInventory.Enabled = false;
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -66,8 +70,8 @@ namespace SweetSpotDiscountGolfPOS
                 }
                 else
                 {
-                    //If teaxt has been entered to search use it to dislpay relevent items
-                    string loc = Convert.ToString(Session["Loc"]);
+                    //If text has been entered to search use it to dislpay relevent items
+                    //string loc = Convert.ToString(Session["Loc"]);
                     SweetShopManager ssm = new SweetShopManager();
                     string itemType = ddlInventoryType.SelectedItem.ToString();
                     //determines if the searched text is a sku number
@@ -99,10 +103,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -125,10 +130,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("InventoryAddNew.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -152,16 +158,17 @@ namespace SweetSpotDiscountGolfPOS
                 if (e.CommandName == "viewItem")
                 {
                     //If the command selected is viewItem, store item type 
-                    Session["itemKey"] = itemKey;
+                    Session["key"] = itemKey;
                     //Change to Inventory Add new page to display selected item
                     Server.Transfer("InventoryAddNew.aspx");
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

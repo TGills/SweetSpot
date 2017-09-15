@@ -10,22 +10,31 @@ namespace SweetShop
     //The current user class is used to keep track of the current user's information
     class CurrentUser
     {
-        private int password;
-        private int empID { get; set; }
-        private int locationID { get; set; }
+        public int empID { get; set; }
+        public int password { get; set; }
+        public int locationID { get; set; }
+        public string locationName { get; set; }
+        public int jobID { get; set; }
 
         public CurrentUser() { }
-        public CurrentUser(int id, int loc)
-        {
-            empID = id;
-            locationID = loc;
+        public CurrentUser(int e, int j, int l, string ln, int p) {
+            empID = e;
+            jobID = j;
+            locationID = l;
+            locationName = ln;
+            password = p;
         }
-        public CurrentUser(int password)
-        {
-            this.password = password;
-        }
-        
-       
-        
+        //public CurrentUser(int id, int loc)
+        //{
+        //    empID = id;
+        //    locationID = loc;
+        //}
+        //public CurrentUser(int password)
+        //{
+        //    this.password = password;
+        //}
+
+
+
     }
 }

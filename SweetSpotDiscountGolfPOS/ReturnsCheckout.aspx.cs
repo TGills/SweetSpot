@@ -4,6 +4,7 @@ using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -18,7 +19,7 @@ namespace SweetSpotDiscountGolfPOS
         List<Cart> itemsInCart = new List<Cart>();
         ItemDataUtilities idu = new ItemDataUtilities();
         CheckoutManager ckm;
-
+        CurrentUser cu;
         public double dblRemaining;
         public double subtotal;
         public double gst;
@@ -39,8 +40,9 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "ReturnsCheckout.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
@@ -71,12 +73,12 @@ namespace SweetSpotDiscountGolfPOS
                     else
                     {
                         //Retrieve taxes based on current location
-                        t = ssm.getTaxes(cm.returnLocationID(Convert.ToString(Session["Loc"])), recDate);
+                        t = ssm.getTaxes(cm.returnLocationID(cu.locationID), recDate);
                         //Set shipping amount to 0
                         dblShippingAmount = 0;
                     }
                     //Retrieve the location from Session
-                    int location = Convert.ToInt32(Session["locationID"]);
+                    int location = cu.locationID;
                     //Retrieve invoice from session
                     Invoice rInvoice = (Invoice)Session["searchReturnInvoices"];
                     //stores all checkout info in class
@@ -181,10 +183,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -234,10 +237,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -294,10 +298,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -332,10 +337,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -370,10 +376,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -408,10 +415,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -480,10 +488,11 @@ namespace SweetSpotDiscountGolfPOS
                 txtAmountRefunding.Text = ckm.dblRemainingBalance.ToString("#0.00");
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -543,10 +552,11 @@ namespace SweetSpotDiscountGolfPOS
                 txtAmountRefunding.Text = ckm.dblRemainingBalance.ToString("#0.00");
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -603,10 +613,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("HomePage.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -630,10 +641,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("ReturnsCart.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -653,6 +665,7 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnFinalize_Click";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //Checks to make sure total is 0
                 if (!txtAmountRefunding.Text.Equals("0.00"))
                 {
@@ -673,8 +686,9 @@ namespace SweetSpotDiscountGolfPOS
                     Customer c = ssm.GetCustomerbyCustomerNumber(custNum);
                     //Employee
                     EmployeeManager em = new EmployeeManager();
-                    int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
-                    Employee emp = em.getEmployeeByID(empNum);
+                    //int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
+
+                    Employee emp = em.getEmployeeByID(cu.empID);
                     //CheckoutTotals
                     ckm = (CheckoutManager)Session["CheckOutTotals"];
                     //MOP
@@ -689,15 +703,15 @@ namespace SweetSpotDiscountGolfPOS
                     Session["shipping"] = null;
                     Session["ShippingAmount"] = null;
                     Session["searchReturnInvoices"] = null;
-                    Session["strDate"] = null;
                     Server.Transfer("PrintableInvoice.aspx", false);
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

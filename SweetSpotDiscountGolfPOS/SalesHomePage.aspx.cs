@@ -9,20 +9,22 @@ using System.Configuration;
 using System.Data.SqlClient;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
 using SweetSpotProShop;
+using System.Threading;
 
 namespace SweetSpotDiscountGolfPOS
 {
     public partial class SalesHomePage : System.Web.UI.Page
     {
         ErrorReporting er = new ErrorReporting();
-        private String connectionString;
+        //private String connectionString;
         SweetShopManager ssm = new SweetShopManager();
         LocationManager lm = new LocationManager();
         EmployeeManager em = new EmployeeManager();
-        public SalesHomePage()
-        {
-            connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
-        }
+        CurrentUser cu;
+        //public SalesHomePage()
+        //{
+        //    connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
+        //}
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
@@ -30,18 +32,20 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "SalesHomePage.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -68,10 +72,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("SalesCart.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -139,10 +144,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["searchReturnInvoices"] = fullInvoices;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -196,10 +202,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

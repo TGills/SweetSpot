@@ -135,13 +135,13 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         }
 
         //This method returns the locationID based on a string location name
-        public int returnLocationID(string loc)
+        public int returnLocationID(int lID)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = "Select provStateID from tbl_location where city = '" + loc + "'";
+            cmd.CommandText = "Select provStateID from tbl_location where locationID = '" + lID + "'";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             int locID = 0;

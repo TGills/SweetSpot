@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using SweetShop;
 using SweetSpotProShop;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
+using System.Threading;
 
 namespace SweetSpotDiscountGolfPOS
 {
@@ -20,6 +21,7 @@ namespace SweetSpotDiscountGolfPOS
         Clothing cl = new Clothing();
         ItemDataUtilities idu = new ItemDataUtilities();
         LocationManager lm = new LocationManager();
+        CurrentUser cu = new CurrentUser();
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
@@ -27,25 +29,26 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "InventoryAddNew.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
-                if (Session["Admin"] == null)
+                if (cu.jobID != 0)
                 {
                     //If user is not an admin then disable the edit item button
                     btnEditItem.Enabled = false;
                 }
                 //Check to see if an item was selected
-                if (Session["itemKey"] != null)
+                if (Session["key"] != null)
                 {
                     if (!IsPostBack)
                     {
                         //Using the item number
                         string itemType = Session["itemType"].ToString();
-                        int itemSKU = Convert.ToInt32(Session["itemKey"].ToString());
+                        int itemSKU = Convert.ToInt32(Session["key"].ToString());
                         lblTypeDisplay.Text = itemType;
                         //Checks the item type
                         if (itemType == "Clubs")
@@ -261,10 +264,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -348,15 +352,16 @@ namespace SweetSpotDiscountGolfPOS
                 //adds item into the inventory
                 skuNum = ssm.addItem(o);
                 //store sku into Session
-                Session["itemKey"] = skuNum;
+                Session["key"] = skuNum;
                 //Refreshes current page
                 Server.Transfer(Request.RawUrl, false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -492,10 +497,11 @@ namespace SweetSpotDiscountGolfPOS
                 btnBackToSearch.Visible = false;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -517,7 +523,7 @@ namespace SweetSpotDiscountGolfPOS
                 if (lblTypeDisplay.Text == "Clubs")
                 {
                     //if item type is club then save as club class
-                    c.sku = Convert.ToInt32(Session["itemKey"].ToString());
+                    c.sku = Convert.ToInt32(Session["key"].ToString());
                     c.cost = Convert.ToDouble(txtCost.Text);
                     c.brandID = Convert.ToInt32(ddlBrand.SelectedValue);
                     c.price = Convert.ToDouble(txtPrice.Text);
@@ -652,10 +658,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer(Request.RawUrl, false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -678,10 +685,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer(Request.RawUrl, false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -702,15 +710,16 @@ namespace SweetSpotDiscountGolfPOS
             {
                 //removes item key and type that was set so no item is currently selected
                 Session["itemType"] = null;
-                Session["itemKey"] = null;
+                Session["key"] = null;
                 //Changes page to the inventory home page
                 Server.Transfer("InventoryHomePage.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -733,10 +742,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["itemType"] = ddlType.SelectedIndex;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

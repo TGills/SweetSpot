@@ -1566,7 +1566,45 @@ namespace SweetShop
             //Returns a list of invoices
             return i;
         }
-
+        public Invoice getSingleInvoice(int invoiceID, int invoiceSub)
+        {
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, "
+                + "tradeinAmount, governmentTax, provincialTax, balanceDue, transactionType, comments FROM tbl_invoice "
+                + "WHERE invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
+            cmd.Parameters.AddWithValue("invoiceNum", invoiceID);
+            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSub);
+            cmd.Connection = con;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            Invoice i = new Invoice();
+            while (reader.Read())
+            {
+                i = new Invoice(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]), Convert.ToDateTime(reader["invoiceDate"]),
+                    reader["invoiceTime"].ToString(), Convert.ToInt32(reader["custID"]), Convert.ToInt32(reader["empID"]), Convert.ToInt32(reader["locationID"]),
+                    Convert.ToDouble(reader["subTotal"]), Convert.ToDouble(reader["discountAmount"]), Convert.ToDouble(reader["tradeinAmount"]), Convert.ToDouble(reader["governmentTax"]),
+                    Convert.ToDouble(reader["provincialTax"]), Convert.ToDouble(reader["balanceDue"]), Convert.ToInt32(reader["transactionType"]), reader["comments"].ToString());
+            }
+            con.Close();
+            con.Open();
+            cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, "
+                + "tradeinAmount, governmentTax, provincialTax, balanceDue, transactionType, comments FROM tbl_deletedInvoice "
+                + "WHERE invoiceNum = @invoiceNumb and invoiceSubNum = @invoiceSubNumb";
+            cmd.Parameters.AddWithValue("invoiceNumb", invoiceID);
+            cmd.Parameters.AddWithValue("invoiceSubNumb", invoiceSub);
+            SqlDataReader readerDel = cmd.ExecuteReader();
+            while (readerDel.Read())
+            {
+                i = new Invoice(Convert.ToInt32(readerDel["invoiceNum"]), Convert.ToInt32(readerDel["invoiceSubNum"]), Convert.ToDateTime(readerDel["invoiceDate"]),
+                    readerDel["invoiceTime"].ToString(), Convert.ToInt32(readerDel["custID"]), Convert.ToInt32(readerDel["empID"]), Convert.ToInt32(readerDel["locationID"]),
+                    Convert.ToDouble(readerDel["subTotal"]), Convert.ToDouble(readerDel["discountAmount"]), Convert.ToDouble(readerDel["tradeinAmount"]), Convert.ToDouble(readerDel["governmentTax"]),
+                    Convert.ToDouble(readerDel["provincialTax"]), Convert.ToDouble(readerDel["balanceDue"]), Convert.ToInt32(readerDel["transactionType"]), readerDel["comments"].ToString());
+            }
+            con.Close();
+            //Returns the invoice
+            return i;
+        }
         //Returns a list of invoices that fit the search criteria
         public List<Invoice> multiTypeSearchInvoices(string searchCriteria, Nullable<DateTime> searchDate)
         {
@@ -1892,22 +1930,14 @@ namespace SweetShop
                 double pst = Convert.ToDouble(reader["provincialTax"]);
                 bool isGST = false;
                 bool isPST = false;
-                if (gst > 0)
+                if (gst != 0)
                 {
                     isGST = true;
                 }
-                else
-                {
-                    isGST = false;
-                }
-                if (pst > 0)
+                if (pst != 0)
                 {
                     isPST = true;
-                }
-                else
-                {
-                    isPST = false;
-                }
+                }                
                 double shipping;
                 try
                 {

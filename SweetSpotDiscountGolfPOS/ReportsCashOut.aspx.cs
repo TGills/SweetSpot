@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -20,7 +21,7 @@ namespace SweetSpotDiscountGolfPOS
         Employee e;
         Reports reports = new Reports();
         ItemDataUtilities idu = new ItemDataUtilities();
-
+        CurrentUser cu = new CurrentUser();
         double cashoutTotal;
         double mcTotal = 0;
         double visaTotal = 0;        
@@ -52,8 +53,9 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "ReportsCashOut.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
@@ -73,11 +75,11 @@ namespace SweetSpotDiscountGolfPOS
                     lblCashoutDate.Text = "Cashout for: " + startDate.ToString("d") + " to " + endDate.ToString("d");
                 }
                 //Gathers current employe based on Session id
-                EmployeeManager em = new EmployeeManager();
-                int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
-                Employee emp = em.getEmployeeByID(empNum);
+                //EmployeeManager em = new EmployeeManager();
+                //int empNum = idu.returnEmployeeIDfromPassword(Convert.ToInt32(Session["id"]));
+                //Employee emp = em.getEmployeeByID(empNum);
 
-                int locationID = emp.locationID;
+                int locationID = cu.locationID;
                 //Creating a cashout list and calling a method that grabs all mops and amounts paid
                 List<Cashout> lc = reports.cashoutAmounts(startDate, endDate, locationID);
                 List<Cashout> rc = reports.getRemainingCashout(startDate, endDate, locationID);
@@ -137,10 +139,11 @@ namespace SweetSpotDiscountGolfPOS
                 lblPreTaxDisplay.Text = (subtotalTotal + tradeinTotal).ToString("#0.00");
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -210,10 +213,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["receiptCashout"] = cas;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -242,10 +246,11 @@ namespace SweetSpotDiscountGolfPOS
                 txtVisa.Text = "";
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -266,10 +271,11 @@ namespace SweetSpotDiscountGolfPOS
             try
             { }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -309,10 +315,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["receiptCashout"] = null;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

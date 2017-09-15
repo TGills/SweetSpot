@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.UI;
@@ -20,21 +21,23 @@ namespace SweetSpotDiscountGolfPOS
         LocationManager lm = new LocationManager();
         ItemDataUtilities idu = new ItemDataUtilities();
         List<Invoice> invoiceList = new List<Invoice>();
+        CurrentUser cu;
         Boolean isDeleted = false;
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
             string method = "Page_Load";
             Session["currPage"] = "HomePage.aspx";
-            Session["prevPage"] = "HomePage.aspx";
-            //checks if the user has logged in
-            if (Convert.ToBoolean(Session["loggedIn"]) == false)
-            {
-                //Go back to Login to log in
-                Server.Transfer("LoginPage.aspx", false);
-            }
+            //Session["prevPage"] = "HomePage.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
+                //checks if the user has logged in
+                if (Session["currentUser"] == null)
+                {
+                    //Go back to Login to log in
+                    Server.Transfer("LoginPage.aspx", false);
+                }
                 if (!this.IsPostBack)
                 {
                     //Sets sql connection and executes location command
@@ -47,11 +50,11 @@ namespace SweetSpotDiscountGolfPOS
                     ddlLocation.DataSource = cmd.ExecuteReader();
                     ddlLocation.DataTextField = "City";
                     ddlLocation.DataBind();
-                    ddlLocation.SelectedValue = Convert.ToString(Session["Loc"]);
+                    ddlLocation.SelectedValue = cu.locationName;
                     con.Close();
                 }
                 //Checks user for admin status
-                if (Session["Admin"] != null)
+                if (cu.jobID == 0)
                 {
                     lbluser.Text = "You have Admin Access";
                     lbluser.Visible = true;
@@ -59,7 +62,7 @@ namespace SweetSpotDiscountGolfPOS
                 else/* if (Session["Loc"] != null)*/
                 {
                     //If no admin status shows location as label instead of drop down
-                    lblLocation.Text = Convert.ToString(Session["Loc"]);
+                    lblLocation.Text = cu.locationName;
                     lblLocation.Visible = true;
                     ddlLocation.Visible = false;
                 }
@@ -70,10 +73,11 @@ namespace SweetSpotDiscountGolfPOS
                 grdSameDaySales.DataBind();
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -119,10 +123,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -184,10 +189,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("PrintableInvoice.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

@@ -9,6 +9,7 @@ using SweetSpotProShop;
 using System.Data;
 using System.Threading.Tasks;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
+using System.Threading;
 
 namespace SweetSpotDiscountGolfPOS
 {
@@ -27,6 +28,7 @@ namespace SweetSpotDiscountGolfPOS
         LocationManager lm = new LocationManager();
         Cart tempItemInCart;
         Object o = new Object();
+        CurrentUser cu;
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
@@ -34,8 +36,9 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "SalesCart.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
@@ -62,7 +65,7 @@ namespace SweetSpotDiscountGolfPOS
                         DateTime today = DateTime.Today;
                         lblDateDisplay.Text = today.ToString("yyyy-MM-dd");
                         //Retrieves location from Session
-                        string loc = Convert.ToString(Session["Loc"]);
+                        string loc = cu.locationName;
                         //Get the next invoice number, sets in texyt box and stores in session
                         if (Session["Invoice"] == null)
                         {
@@ -135,10 +138,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["strDate"] = lblDateDisplay.Text;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -183,10 +187,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("CustomerHomePage.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -205,9 +210,10 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnInventorySearch_Click";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 lblInvalidQty.Visible = false;
                 //Retrieves the location from session
-                string loc = Convert.ToString(Session["Loc"]);
+                string loc = cu.locationName;
                 //Checks to see if some number or text has been entered into the search field
                 if (!txtSearch.Text.Equals("") && !txtSearch.Text.Equals(null))
                 {
@@ -243,10 +249,11 @@ namespace SweetSpotDiscountGolfPOS
                 txtSearch.Text = "";
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -302,10 +309,11 @@ namespace SweetSpotDiscountGolfPOS
                 lblSubtotalDisplay.Text = "$ " + ssm.returnSubtotalAmount(itemsInCart).ToString("#0.00");
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -340,10 +348,11 @@ namespace SweetSpotDiscountGolfPOS
                 lblSubtotalDisplay.Text = "$ " + ssm.returnSubtotalAmount((List<Cart>)Session["ItemsInCart"]).ToString("#0.00");
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -375,10 +384,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["originalQTY"] = null;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -488,10 +498,11 @@ namespace SweetSpotDiscountGolfPOS
                 Session["originalQTY"] = null;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -548,10 +559,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("HomePage.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -588,10 +600,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer("SalesCheckout.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -652,7 +665,7 @@ namespace SweetSpotDiscountGolfPOS
                     }
 
                     //int locationID = Convert.ToInt32(lblLocationID.Text);
-                    int locationID = lm.locationID(Convert.ToString(Session["Loc"]));
+                    int locationID = cu.locationID;
                     //Finding the min and max range for trade ins
                     int[] range = idu.tradeInSkuRange(locationID);
 
@@ -724,10 +737,11 @@ namespace SweetSpotDiscountGolfPOS
                 lblSubtotalDisplay.Text = "$ " + ssm.returnSubtotalAmount(itemsInCart).ToString("#.00");
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -751,10 +765,11 @@ namespace SweetSpotDiscountGolfPOS
                 Response.Write(redirect);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

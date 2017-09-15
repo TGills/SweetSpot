@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using SweetShop;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
 using SweetSpotProShop;
+using System.Threading;
 
 namespace SweetSpotDiscountGolfPOS
 {
@@ -15,6 +16,7 @@ namespace SweetSpotDiscountGolfPOS
         ErrorReporting er = new ErrorReporting();
         LocationManager lm = new LocationManager();
         EmployeeManager empM = new EmployeeManager();
+        CurrentUser cu = new CurrentUser();
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
@@ -22,25 +24,25 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "EmployeeAddNew.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
                 }
-
-                if (Session["Admin"] == null)
+                if (cu.jobID != 0)
                 {
                     //If user is not an admin then disable the edit employee button
                     btnEditEmployee.Enabled = false;
                 }
                 //Check to see if an employee was selected
-                if (Session["empKey"] != null)
+                if (Session["key"] != null)
                 {
                     if (!IsPostBack)
                     {
                         //Using the employee number
-                        int empNum = (Convert.ToInt32(Session["empKey"].ToString()));
+                        int empNum = (Convert.ToInt32(Session["key"].ToString()));
                         //Create an employee class
                         Employee em = empM.getEmployeeByID(empNum);
                         //Fill asll lables with current selected employee info
@@ -99,10 +101,11 @@ namespace SweetSpotDiscountGolfPOS
                 }
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -138,14 +141,15 @@ namespace SweetSpotDiscountGolfPOS
                 em.country = Convert.ToInt32(ddlCountry.SelectedValue);
 
                 //Process the add and saves the employee into the key.
-                Session["empKey"] = empM.addEmployee(em);
+                Session["key"] = empM.addEmployee(em);
                 Server.Transfer(Request.RawUrl, false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -228,10 +232,11 @@ namespace SweetSpotDiscountGolfPOS
                 btnBackToSearch.Visible = false;
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -252,7 +257,7 @@ namespace SweetSpotDiscountGolfPOS
             {
                 //Collects employee data to add to database
                 Employee em = new Employee();
-                em.employeeID = Convert.ToInt32(Session["empKey"].ToString());
+                em.employeeID = Convert.ToInt32(Session["key"].ToString());
                 em.firstName = txtFirstName.Text;
                 em.lastName = txtLastName.Text;
                 em.jobID = Convert.ToInt32(ddlJob.SelectedValue);
@@ -307,10 +312,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer(Request.RawUrl, false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -333,10 +339,11 @@ namespace SweetSpotDiscountGolfPOS
                 Server.Transfer(Request.RawUrl, false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -356,15 +363,16 @@ namespace SweetSpotDiscountGolfPOS
             try
             {
                 //removes employee key that was set so no employee is currently selected
-                Session["empKey"] = null;
+                Session["key"] = null;
                 //Changes page to the settings page
                 Server.Transfer("SettingsHomePage.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table

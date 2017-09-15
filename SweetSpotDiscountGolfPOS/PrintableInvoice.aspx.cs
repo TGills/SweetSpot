@@ -4,6 +4,7 @@ using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -18,6 +19,7 @@ namespace SweetSpotDiscountGolfPOS
         List<Checkout> mopList = new List<Checkout>();
         List<Cart> cart = new List<Cart>();
         CheckoutManager ckm = new CheckoutManager();
+        CurrentUser cu;
         int tranType;
         double dblAmountPaid;
         protected void Page_Load(object sender, EventArgs e)
@@ -27,8 +29,9 @@ namespace SweetSpotDiscountGolfPOS
             Session["currPage"] = "PrintableInvoice.aspx";
             try
             {
+                cu = (CurrentUser)Session["currentUser"];
                 //checks if the user has logged in
-                if (Convert.ToBoolean(Session["loggedIn"]) == false)
+                if (Session["currentUser"] == null)
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
@@ -43,14 +46,14 @@ namespace SweetSpotDiscountGolfPOS
                 lblPostalAddress.Text = c.city.ToString() + ", " + lm.provinceName(c.province) + " " + c.postalCode.ToString();
                 lblPhone.Text = c.primaryPhoneNumber.ToString();
                 lblinvoiceNum.Text = Convert.ToString(Session["Invoice"]);
-                lblDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
+                lblDate.Text = Convert.ToDateTime(Session["strDate"]).ToString("yyyy-MM-dd");
                 //Gathers location info from session
                 bool useInvoiceLocation = Convert.ToBoolean(Session["useInvoice"]);
                 Location l = new Location();
                 if (useInvoiceLocation == false)
                 {
                     //Use current location to display on invoice
-                    l = lm.returnLocationForInvoice(Convert.ToString(Session["Loc"]));
+                    l = lm.returnLocationForInvoice(cu.locationName);
                 }
                 else if (useInvoiceLocation == true)
                 {
@@ -148,10 +151,11 @@ namespace SweetSpotDiscountGolfPOS
                 grdMOPS.DataBind();
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
@@ -179,14 +183,16 @@ namespace SweetSpotDiscountGolfPOS
                 Session["TranType"] = null;
                 Session["CheckOutTotals"] = null;
                 Session["MethodsofPayment"] = null;
+                Session["strDate"] = null;
                 //Change to the Home Page
                 Server.Transfer("HomePage.aspx", false);
             }
             //Exception catch
+            catch (ThreadAbortException tae) { }
             catch (Exception ex)
             {
                 //Log employee number
-                int employeeID = Convert.ToInt32(Session["loginEmployeeID"]);
+                int employeeID = cu.empID;
                 //Log current page
                 string currPage = Convert.ToString(Session["currPage"]);
                 //Log all info into error table
