@@ -1905,7 +1905,7 @@ namespace SweetShop
                 items.Add(new Cart(sku, getDescription(sku, getItemType(sku)),
                     Convert.ToInt32(reader["itemQuantity"]), Convert.ToDouble(reader["itemPrice"]),
                     Convert.ToDouble(reader["itemCost"]), Convert.ToDouble(reader["itemDiscount"]),
-                    Convert.ToBoolean(reader["percentage"])));
+                    Convert.ToBoolean(reader["percentage"]), Convert.ToDouble(reader["itemRefund"])));
             }
             conn.Close();
             //Returns list of the items

@@ -126,7 +126,7 @@
                     <asp:Label runat="server" Text="Search Between Dates For:"></asp:Label>
                 </div>
                 <asp:Button ID="btnInvoiceBetweenDates" runat="server" Text="Invoices" Width="200px" OnClick="btnInvoiceBetweenDates_Click" />
-                <asp:Button ID="btnDeletedInvoiceBetweenDates" runat="server" Text="Deleted Invoices" Width="200px" OnClick="btnDeletedInvoiceBetweenDates_Click" />
+                <%--<asp:Button ID="btnDeletedInvoiceBetweenDates" runat="server" Text="Deleted Invoices" Width="200px" OnClick="btnDeletedInvoiceBetweenDates_Click" />--%>
             </div>
             <asp:Button ID="btnReturnInvoice" runat="server" Text="Search For Invoice" OnClick="btnReturnInvoice_Click" />
             <%--Testing--%>
@@ -135,7 +135,7 @@
 
 
             <hr />
-            <asp:GridView ID="grdInvoicesBetweenDates" runat="server" AutoGenerateColumns="False" Width="100%" OnRowDeleting="OnRowDeleting">
+            <asp:GridView ID="grdInvoicesBetweenDates" runat="server" AutoGenerateColumns="False" Width="100%" >
                 <Columns>
                     <asp:TemplateField HeaderText="Invoice Number">
                         <ItemTemplate>
@@ -155,12 +155,12 @@
                     <asp:BoundField DataField="governmentTax" ReadOnly="true" HeaderText="Government Tax" DataFormatString="{0:0.00}" />
                     <asp:BoundField DataField="provincialTax" ReadOnly="true" HeaderText="Provincial Tax" DataFormatString="{0:0.00}" />
                     <asp:BoundField DataField="balanceDue" ReadOnly="true" HeaderText="Balance Paid" DataFormatString="{0:0.00}" />
-                    <asp:TemplateField HeaderText="Delete Invoice">
+                    <%--<asp:TemplateField HeaderText="Delete Invoice">
                         <ItemTemplate>
-                            <%--<asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />--%>
+                            <%--<asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />
                             <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="userInput()" CausesValidation="false" />
                         </ItemTemplate>
-                    </asp:TemplateField>
+                    </asp:TemplateField>--%>
                 </Columns>
             </asp:GridView>
             <div>

@@ -824,10 +824,10 @@ namespace SweetSpotDiscountGolfPOS
             {
                 cu = (CurrentUser)Session["currentUser"];
                 //Checks the amount paid and the bypass check box
-                if (!txtAmountPaying.Text.Equals("0.00") && chbxDoesNotEqualZero.Checked == false)
+                if (!txtAmountPaying.Text.Equals("0.00"))
                 {
                     //Displays message
-                    MessageBox.ShowMessage("Remaining Balance Does NOT Equal 0. Check box to proceed", this);
+                    MessageBox.ShowMessage("Remaining Balance Does NOT Equal $0.00.", this);
                 }
                 else
                 {

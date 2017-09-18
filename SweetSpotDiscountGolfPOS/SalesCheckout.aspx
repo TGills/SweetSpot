@@ -204,9 +204,9 @@
                     <td>
                         <asp:Button ID="btnFinalize" runat="server" Text="Process Sale" OnClick="btnFinalize_Click" Width="163px" />
                     </td>
-                    <td>
+                    <%--<td>
                         <asp:CheckBox ID="chbxDoesNotEqualZero" Text="Check box to bypass MOPs" runat="server" />
-                    </td>
+                    </td>--%>
                 </tr>
             </table>
             <p>

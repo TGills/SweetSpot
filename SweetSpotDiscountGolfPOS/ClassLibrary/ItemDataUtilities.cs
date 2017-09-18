@@ -273,6 +273,7 @@ namespace SweetSpotProShop
                     c.clubSpec + " " + c.clubType + " " + c.shaftSpec + " " + c.shaftFlex + " " + c.dexterity;
                 ca.price = c.price;
                 ca.cost = c.cost;
+                ca.returnAmount = 0;
                 ca.typeID = c.typeID;
             }
             //Checks if the item is an accessory
@@ -283,6 +284,7 @@ namespace SweetSpotProShop
                 ca.description = brandType(a.brandID) + " " + a.accessoryType + " " + a.size + " " + a.colour;
                 ca.price = a.price;
                 ca.cost = a.cost;
+                ca.returnAmount = 0;
                 ca.typeID = a.typeID;
             }
             //Checks if the item is clothing
@@ -293,6 +295,7 @@ namespace SweetSpotProShop
                 ca.description = brandType(cl.brandID) + " " + cl.size + " " + cl.colour + " " + cl.gender + " " + cl.style;
                 ca.price = cl.price;
                 ca.cost = cl.cost;
+                ca.returnAmount = 0;
                 ca.typeID = cl.typeID;
             }
             ca.quantity = 1;
@@ -847,7 +850,7 @@ namespace SweetSpotProShop
                     percentage = 0;
                 }
                 string insert = "insert into " + tbl + " values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", " + item.sku + ", " + item.quantity + ", " +
-                    item.cost + ", " + item.price + ", " + item.discount + ", " + percentage + ");";
+                    item.cost + ", " + item.price + ", " + item.discount + ", " + item.returnAmount + ", " + percentage + ");";
                 //Inserts the item
                 invoiceItem(insert);
             }

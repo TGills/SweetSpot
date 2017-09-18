@@ -665,12 +665,12 @@ namespace SweetSpotDiscountGolfPOS
                     }
 
                     //int locationID = Convert.ToInt32(lblLocationID.Text);
-                    int locationID = cu.locationID;
-                    //Finding the min and max range for trade ins
-                    int[] range = idu.tradeInSkuRange(locationID);
+                    //int locationID = cu.locationID;
+                    ////Finding the min and max range for trade ins
+                    //int[] range = idu.tradeInSkuRange(locationID);
 
                     //If the itemKey is between or equal to the ranges, do trade in
-                    if (itemKey >= range[0] && itemKey < range[1])
+                    if (itemKey == 100000)
                     {
                         //Trade In Sku to add in SK
                         string redirect = "<script>window.open('TradeINEntry.aspx');</script>";

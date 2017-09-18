@@ -104,6 +104,7 @@ namespace SweetSpotDiscountGolfPOS
                 if (tranType == 1) { cart = (List<Cart>)Session["ItemsInCart"]; }
                 else if (tranType == 2) { cart = (List<Cart>)Session["returnedCart"]; }
                 else if (tranType == 3) { cart = (List<Cart>)Session["ItemsInCart"]; }
+                else if (tranType == 4) { cart = (List<Cart>)Session["ItemsInCart"]; }
                 //Gathers stored totals
                 ckm = (CheckoutManager)Session["CheckOutTotals"];
                 //Gathers stored payment methods
@@ -134,7 +135,7 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     dblAmountPaid += mop.amountPaid;
                 }
-                if (tranType == 2)
+                if (tranType == 2 || tranType == 4)
                 {
                     //Changes headers if the invoice is return
                     grdItemsSoldList.Columns[3].HeaderText = "Sold At";

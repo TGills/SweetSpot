@@ -114,17 +114,17 @@
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Retail Price">
                         <ItemTemplate>
-                            <asp:Label ID="retail" Text='<%# Convert.ToInt32(Session["TranType"])  == 1 ? Eval("price","{0:.00}") : (Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-Convert.ToDouble(Eval("discount"))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00")) %>' runat="server"></asp:Label>
+                            <asp:Label ID="retail" Text='<%# (Convert.ToInt32(Session["TranType"])  == 1 || Convert.ToInt32(Session["TranType"])  == 3) ? Eval("price","{0:.00}") : (Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-Convert.ToDouble(Eval("discount"))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00")) %>' runat="server"></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Discounts/Bonus Applied">
                         <ItemTemplate>
-                            <asp:Label ID="discount" Text='<%# Convert.ToInt32(Session["TranType"])  == 1 ? Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))).ToString("#0.00") : (Convert.ToBoolean(Eval("percentage")) == false ? (((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))) - Convert.ToDouble(Eval("returnAmount"))).ToString("#0.00") : (((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))) - Convert.ToDouble(Eval("returnAmount"))).ToString("#0.00")) %>' runat="server" />
+                            <asp:Label ID="discount" Text='<%# (Convert.ToInt32(Session["TranType"])  == 1 || Convert.ToInt32(Session["TranType"])  == 3) ? Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))).ToString("#0.00") : (Convert.ToBoolean(Eval("percentage")) == false ? (((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))) - Convert.ToDouble(Eval("returnAmount"))).ToString("#0.00") : (((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))) - Convert.ToDouble(Eval("returnAmount"))).ToString("#0.00")) %>' runat="server" />
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Extended Price">
                         <ItemTemplate>
-                            <asp:Label ID="extended" Text='<%# Convert.ToInt32(Session["TranType"])  == 1 ? (Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00")) : Eval("returnAmount","{0:.00}") %>' runat="server" />
+                            <asp:Label ID="extended" Text='<%# (Convert.ToInt32(Session["TranType"])  == 1 || Convert.ToInt32(Session["TranType"])  == 3) ? (Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00")) : Eval("returnAmount","{0:.00}") %>' runat="server" />
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>

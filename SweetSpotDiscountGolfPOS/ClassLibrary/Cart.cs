@@ -49,6 +49,17 @@ namespace SweetShop
             typeID = id;
         }
 
+        public Cart(int s, string de, int q, double pr, double c, double d, bool p, double retA)
+        {
+            sku = s;
+            description = de;
+            quantity = q;
+            price = pr;
+            cost = c;
+            discount = d;
+            percentage = p;
+            returnAmount = retA;
+        }
 
         public Cart(int s, string de, int q, double pr, double c, double d, bool p)
         {
