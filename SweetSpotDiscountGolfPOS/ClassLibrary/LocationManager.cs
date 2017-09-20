@@ -205,7 +205,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             string cityName = "";
             DataTable table = new DataTable();
             SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getLocationName", con))
+            using (var cmd = new SqlCommand("getCityFromLocationID", con))
             using (var da = new SqlDataAdapter(cmd))
             {
                 cmd.Parameters.AddWithValue("@locationID", locID);
