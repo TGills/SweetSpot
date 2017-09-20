@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -20,27 +21,25 @@ namespace SweetShop
         //This method gets the employee ID from a password
         public int getuserinfologin(int password)
         {
-            int empid = 0;
-            // List<CurrentUser> empid = new List<CurrentUser>();
+            //Variable to store the employee ID
+            int empID = 0;
+            //Creating a table to store the results
+            DataTable table = new DataTable();
             SqlConnection con = new SqlConnection(connectionstring);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-            cmd.CommandText = "SELECT empID from tbl_userInfo where password = @password";
-            cmd.Parameters.AddWithValue("password", password);
-            con.Open();
-            SqlDataReader read = cmd.ExecuteReader();
-            //get userinfo from CurrentUser
-            List<tbl_userinfo> cus = new List<tbl_userinfo>();
-            while (read.Read())
+            using (var cmd = new SqlCommand("getEmloyeeIDFromPassword", con)) //Calling the SP   
+            using (var da = new SqlDataAdapter(cmd))
             {
-                tbl_userinfo cu = new tbl_userinfo(Convert.ToInt32(read["empID"]),
-                                          (Convert.ToInt32(read["password"])));
-
-                //  int empid = Int32.Parse(Convert.ToInt32(read["empID"]));
-                empid = Convert.ToInt32(read["empID"]);
-                cus.Add(cu);
+                //Adding the parameter
+                cmd.Parameters.AddWithValue("@password", password);
+                //Executing the SP
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            con.Close();
+            //Looping through the table and creating employees from the rows
+            foreach (DataRow row in table.Rows)
+            {
+                empID = Convert.ToInt32(row["empID"]);
+            }
             //Returns employee ID
             return empid;
         }

@@ -190,30 +190,36 @@ namespace SweetSpotDiscountGolfPOS
             string method = "btnExportInvoices_Click";
             try
             {
-                //Sets up database connection
+                ////Sets up database connection
                 string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
-                SqlConnection sqlCon = new SqlConnection(connectionString);
-                //Selects everything form the invoice table
-                sqlCon.Open();
-                SqlDataAdapter im = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+                //Creating datatables. One for each worksheet
                 DataTable dtim = new DataTable();
-                im.Fill(dtim);
-                DataColumnCollection dcimHeaders = dtim.Columns;
-                sqlCon.Close();
-                //Selects everything form the invoice item table
-                sqlCon.Open();
-                SqlDataAdapter ii = new SqlDataAdapter("SELECT * FROM tbl_invoiceItem", sqlCon);
                 DataTable dtii = new DataTable();
-                ii.Fill(dtii);
-                DataColumnCollection dciiHeaders = dtii.Columns;
-                sqlCon.Close();
-                //Selects everything form the invoice mop table
-                sqlCon.Open();
-                SqlDataAdapter imo = new SqlDataAdapter("SELECT * FROM tbl_invoiceMOP", sqlCon);
                 DataTable dtimo = new DataTable();
-                imo.Fill(dtimo);
+                SqlConnection con = new SqlConnection(connectionString);
+                using (var cmd = new SqlCommand("getInvoiceAll", con))
+                using (var im = new SqlDataAdapter(cmd))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    im.Fill(dtim);
+                }
+                using (var cmd = new SqlCommand("getInvoiceItemAll", con))
+                using (var im = new SqlDataAdapter(cmd))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    im.Fill(dtii);
+                }
+                using (var cmd = new SqlCommand("getInvoiceMOPAll", con))
+                using (var im = new SqlDataAdapter(cmd))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    im.Fill(dtimo);
+
+                }
+                //Setting up column headers
+                DataColumnCollection dcimHeaders = dtim.Columns;
+                DataColumnCollection dciiHeaders = dtii.Columns;
                 DataColumnCollection dcimoHeaders = dtimo.Columns;
-                sqlCon.Close();
                 //Sets path and file name to download report to
                 string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 string pathDownload = (pathUser + "\\Downloads\\");
@@ -359,13 +365,12 @@ namespace SweetSpotDiscountGolfPOS
             {
                 Session["isDeleted"] = false;
                 //Gathers start and end dates
-                DateTime startDate = calStartDate.SelectedDate;
-                DateTime endDate = calEndDate.SelectedDate;
+                string startDate = calStartDate.SelectedDate.ToString("yyyy-MM-dd");                
+                string endDate = calEndDate.SelectedDate.ToString("yyyy-MM-dd");
                 //Gathers selected location
                 string locationID = ddlLocation.SelectedValue;
                 //Calls query to return list of all invoices between dates
                 List<Invoice> i = ssm.getInvoiceBetweenDates(startDate, endDate, "tbl_invoice", locationID);
-                grdInvoicesBetweenDates.Columns[8].Visible = true;
                 //Binds invoice list to gridview
                 grdInvoicesBetweenDates.DataSource = i;
                 grdInvoicesBetweenDates.DataBind();
