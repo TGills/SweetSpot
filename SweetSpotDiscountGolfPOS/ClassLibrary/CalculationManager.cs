@@ -3,6 +3,7 @@ using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -138,18 +139,20 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         public int returnLocationID(int lID)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select provStateID from tbl_location where locationID = '" + lID + "'";
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             int locID = 0;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getprovStateIDFromCity", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                locID = Convert.ToInt32(reader["provStateID"]);
+                cmd.Parameters.AddWithValue("@cityName", lID);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                locID = Convert.ToInt32(row["provStateID"]);
+            }
             //Returns the locationID
             return locID;
         }

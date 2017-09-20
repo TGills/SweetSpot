@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -25,44 +26,40 @@ namespace SweetShop
         {
             try
             {
-                //Declares space for connection string and new command
-                SqlConnection con = new SqlConnection(connectionString);
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
-                //cmd.CommandText = "Select * From tbl_customers Where (firstName + ' ' + lastName) Like '%@searchField1%' or (primaryPhoneINT + ' ' + secondaryPhoneINT) like '%@searchField2%' order by firstName asc";
-                cmd.CommandText = "Select * From tbl_employee Where Concat(firstName,lastName) Like '%" + searchField + "%' or Concat(primaryContactINT,secondaryContactINT) like '%" + searchField + "%' order by firstName asc";
-                //cmd.Parameters.AddWithValue("searchField1", searchField);
-                //cmd.Parameters.AddWithValue("searchField2", searchField);
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                //New List for Customer
-
+                //Creating a list for the employees
                 List<Employee> employee = new List<Employee>();
-
-                //Begin reading
-                while (reader.Read())
+                //Creating a table to store the results
+                DataTable table = new DataTable();
+                SqlConnection con = new SqlConnection(connectionString);
+                using (var cmd = new SqlCommand("getEmployeeFromSearch", con)) //Calling the SP
+                using (var da = new SqlDataAdapter(cmd))
                 {
-                    Employee emp = new Employee(Convert.ToInt32(reader["empID"]),
-                        reader["firstName"].ToString(),
-                        reader["lastName"].ToString(),
-                        Convert.ToInt32(reader["jobID"]),
-                        Convert.ToInt32(reader["locationID"]),
-                        reader["email"].ToString(),
-                        reader["primaryContactINT"].ToString(),
-                        reader["secondaryContactINT"].ToString(),
-                        reader["primaryAddress"].ToString(),
-                        reader["secondaryAddress"].ToString(),
-                        reader["city"].ToString(),
-                        Convert.ToInt32(reader["provStateID"]),
-                        Convert.ToInt32(reader["countryID"]),
-                        reader["postZip"].ToString());
-
-                    employee.Add(emp);
-
+                    //Adding the parameter
+                    cmd.Parameters.AddWithValue("@searchField", searchField);
+                    //Executing the SP
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    //Filling the table with what is found
+                    da.Fill(table);
                 }
-
-                con.Close();
+                //Looping through the table and creating employees from the rows
+                foreach (DataRow row in table.Rows)
+                {
+                    Employee emp = new Employee(Convert.ToInt32(row["empID"]),
+                        row["firstName"].ToString(),
+                        row["lastName"].ToString(),
+                        Convert.ToInt32(row["jobID"]),
+                        Convert.ToInt32(row["locationID"]),
+                        row["email"].ToString(),
+                        row["primaryContactINT"].ToString(),
+                        row["secondaryContactINT"].ToString(),
+                        row["primaryAddress"].ToString(),
+                        row["secondaryAddress"].ToString(),
+                        row["city"].ToString(),
+                        Convert.ToInt32(row["provStateID"]),
+                        Convert.ToInt32(row["countryID"]),
+                        row["postZip"].ToString());
+                    employee.Add(emp);
+                }
                 //Returns a full employee
                 return employee;
             }
@@ -78,40 +75,40 @@ namespace SweetShop
         {
             try
             {
-                //Declares space for connection string and new command
-                SqlConnection con = new SqlConnection(connectionString);
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = con;
-                cmd.CommandText = "Select * From tbl_employee Where empID = @empID;";
-                cmd.Parameters.AddWithValue("empID", empID);
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
                 //New Employee
                 Employee employee = new Employee();
-
-                //Begin reading
-                while (reader.Read())
+                //Creating a table to store the results
+                DataTable table = new DataTable();
+                SqlConnection con = new SqlConnection(connectionString);
+                using (var cmd = new SqlCommand("getEmployeeByID", con)) //Calling the SP
+                using (var da = new SqlDataAdapter(cmd))
                 {
-                    Employee em = new Employee(Convert.ToInt32(reader["empID"]),
-                        reader["firstName"].ToString(),
-                        reader["lastName"].ToString(),
-                        Convert.ToInt32(reader["jobID"]),
-                        Convert.ToInt32(reader["locationID"]),
-                        reader["email"].ToString(),
-                        reader["primaryContactINT"].ToString(),
-                        reader["secondaryContactINT"].ToString(),
-                        reader["primaryAddress"].ToString(),
-                        reader["secondaryAddress"].ToString(),
-                        reader["city"].ToString(),
-                        Convert.ToInt32(reader["provStateID"]),
-                        Convert.ToInt32(reader["countryID"]),
-                        reader["postZip"].ToString());
-
+                    //Adding the parameter
+                    cmd.Parameters.AddWithValue("@empID", empID);
+                    //Executing the SP
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    //Filling the table with what is found
+                    da.Fill(table);
+                }
+                //Looping through the table and creating employees from the rows
+                foreach (DataRow row in table.Rows)
+                {
+                    Employee em = new Employee(Convert.ToInt32(row["empID"]),
+                        row["firstName"].ToString(),
+                        row["lastName"].ToString(),
+                        Convert.ToInt32(row["jobID"]),
+                        Convert.ToInt32(row["locationID"]),
+                        row["email"].ToString(),
+                        row["primaryContactINT"].ToString(),
+                        row["secondaryContactINT"].ToString(),
+                        row["primaryAddress"].ToString(),
+                        row["secondaryAddress"].ToString(),
+                        row["city"].ToString(),
+                        Convert.ToInt32(row["provStateID"]),
+                        Convert.ToInt32(row["countryID"]),
+                        row["postZip"].ToString());
                     employee = em;
                 }
-
-                con.Close();
                 //Returns a full employee
                 return employee;
             }
@@ -126,32 +123,28 @@ namespace SweetShop
         public int addEmployee(Employee em)
         {
             SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.CommandText = "Insert Into tbl_employee (firstName, lastName, jobID, locationID, email, primaryContactINT,"
-                + " secondaryContactINT, primaryAddress, secondaryAddress, city, provStateID, countryID, postZip) Values"
-                + " (@firstName, @lastName, @jobID, @locationID, @email, @primaryContactINT, @secondaryContactINT, @primaryAddress,"
-                + " @secondaryAddress, @city, @province, @country, @postalCode)";
-            cmd.Parameters.AddWithValue("firstName", em.firstName);
-            cmd.Parameters.AddWithValue("lastName", em.lastName);
-            cmd.Parameters.AddWithValue("jobID", em.jobID);
-            cmd.Parameters.AddWithValue("locationID", em.locationID);
-            cmd.Parameters.AddWithValue("email", em.emailAddress);
-            cmd.Parameters.AddWithValue("primaryContactINT", em.primaryContactNumber);
-            cmd.Parameters.AddWithValue("secondaryContactINT", em.secondaryContactNumber);
-            cmd.Parameters.AddWithValue("primaryAddress", em.primaryAddress);
-            cmd.Parameters.AddWithValue("secondaryAddress", em.secondaryAddress);
-            cmd.Parameters.AddWithValue("city", em.city);
-            cmd.Parameters.AddWithValue("province", em.provState);
-            cmd.Parameters.AddWithValue("country", em.country);
-            cmd.Parameters.AddWithValue("postalCode", em.postZip);
-
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute Insert
-            cmd.ExecuteNonQuery();
-            con.Close();
+            using (var cmd = new SqlCommand("insertEmployee", con)) //Calling the SP      
+            {
+                //Adding the parameter
+                cmd.Parameters.AddWithValue("@firstName", em.firstName);
+                cmd.Parameters.AddWithValue("@lastName", em.lastName);
+                cmd.Parameters.AddWithValue("@jobID", em.jobID);
+                cmd.Parameters.AddWithValue("@locationID", em.locationID);
+                cmd.Parameters.AddWithValue("@email", em.emailAddress);
+                cmd.Parameters.AddWithValue("@primaryContactINT", em.primaryContactNumber);
+                cmd.Parameters.AddWithValue("@secondaryContactINT", em.secondaryContactNumber);
+                cmd.Parameters.AddWithValue("@primaryAddress", em.primaryAddress);
+                cmd.Parameters.AddWithValue("@secondaryAddress", em.secondaryAddress);
+                cmd.Parameters.AddWithValue("@city", em.city);
+                cmd.Parameters.AddWithValue("@province", em.provState);
+                cmd.Parameters.AddWithValue("@country", em.country);
+                cmd.Parameters.AddWithValue("@postalCode", em.postZip);
+                //Executing the SP
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
 
             //Returns the employee ID of the newly created employee
             return returnEmployeeNumber(em);
@@ -161,96 +154,91 @@ namespace SweetShop
         public int returnEmployeeNumber(Employee em)
         {
 
+            //Variable to store the employee ID
+            int empID = 0;
+            //Creating a table to store the results
+            DataTable table = new DataTable();
             SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-            cmd.CommandText = "Select empID From tbl_employee Where firstName = @firstName and lastName = @lastName and jobID = @jobID and"
-                + " locationID = @locationID and email = @email and primaryContactINT = @primaryContactINT and secondaryContactINT ="
-                + " @secondaryContactINT and primaryAddress = @primaryAddress and secondaryAddress = @secondaryAddress and city = @city"
-                + " and provStateID = @province and countryID = @country and postZip = @postalCode;";
-            cmd.Parameters.AddWithValue("firstName", em.firstName);
-            cmd.Parameters.AddWithValue("lastName", em.lastName);
-            cmd.Parameters.AddWithValue("jobID", em.jobID);
-            cmd.Parameters.AddWithValue("locationID", em.locationID);
-            cmd.Parameters.AddWithValue("email", em.emailAddress);
-            cmd.Parameters.AddWithValue("primaryContactINT", em.primaryContactNumber);
-            cmd.Parameters.AddWithValue("secondaryContactINT", em.secondaryContactNumber);
-            cmd.Parameters.AddWithValue("primaryAddress", em.primaryAddress);
-            cmd.Parameters.AddWithValue("secondaryAddress", em.secondaryAddress);
-            cmd.Parameters.AddWithValue("city", em.city);
-            cmd.Parameters.AddWithValue("province", em.provState);
-            cmd.Parameters.AddWithValue("country", em.country);
-            cmd.Parameters.AddWithValue("postalCode", em.postZip);
-            con.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            //New Customer number
-            int empNum = 0;
-
-            //Begin reading
-            while (reader.Read())
+            using (var cmd = new SqlCommand("getEmployeeID", con)) //Calling the SP   
+            using (var da = new SqlDataAdapter(cmd))
             {
-                empNum = Convert.ToInt32(reader["empID"]);
+                //Adding the parameter
+                cmd.Parameters.AddWithValue("@firstName", em.firstName);
+                cmd.Parameters.AddWithValue("@lastName", em.lastName);
+                cmd.Parameters.AddWithValue("@jobID", em.jobID);
+                cmd.Parameters.AddWithValue("@locationID", em.locationID);
+                cmd.Parameters.AddWithValue("@email", em.emailAddress);
+                cmd.Parameters.AddWithValue("@primaryContactINT", em.primaryContactNumber);
+                cmd.Parameters.AddWithValue("@secondaryContactINT", em.secondaryContactNumber);
+                cmd.Parameters.AddWithValue("@primaryAddress", em.primaryAddress);
+                cmd.Parameters.AddWithValue("@secondaryAddress", em.secondaryAddress);
+                cmd.Parameters.AddWithValue("@city", em.city);
+                cmd.Parameters.AddWithValue("@province", em.provState);
+                cmd.Parameters.AddWithValue("@country", em.country);
+                cmd.Parameters.AddWithValue("@postalCode", em.postZip);
+                //Executing the SP
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            con.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                empID = Convert.ToInt32(row["empID"]);
+            }
             //Returns the employee ID 
-            return empNum;
+            return empID;
         }
 
         //Update Employee Nathan and Tyler Created
         public void updateEmployee(Employee em)
         {
-            //New command
             SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.CommandText = "Update tbl_employee Set firstName = @firstName, lastName = @lastName, jobID = @jobID, locationID = @locationID,"
-                + " email = @email, primaryContactINT = @primaryContactINT, secondaryContactINT = @secondaryContactINT,"
-                + " primaryAddress = @primaryAddress, secondaryAddress = @secondaryAddress, city = @city, provStateID = @province,"
-                + " countryID = @country, postZip = @postalCode Where empID = @employeeID";
-            cmd.Parameters.AddWithValue("employeeID", em.employeeID);
-            cmd.Parameters.AddWithValue("firstName", em.firstName);
-            cmd.Parameters.AddWithValue("lastName", em.lastName);
-            cmd.Parameters.AddWithValue("jobID", em.jobID);
-            cmd.Parameters.AddWithValue("locationID", em.locationID);
-            cmd.Parameters.AddWithValue("email", em.emailAddress);
-            cmd.Parameters.AddWithValue("primaryContactINT", em.primaryContactNumber);
-            cmd.Parameters.AddWithValue("secondaryContactINT", em.secondaryContactNumber);
-            cmd.Parameters.AddWithValue("primaryAddress", em.primaryAddress);
-            cmd.Parameters.AddWithValue("secondaryAddress", em.secondaryAddress);
-            cmd.Parameters.AddWithValue("city", em.city);
-            cmd.Parameters.AddWithValue("province", em.provState);
-            cmd.Parameters.AddWithValue("country", em.country);
-            cmd.Parameters.AddWithValue("postalCode", em.postZip);
-
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-
-            //Execute Update
-            cmd.ExecuteNonQuery();
-            con.Close();
+            using (var cmd = new SqlCommand("updateEmployee", con)) //Calling the SP      
+            {
+                //Adding the parameter
+                cmd.Parameters.AddWithValue("@employeeID", em.employeeID);
+                cmd.Parameters.AddWithValue("@firstName", em.firstName);
+                cmd.Parameters.AddWithValue("@lastName", em.lastName);
+                cmd.Parameters.AddWithValue("@jobID", em.jobID);
+                cmd.Parameters.AddWithValue("@locationID", em.locationID);
+                cmd.Parameters.AddWithValue("@email", em.emailAddress);
+                cmd.Parameters.AddWithValue("@primaryContactINT", em.primaryContactNumber);
+                cmd.Parameters.AddWithValue("@secondaryContactINT", em.secondaryContactNumber);
+                cmd.Parameters.AddWithValue("@primaryAddress", em.primaryAddress);
+                cmd.Parameters.AddWithValue("@secondaryAddress", em.secondaryAddress);
+                cmd.Parameters.AddWithValue("@city", em.city);
+                cmd.Parameters.AddWithValue("@province", em.provState);
+                cmd.Parameters.AddWithValue("@country", em.country);
+                cmd.Parameters.AddWithValue("@postalCode", em.postZip);
+                //Executing the SP
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
         }
 
         //This method returns the jobID of a given job
         public int jobType(string jobName)
         {
 
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select jobID from tbl_jobPosition where title = '" + jobName + "'";
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
+            //Variable to store the employee ID
             int job = 0;
-            while (reader.Read())
+            //Creating a table to store the results
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getJobID", con)) //Calling the SP   
+            using (var da = new SqlDataAdapter(cmd))
             {
-                int j = Convert.ToInt32(reader["jobID"]);
-                job = j;
+                //Adding the parameter
+                cmd.Parameters.AddWithValue("@jobName", jobName);
+                //Executing the SP
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                job = Convert.ToInt32(row["jobID"]);
+            }
             //Returns the job ID
             return job;
         }
@@ -258,21 +246,24 @@ namespace SweetShop
         //Returns the job name when given a job ID
         public string jobName(int jobNum)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select title from tbl_jobPosition where jobID = " + jobNum;
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            string job = null;
-            while (reader.Read())
+            //Variable to store the employee ID
+            string job = "";
+            //Creating a table to store the results
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getJobID", con)) //Calling the SP   
+            using (var da = new SqlDataAdapter(cmd))
             {
-                string j = reader["title"].ToString();
-                job = j;
+                //Adding the parameter
+                cmd.Parameters.AddWithValue("@jobName", jobNum);
+                //Executing the SP
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                job = row["jobID"].ToString();
+            }
             //Returns the job name
             return job;
         }

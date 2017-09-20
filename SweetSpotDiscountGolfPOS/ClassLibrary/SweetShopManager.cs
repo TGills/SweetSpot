@@ -1833,7 +1833,7 @@ namespace SweetShop
             con.Close();
         }
         //Gets invoices between dates
-        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate, string table, string locationID)
+        public List<Invoice> getInvoiceBetweenDates(string startDate, string endDate, string table, string locationID)
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();

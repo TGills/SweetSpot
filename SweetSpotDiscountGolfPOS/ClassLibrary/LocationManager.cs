@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -19,209 +20,202 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         //Provinve/State Name based on Province/State ID
         public string provinceName(int provID)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select provName from tbl_provState where provStateID = " + provID;
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             string provStateName = null;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getProvinceName", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                string name = reader["provName"].ToString();
-                provStateName = name;
+                cmd.Parameters.AddWithValue("@provID", provID);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                provStateName = row["provName"].ToString();
+            }
             //Returns province/state name
             return provStateName;
         }
         //Province/State ID based on Province/State name
         public int pronvinceID(string provName)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select provStateID from tbl_provState where provName = '" + provName + "'";
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             int provStateID = 0;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getProvinceID", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                int n = Convert.ToInt32(reader["provStateID"]);
-                provStateID = n;
+                cmd.Parameters.AddWithValue("@provName", provName);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                provStateID = Convert.ToInt32(row["provStateID"]);
+            }
             //Returns province/state ID
             return provStateID;
         }
         //Country name based on country ID
         public string countryName(int countryID)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select countryDesc from tbl_country where countryID = " + countryID;
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             string countryName = null;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getCountryName", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                string name = reader["countryDesc"].ToString();
-                countryName = name;
+                cmd.Parameters.AddWithValue("@countryID", countryID);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                countryName = row["countryDesc"].ToString();
+            }
             //Returns country name
             return countryName;
         }
         //Country ID based on country name
         public int countryID(string countryName)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select countryID from tbl_country where countryDesc = '" + countryName + "'";
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             int countryID = 0;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getCountryID", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                int n = Convert.ToInt32(reader["countryID"]);
-                countryID = n;
+                cmd.Parameters.AddWithValue("@countryName", countryName);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                countryID = Convert.ToInt32(row["countryID"]);
+            }
             //Returns country ID
             return countryID;
         }
         //CountryID based on provinceID
         public int countryIDFromProvince(int provID)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select countryID from tbl_provState where provStateID = " + provID;
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             int countryID = 0;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getCountryIDFromProvinceID", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                int n = Convert.ToInt32(reader["countryID"]);
-                countryID = n;
+                cmd.Parameters.AddWithValue("@provID", provID);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                countryID = Convert.ToInt32(row["countryID"]);
+            }
             //Returns country ID
             return countryID;
         }
         //Location name based on location ID
         public string locationName(int locationID)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select locationName from tbl_location where locationID = " + locationID;
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             string locationN = null;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getLocationName", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                string name = reader["locationName"].ToString();
-                locationN = name;
+                cmd.Parameters.AddWithValue("@locationID", locationID);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                locationN = row["locationName"].ToString();
+            }
             //Returns location name
             return locationN;
         }
         //Location ID based on location name
         public int locationID(string locationName)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = $"Select locationID from tbl_location where locationName like '{locationName}'";
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            int locID = 1;
-            while (reader.Read())
+            int locID = 0;
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getLocationID", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                int n = Convert.ToInt32(reader["locationID"]);
-                locID = n;
+                cmd.Parameters.AddWithValue("@locationName", locationName);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                locID = Convert.ToInt32(row["locationID"]);
+            }
             //Returns location ID
             return locID;
         }
         //Location ID based on City
         public int locationIDfromCity(string locationName)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select locationID from tbl_location where city = '" + locationName + "'";
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             int locID = 0;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getLocationIDFromCity", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                int n = Convert.ToInt32(reader["locationID"]);
-                locID = n;
+                cmd.Parameters.AddWithValue("@cityName", cityname);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                locID = Convert.ToInt32(row["locationID"]);
+            }
             //REturns location ID
             return locID;
         }
         //Get location for invoice based on City
         public Location returnLocationForInvoice(string cityName)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select locationName, address, city, provStateID, postZip, PrimaryPhoneINT from tbl_location where city = '" + cityName + "'";
-
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
             Location locationN = null;
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getLocationFromCity", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-                locationN = new Location(reader["locationName"].ToString(), reader["address"].ToString(),
-                    reader["city"].ToString(), Convert.ToInt32(reader["provStateID"]),
-                    reader["postZip"].ToString(), reader["PrimaryPhoneINT"].ToString());
+                cmd.Parameters.AddWithValue("@cityName", cityName);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                locationN = new Location(row["locationName"].ToString(), row["address"].ToString(),
+                    row["city"].ToString(), Convert.ToInt32(row["provStateID"]),
+                    row["postZip"].ToString(), row["PrimaryPhoneINT"].ToString());
+            }
             //Returns object location
             return locationN;
         }
         //Gets city based on location id
         public string locationCity(int locID)
         {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.Connection = conn;
-            cmd.CommandText = "Select city from tbl_location where locationID  = "  + locID.ToString();
             string cityName = "";
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();            
-            while (reader.Read())
+            DataTable table = new DataTable();
+            SqlConnection con = new SqlConnection(connectionString);
+            using (var cmd = new SqlCommand("getLocationName", con))
+            using (var da = new SqlDataAdapter(cmd))
             {
-
-                cityName = reader["city"].ToString();
+                cmd.Parameters.AddWithValue("@locationID", locID);
+                cmd.CommandType = CommandType.StoredProcedure;
+                da.Fill(table);
             }
-            conn.Close();
+            foreach (DataRow row in table.Rows)
+            {
+                cityName = row["city"].ToString();
+            }
             //Returns city name
             return cityName;
         }
