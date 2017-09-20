@@ -158,7 +158,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             return locID;
         }
         //Location ID based on City
-        public int locationIDfromCity(string locationName)
+        public int locationIDfromCity(string cityname)
         {
             int locID = 0;
             DataTable table = new DataTable();

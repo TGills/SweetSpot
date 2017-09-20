@@ -3,7 +3,7 @@
 <%--<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>--%>
 <asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server">
-    <style media="print">
+    <%--<style media="print">
         .noPrint {
             display: none;
             /*margin-left: 0;*/
@@ -29,7 +29,7 @@
     <div id="image_simple">
         <img src="Images/combinedLogo.jpg" />
     </div>
-    <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />--%>
 </asp:Content>
 <asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server">
 

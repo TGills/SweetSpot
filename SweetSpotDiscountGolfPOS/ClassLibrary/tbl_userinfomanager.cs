@@ -41,7 +41,7 @@ namespace SweetShop
                 empID = Convert.ToInt32(row["empID"]);
             }
             //Returns employee ID
-            return empid;
+            return empID;
         }
 
     }
