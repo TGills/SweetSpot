@@ -7,7 +7,6 @@ using System.Web.Configuration;
 using System.Configuration;
 using SweetShop;
 using SweetSpotDiscountGolfPOS.ClassLibrary;
-using System.Data;
 
 namespace SweetSpotProShop
 {
@@ -16,8 +15,6 @@ namespace SweetSpotProShop
     {
         private String connectionString;
         LocationManager lm = new LocationManager();
-        DataTable table = new DataTable();
-
         //Connection String
         public ItemDataUtilities()
         {
@@ -26,65 +23,71 @@ namespace SweetSpotProShop
         //Return Model string created by Nathan and Tyler **getModelName
         public string modelType(int modelID)
         {
-            //Variable to store the modelName
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select modelName from tbl_model where modelID = " + modelID;
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
             string model = null;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getModelName", con)) //Calling the SP   
-            using (var da = new SqlDataAdapter(cmd))
+
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@modelID", modelID);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                string m = reader["modelName"].ToString();
+                model = m;
             }
-            foreach (DataRow row in table.Rows)
-            {
-                model = row["modelName"].ToString();
-            }
+            conn.Close();
             //Returns the model name
             return model;
         }
         //Return Brand string created by Nathan and Tyler **getBrandName
         public string brandType(int brandID)
         {
-            //Variable to store the brandName
-            string brandName = null;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getBrandName", con)) //Calling the SP
-            using (var da = new SqlDataAdapter(cmd))
+
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select brandName from tbl_brand where brandID = " + brandID;
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            string brand = null;
+
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@brandID", brandID);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                string b = reader["brandName"].ToString();
+                brand = b;
             }
-            foreach (DataRow row in table.Rows)
-            {
-                brandName = row["brandName"].ToString();
-            }
+            conn.Close();
             //Returns the brand name
-            return brandName;
+            return brand;
         }
         //Return Model Int created by Nathan and Tyler **getModelID
         public int modelName(string modelN)
         {
-            //Variable to store the modelID
             int model = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getModelID", con)) //Calling the SP
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select modelID from tbl_model where modelName = @modelName";
+            cmd.Parameters.AddWithValue("modelName", modelN);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@modelName", modelN);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                int m = Convert.ToInt32(reader["modelID"]);
+                model = m;
             }
-            foreach (DataRow row in table.Rows)
+            conn.Close();
+
+            if (model == 0)
             {
-                model = Convert.ToInt32(row["modelID"]);
+                model = insertModel(modelN);
             }
             //Returns the modelID 
             return model;
@@ -92,93 +95,84 @@ namespace SweetSpotProShop
         //Return Brand Int created by Nathan and Tyler **getBrandID
         public int brandName(string brandN)
         {
-            //Variable to store the brandID
-            int brandID = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getBrandID", con)) //Calling the SP
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select brandID from tbl_brand where brandName = '" + brandN + "'";
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            int brand = 0;
+
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@brandName", brandN);
-                //Executing teh SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                int b = Convert.ToInt32(reader["brandID"]);
+                brand = b;
             }
-            foreach (DataRow row in table.Rows)
+            conn.Close();
+
+
+            if (brand == 0)
             {
-                brandID = Convert.ToInt32(row["brandID"]);
+                brand = insertBrand(brandN);
             }
             //Returns the brandID
-            return brandID;
+            return brand;
         }
-        //Return Model string created by Nathan and Tyler **getItemTypeDescritpion
+        //Return Item Type string created by Nathan and Tyler **getItemTypeDescritpion
         public string typeName(int typeNum)
         {
-            //Creating a variable to store the typeDescription
-            string typeDesc = null;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getItemTypeDescription", con))
-            using (var da = new SqlDataAdapter(cmd))
+
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select typeDescription from tbl_itemType where typeID = " + typeNum;
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            string type = null;
+
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@typeID", typeNum);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                string t = reader["typeDescription"].ToString();
+                type = t;
             }
-            foreach (DataRow row in table.Rows)
-            {
-                typeDesc = row["typeDescription"].ToString();
-            }
+            conn.Close();
             //Returns the item type description
-            return typeDesc;
+            return type;
         }
         //Insert new brand name. Returns new brandID
         public int insertBrand(string brandName)
         {
-            //Creating a variable to store the new brandID
             int brandID = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("insertBrand", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@brandName", brandName);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
-            {
-                brandID = Convert.ToInt32(row["brandID"]);
-            }
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "INSERT INTO tbl_brand (brandName) OUTPUT Inserted.brandID VALUES(@brandName); ";
+            cmd.Parameters.AddWithValue("brandName", brandName);
+            conn.Open();
+            brandID = (int)cmd.ExecuteScalar();
+            conn.Close();
             //Returns the brandID of the newly added brand
             return brandID;
         }
         //Insert new model name. return new modelID
         public int insertModel(string modelName)
         {
-            //Creating a variable to store the new modelID
             int modelID = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("insertModel", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                //Adding the paramter
-                cmd.Parameters.AddWithValue("@brandName", modelName);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
-            {
-                modelID = Convert.ToInt32(row["brandID"]);
-            }
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "INSERT INTO tbl_model (modelName) OUTPUT Inserted.modelID VALUES(@modelName); ";
+            cmd.Parameters.AddWithValue("modelName", modelName);
+            conn.Open();
+            modelID = (int)cmd.ExecuteScalar();
+            conn.Close();
             //Returns the modelID of the newly added model
             return modelID;
         }
-
-
         //***NOT USED
         //Return Vendor ID
         public int getVendorID(string vendorName)
@@ -221,54 +215,50 @@ namespace SweetSpotProShop
             return vendorName;
         }
         //NOT USED***
-
-
         //Return Club Type ID
         public int getClubTypeID(string typeName)
         {
-            //Creating a variable to store the typeID
             int typeID = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getClubTypeID", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select typeID from tbl_clubType where typeName = '" + typeName + "'";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@typeName", typeName);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                int tID = Convert.ToInt32(reader["typeID"]);
+                typeID = tID;
             }
-            foreach (DataRow row in table.Rows)
-            {
-                typeID = Convert.ToInt32(row["typeID"]);
-            }
+            conn.Close();
+            //Returns the club type ID
             return typeID;
         }
         //Return Club Type Name
         public string getClubTypeName(int typeID)
         {
-            //Creating a variable to store the results
             string typeName = null;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getClubTypeDesc", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select typeName from tbl_clubType where typeID = " + typeID;
+
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
             {
-                //Adding the parameter
-                cmd.Parameters.AddWithValue("@typeID", typeID);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                string tN = reader["typeName"].ToString();
+                typeName = tN;
             }
-            foreach (DataRow row in table.Rows)
-            {
-                typeName = row["typeName"].ToString();
-            }
+            conn.Close();
             //Returns the name of the club type
             return typeName;
         }
         //Adding items to the Cart class. Totally not stolen by Tickles
         public Cart addingToCart(Object o)
-        {
+        {            
             Cart ca = new Cart();
             //Checks if the item is a club
             if (o is Clubs)
@@ -277,7 +267,7 @@ namespace SweetSpotProShop
                 Clubs c = o as Clubs;
                 ca.sku = c.sku;
                 //Creates the description of the item for the cart
-                ca.description = brandType(c.brandID) + " " + modelType(c.modelID) + " " +
+                ca.description = brandType(c.brandID) + " " + modelType(c.modelID) + " " + 
                     c.clubSpec + " " + c.clubType + " " + c.shaftSpec + " " + c.shaftFlex + " " + c.dexterity;
                 ca.price = c.price;
                 ca.cost = c.cost;
@@ -310,71 +300,6 @@ namespace SweetSpotProShop
             //Returns the item in the form of a cart
             return ca;
         }
-        //Converts a dbnull value to a string
-        public string ConvertDBNullToString(Object o)
-        {
-            if (o is DBNull)
-                o = "";
-
-            return o.ToString();
-
-        }
-        //Converts a dbnull value to a double
-        public double ConvertDBNullToDouble(Object o)
-        {
-            double dbl = 0.0;
-            if (o is DBNull)
-                dbl = 0.0;
-            else
-                dbl = Convert.ToDouble(o);
-
-            return dbl;
-
-        }
-        //Returns the GST of a province
-        public double GetTaxRates(int ProId)
-        {
-            //Create variable to store the results
-            double tax = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getGSTTaxRates", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@ProID", ProId);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
-            {
-                tax = Convert.ToDouble(row["GST"]);
-            }
-            //Returns the GST rate
-            return tax;
-        }
-        //Returns the PST of a province
-        public double GetPSTTax(int ProId)
-        {
-            //Create variable to store the results
-            double tax = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getPSTTaxRates", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@ProID", ProId);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
-            {
-                tax = Convert.ToDouble(row["PST"]);
-            }
-            //Returns the GST rate
-            return tax;
-        }
         //Populating gridView on Inventory Search button in Sales Cart with location **NOT USED
         public List<Items> getItemByID(Int32 ItemNumber, string loc)
         {
@@ -395,7 +320,7 @@ namespace SweetSpotProShop
             while (readerAcc.Read())
             {
 
-                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) + " " + readerAcc["accessoryType"].ToString()
+                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) + " " + readerAcc["accessoryType"].ToString() 
                     + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
                     Convert.ToInt32(readerAcc["quantity"]), Convert.ToDouble(readerAcc["price"]),
                     Convert.ToDouble(readerAcc["cost"]));
@@ -412,7 +337,7 @@ namespace SweetSpotProShop
                 while (readerClubs.Read())
                 {
                     i = new Items(Convert.ToInt32(readerClubs["sku"]),
-
+                        
                         brandType(Convert.ToInt32(readerClubs["brandID"]))
                         + " " + modelType(Convert.ToInt32(readerClubs["modelID"])) + " " + readerClubs["clubSpec"].ToString()
                         + " " + readerClubs["clubType"].ToString() + " " + readerClubs["shaftSpec"].ToString() + " "
@@ -444,101 +369,69 @@ namespace SweetSpotProShop
                 items.Add(i);
             }
             conn.Close();
-
             return items;
-
         }
         //Populating gridView on Inventory Search button for all locations
         public List<Items> getItemByID(Int32 ItemNumber)
         {
             //Loops through the database searching for items that match sku's with the search
-
             //Adds the items that are found to a list of type item
             List<Items> items = new List<Items>();
             Items i = new Items();
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            conn.Open();
+            cmd.CommandText = "Select sku, quantity, brandID, accessoryType size, colour, price, cost, typeID, locationID From tbl_accessories Where SKU = @skuAcc";
+            cmd.Parameters.AddWithValue("skuAcc", ItemNumber);
 
-            SqlConnection con = new SqlConnection(connectionString);
-
-            //Accessories
-            using (var cmd = new SqlCommand("getAccessoryFromSku", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlDataReader readerAcc = cmd.ExecuteReader();
+            //Starts the search by looking in the accessories
+            while (readerAcc.Read())
             {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@skuAcc", ItemNumber);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            if (table.Rows.Count != 0)
-            {
-                DataRow row = table.Rows[0];
                 //If an item is found, creating a new "item" with the accessory information
-                i = new Items(Convert.ToInt32(row["sku"]),
-                        //Description
-                        brandType(Convert.ToInt32(row["brandID"])) + " " +
-                        row["size"].ToString() + " " +
-                        row["colour"].ToString(),
-                        //End of Description
-                        Convert.ToInt32(row["quantity"]), Convert.ToDouble(row["price"]),
-                        Convert.ToDouble(row["cost"]), Convert.ToInt32(row["typeID"]),
-                        lm.locationName(Convert.ToInt32(row["locationID"])));
+                //+ " " + readerAcc["accessoryType"].ToString()
+                i = new Items(Convert.ToInt32(readerAcc["sku"]), brandType(Convert.ToInt32(readerAcc["brandID"])) 
+                    + " " + readerAcc["size"].ToString() + " " + readerAcc["colour"].ToString(),
+                    Convert.ToInt32(readerAcc["quantity"]), Convert.ToDouble(readerAcc["price"]),
+                    Convert.ToDouble(readerAcc["cost"]), Convert.ToInt32(readerAcc["typeID"]),
+                    lm.locationName(Convert.ToInt32(readerAcc["locationID"])));
 
             }
-            else
+            //If the search provides no results, we move into the next item type category - Clubs
+            if (!readerAcc.HasRows)
             {
-                using (var cmd = new SqlCommand("getClothingFromSku", con))
-                using (var da = new SqlDataAdapter(cmd))
+                readerAcc.Close();
+                cmd.CommandText = "Select sku, brandID, modelID, clubType, shaft, numberOfClubs, dexterity, quantity, price, cost, typeID, locationID From tbl_clubs Where SKU = @skuClubs";
+                cmd.Parameters.AddWithValue("skuClubs", ItemNumber);
+                SqlDataReader readerClubs = cmd.ExecuteReader();
+                while (readerClubs.Read())
                 {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@skuClothing", ItemNumber);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    da.Fill(table);
+                    //If an item is found, creating a new "item" with the club information
+                    i = new Items(Convert.ToInt32(readerClubs["sku"]), brandType(Convert.ToInt32(readerClubs["brandID"]))
+                        + " " + modelType(Convert.ToInt32(readerClubs["modelID"])) + " " + readerClubs["clubType"].ToString()
+                        + " " + readerClubs["shaft"].ToString() + " " + readerClubs["numberOfClubs"].ToString() + " "
+                        + readerClubs["dexterity"].ToString(), Convert.ToInt32(readerClubs["quantity"]),
+                        Convert.ToDouble(readerClubs["price"]), Convert.ToDouble(readerClubs["cost"]),
+                        Convert.ToInt32(readerClubs["typeID"]), lm.locationName(Convert.ToInt32(readerClubs["locationID"])));
+
                 }
-                if (table.Rows.Count != 0)
+                //If the search once again provides no results, we search the clothing table for matches
+                if (!readerClubs.HasRows)
                 {
-                    DataRow row = table.Rows[0];
-                    //If an item is found, creating a new "item" with the clothing information
-                    i = new Items(Convert.ToInt32(row["sku"]),
-                            //Description
-                            brandType(Convert.ToInt32(row["brandID"])) + " " +
-                            row["size"].ToString() + " " +
-                            row["colour"].ToString() + " " +
-                            row["gender"].ToString() + " " +
-                            row["style"].ToString(),
-                            //End of Description
-                            Convert.ToInt32(row["quantity"]), Convert.ToDouble(row["price"]),
-                            Convert.ToDouble(row["cost"]), Convert.ToInt32(row["typeID"]),
-                            lm.locationName(Convert.ToInt32(row["locationID"])));
-                }
-                else
-                {
-                    using (var cmd = new SqlCommand("getClubFromSku", con))
-                    using (var da = new SqlDataAdapter(cmd))
+                    readerClubs.Close();
+                    cmd.CommandText = "Select sku, brandID, size, colour, gender, style, quantity, price, cost, typeID, locationID From tbl_clothing Where SKU = @skuClothing";
+                    cmd.Parameters.AddWithValue("skuClothing", ItemNumber);
+                    SqlDataReader readerClothing = cmd.ExecuteReader();
+                    while (readerClothing.Read())
                     {
-                        //Adding the parameters
-                        cmd.Parameters.AddWithValue("@skuClubs", ItemNumber);
-                        //Executing the SP
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        da.Fill(table);
-                    }
-                    if (table.Rows.Count != 0)
-                    {
-                        DataRow row = table.Rows[0];
-                        //If an item is found, creating a new "item" with the club information
-                        i = new Items(Convert.ToInt32(row["sku"]),
-                            //Description
-                            brandType(Convert.ToInt32(row["brandID"])) + " " +
-                            modelType(Convert.ToInt32(row["modelID"])) + " " +
-                            row["clubSpec"].ToString() + " " +
-                            row["clubType"].ToString() + " " +
-                            row["shaftSpec"].ToString() + " " +
-                            row["shaftFlex"].ToString() + " " +
-                            row["dexterity"].ToString(),
-                            //End of Description
-                            Convert.ToInt32(row["quantity"]),
-                            Convert.ToDouble(row["price"]), Convert.ToDouble(row["cost"]),
-                            Convert.ToInt32(row["typeID"]), lm.locationName(Convert.ToInt32(row["locationID"])));
+                        //If an item is found, creating a new "item" with the clothing information
+                        i = new Items(Convert.ToInt32(readerClothing["sku"]), brandType(Convert.ToInt32(readerClothing["brandID"]))
+                            + " " + readerClothing["size"].ToString() + " " + readerClothing["colour"].ToString()
+                            + " " + readerClothing["gender"].ToString() + " " + readerClothing["style"].ToString(),
+                            Convert.ToInt32(readerClothing["quantity"]), Convert.ToDouble(readerClothing["price"]),
+                            Convert.ToDouble(readerClothing["cost"]), Convert.ToInt32(readerClothing["typeID"]), 
+                            lm.locationName(Convert.ToInt32(readerClothing["locationID"])));
                     }
                 }
             }
@@ -548,171 +441,98 @@ namespace SweetSpotProShop
                 //Adding the item to the list
                 items.Add(i);
             }
-            //conn.Close();
+            conn.Close();
             //Returns a list of any items that are found
             return items;
         }
         //Being used now to return qty to validate if sku can be added to cart.
         public int getquantity(int sku, int typeID)
         {
-            //Variable to store quantity 
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select quantity from tbl_clubs where SKU = @sku";
+            cmd.Parameters.AddWithValue("sku", sku);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
             int itemQTY = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            //Accessories
-            using (var cmd = new SqlCommand("getAccessoryQuantity", con))
-            using (var da = new SqlDataAdapter(cmd))
+
+            //Loops through the three item tables looking for the item so it can return its quantity
+            //Starting the search with clubs
+            while (reader.Read())
             {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@skuacces", sku);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                //Setting the itemQTY to the found quantity
+                itemQTY = Convert.ToInt32(reader["quantity"]);
             }
-            if (table.Rows.Count != 0)
+            //If the item can't be found in the clubs table, we search the accessory table
+            if (!reader.HasRows)
             {
-                DataRow row = table.Rows[0];
-                itemQTY = Convert.ToInt32(row["quantity"]);
-            }
-            else
-            {
-                //Clothing
-                using (var cmd = new SqlCommand("getClothingQuantity", con))
-                using (var da = new SqlDataAdapter(cmd))
+                reader.Close();
+                cmd.CommandText = "Select quantity from tbl_accessories where SKU = @skuacces";
+                cmd.Parameters.AddWithValue("skuacces", sku);
+                SqlDataReader readerAccesories = cmd.ExecuteReader();
+
+                while (readerAccesories.Read())
                 {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@skucloth", sku);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    da.Fill(table);
+                    //Setting the itemQTY to the found quantity
+                    itemQTY = Convert.ToInt32(readerAccesories["quantity"]);
                 }
-                if (table.Rows.Count != 0)
+                //If the item is not in the accessory table, we search the third table - clothing
+                if (!readerAccesories.HasRows)
                 {
-                    DataRow row = table.Rows[0];
-                    itemQTY = Convert.ToInt32(row["quantity"]);
-                }
-                else
-                {
-                    //Clubs
-                    using (var cmd = new SqlCommand("getClubQuantity", con))
-                    using (var da = new SqlDataAdapter(cmd))
+                    readerAccesories.Close();
+                    cmd.CommandText = "Select quantity from tbl_clothing where SKU = @skucloth";
+                    cmd.Parameters.AddWithValue("skucloth", sku);
+                    SqlDataReader readerclothing = cmd.ExecuteReader();
+
+                    while (readerclothing.Read())
                     {
-                        //Adding the parameters
-                        cmd.Parameters.AddWithValue("@sku", sku);
-                        //Executing the SP
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        da.Fill(table);
-                    }
-                    if (table.Rows.Count != 0)
-                    {
-                        DataRow row = table.Rows[0];
-                        itemQTY = Convert.ToInt32(row["quantity"]);
+                        //Setting the itemQTY to the found quantity
+                        itemQTY = Convert.ToInt32(readerclothing["quantity"]);
                     }
                 }
             }
+            conn.Close();
             //Returns the quantity of the searched item
             return itemQTY;
         }
         //This method updates an item with its new quantity
         public void removeQTYfromInventoryWithSKU(int sku, int typeID, int remainingQTY)
         {
-            //Connection string
+            //Works by recieving a sku, a typeID, and the new quantity
             SqlConnection con = new SqlConnection(connectionString);
-            if (typeID == 1) //Clubs
-            {
-                using (var cmd = new SqlCommand("updateClubQuantity", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@sku", sku);
-                    cmd.Parameters.AddWithValue("@quantity", remainingQTY);
-                    cmd.Parameters.AddWithValue("@typeID", typeID);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-            }
-            else if (typeID == 2) //Accessories
-            {
-                using (var cmd = new SqlCommand("updateAccessoryQuantity", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@sku", sku);
-                    cmd.Parameters.AddWithValue("@quantity", remainingQTY);
-                    cmd.Parameters.AddWithValue("@typeID", typeID);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-            }
-            else if (typeID == 3) //Clothing
-            {
-                using (var cmd = new SqlCommand("updateClothingQuantity", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@sku", sku);
-                    cmd.Parameters.AddWithValue("@quantity", remainingQTY);
-                    cmd.Parameters.AddWithValue("@typeID", typeID);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-            }
+            SqlCommand cmd = new SqlCommand();
+            //Determines which table to look in by using the typeID and returning the type name(clubs, accessories, clothing)
+            string table = typeName(typeID);
+            cmd.CommandText = "UPDATE tbl_" + table + " SET quantity = @quantity WHERE sku = @sku and typeID = @typeID";
+            cmd.Parameters.AddWithValue("@sku", sku);
+            cmd.Parameters.AddWithValue("@typeID", typeID);
+            cmd.Parameters.AddWithValue("@quantity", remainingQTY);
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute Insert
+            cmd.ExecuteNonQuery();
+            con.Close();
         }
         //This method updates an item with its new quantity
         public void updateQuantity(int sku, int typeID, int quantity)
         {
-            //Connection string
+            //Works by recieving a sku, a typeID, and the new quantity
             SqlConnection con = new SqlConnection(connectionString);
-            if (typeID == 1) //Clubs
-            {
-                using (var cmd = new SqlCommand("updateClubQuantity", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@sku", sku);
-                    cmd.Parameters.AddWithValue("@quantity", quantity);
-                    cmd.Parameters.AddWithValue("@typeID", typeID);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-            }
-            else if (typeID == 2) //Accessories
-            {
-                using (var cmd = new SqlCommand("updateAccessoryQuantity", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@sku", sku);
-                    cmd.Parameters.AddWithValue("@quantity", quantity);
-                    cmd.Parameters.AddWithValue("@typeID", typeID);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-            }
-            else if (typeID == 3) //Clothing
-            {
-                using (var cmd = new SqlCommand("updateClothingQuantity", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("@sku", sku);
-                    cmd.Parameters.AddWithValue("@quantity", quantity);
-                    cmd.Parameters.AddWithValue("@typeID", typeID);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
-            }
+            SqlCommand cmd = new SqlCommand();
+            //Determines which table to look in by using the typeID and returning the type name(clubs, accessories, clothing)
+            string table = typeName(typeID);
+            cmd.CommandText = "UPDATE tbl_" + table + " SET quantity = @quantity WHERE sku = @sku and typeID = @typeID";
+            cmd.Parameters.AddWithValue("@sku", sku);
+            cmd.Parameters.AddWithValue("@typeID", typeID);
+            cmd.Parameters.AddWithValue("@quantity", quantity);
+            //Declare and open connection
+            cmd.Connection = con;
+            con.Open();
+            //Execute Insert
+            cmd.ExecuteNonQuery();
+            con.Close();
         }
         //Reserve trade-in sku
         public int reserveTradeInSKu(int loc)
@@ -723,18 +543,15 @@ namespace SweetSpotProShop
             int[] range = new int[2];
             //Returns the range for the trade in sku
             range = tradeInSkuRange(loc);
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("reserveTradeInSku", con))
-            {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@sku", tradeInSkuDisplay);
-                cmd.Parameters.AddWithValue("@locationID", loc);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                cmd.ExecuteNonQuery();
-                con.Close();
-            }
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Insert into tbl_tempTradeInCartSkus (sku, locationID) values (@sku, @locationID);";
+            cmd.Parameters.AddWithValue("sku", tradeInSkuDisplay);
+            cmd.Parameters.AddWithValue("locationID", loc);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
             //Returns the trade in items display sku
             return tradeInSkuDisplay;
         }
@@ -743,27 +560,27 @@ namespace SweetSpotProShop
         {
             int sku = 0;
             int[] range = new int[2];
-            //Variable for the max sku
-            int maxSku = 0;
             //Returns the range for the trade in sku
             range = tradeInSkuRange(location);
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getTradeInMaxSku", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select max(sku) as maxsku from tbl_tempTradeInCartSkus where locationID = @locationID";
+            cmd.Parameters.AddWithValue("locationID", location.ToString());
+            //cmd.Parameters.AddWithValue("lowerRange", range[0]);
+            //cmd.Parameters.AddWithValue("upperRange", range[1]);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            Clubs club = new Clubs();
+            int maxSku = 0;
+            while (reader.Read())
             {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@locationID", location);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-                DataRow row = table.Rows[1];
-                maxSku = Convert.ToInt32(row["maxsku"]);
+                //Gets the max sku
+                maxSku = (reader["maxsku"] as int?) ?? range[0]; //Setting it to 0
             }
+            conn.Close();
 
-            //if (table.Rows.Count != 0)
-            //{
-
-            //}
             //If the maxSku returns as null, sets the sku as the min range
             if (maxSku.Equals(null))
             {
@@ -790,24 +607,25 @@ namespace SweetSpotProShop
             int upper = 0;
             int lower = 0;
 
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getTradeInSkuRange", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+
+            cmd.Connection = conn;
+            cmd.CommandText = "Select skuStartAt, skuStopAt from tbl_tradeInSkusForCart where locationID = " + location.ToString();
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
             {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("@locationID", location);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                upper = Convert.ToInt32(reader["skuStopAt"].ToString());
+                lower = Convert.ToInt32(reader["skuStartAt"].ToString());
             }
-            if (table.Rows.Count != 0)
-            {
-                DataRow row = table.Rows[0];
-                upper = Convert.ToInt32(row["skuStopAt"]);
-                lower = Convert.ToInt32(row["skuStartAt"]);
-            }
-            range[0] = lower;
+            //Setting the values in the array
+            range[0] = lower; 
             range[1] = upper;
+
+
+            conn.Close();
             //Returns the range
             return range;
         }
@@ -815,36 +633,46 @@ namespace SweetSpotProShop
         public void addTradeInItem(Clubs tradeInItem, int sku, int loc)
         {
             //This method addes the trade in item to the tempTradeInCartSKus table
-            SqlConnection con = new SqlConnection(connectionString);
-            if (tradeInItem.itemlocation == 0)
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            int used = 0;
+            if (tradeInItem.used == true)
+            { used = 1; }
+            else { used = 0; }
+            if(tradeInItem.itemlocation == 0)
             { tradeInItem.itemlocation = 1; }
-            using (var cmd = new SqlCommand("updateTradeInItem", con))
-            {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("sku", sku);
-                cmd.Parameters.AddWithValue("brandID", tradeInItem.brandID);
-                cmd.Parameters.AddWithValue("modelID", tradeInItem.modelID);
-                cmd.Parameters.AddWithValue("clubType", tradeInItem.clubType);
-                cmd.Parameters.AddWithValue("shaft", tradeInItem.shaft);
-                cmd.Parameters.AddWithValue("numberOfClubs", tradeInItem.numberOfClubs);
-                cmd.Parameters.AddWithValue("premium", tradeInItem.premium);
-                cmd.Parameters.AddWithValue("cost", tradeInItem.cost);
-                cmd.Parameters.AddWithValue("price", tradeInItem.price);
-                cmd.Parameters.AddWithValue("quantity", tradeInItem.quantity);
-                cmd.Parameters.AddWithValue("clubSpec", tradeInItem.clubSpec);
-                cmd.Parameters.AddWithValue("shaftSpec", tradeInItem.shaftSpec);
-                cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.shaftFlex);
-                cmd.Parameters.AddWithValue("dexterity", tradeInItem.dexterity);
-                cmd.Parameters.AddWithValue("typeID", tradeInItem.typeID);
-                cmd.Parameters.AddWithValue("locationID", loc);
-                cmd.Parameters.AddWithValue("used", tradeInItem.used);
-                cmd.Parameters.AddWithValue("comments", tradeInItem.comments);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                cmd.ExecuteNonQuery();
-                con.Close();
-            }
+            cmd.Connection = conn;
+            //cmd.CommandText = "insert into tbl_tempTradeInCartSkus values(" + tradeInItem.sku + ", " + tradeInItem.brandID + ", " +
+            //    tradeInItem.modelID + ", '" + tradeInItem.clubType + "', '" + tradeInItem.shaft + "', '" + tradeInItem.numberOfClubs + "', " +
+            //    tradeInItem.premium + ", " + tradeInItem.cost + ", " + tradeInItem.price + ", " + tradeInItem.quantity + ", '" +
+            //    tradeInItem.clubSpec + "', '" + tradeInItem.shaftSpec + "', '" + tradeInItem.shaftFlex + "', '" +
+            //    tradeInItem.dexterity + "', " + tradeInItem.typeID + ", " + tradeInItem.itemlocation + ", " +
+            //    used + ", '" + tradeInItem.comments + "');";
+            cmd.CommandText = "Update tbl_tempTradeInCartSkus set brandID = @brandID, modelID = @modelID, clubType = @clubType, shaft = @shaft," +
+                "numberOfClubs = @numberOfClubs, premium = @premium, cost = @cost, price = @price, quantity = @quantity, clubSpec = @clubSpec," +
+                "shaftSpec = @shaftSpec, shaftFlex = @shaftFlex, dexterity = @dexterity, typeID = @typeID, locationID = @locationID, used = @used," +
+                "comments = @comments where sku = @sku;";
+            cmd.Parameters.AddWithValue("sku", sku);
+            cmd.Parameters.AddWithValue("brandID", tradeInItem.brandID);
+            cmd.Parameters.AddWithValue("modelID", tradeInItem.modelID);
+            cmd.Parameters.AddWithValue("clubType", tradeInItem.clubType);
+            cmd.Parameters.AddWithValue("shaft", tradeInItem.shaft);
+            cmd.Parameters.AddWithValue("numberOfClubs", tradeInItem.numberOfClubs);
+            cmd.Parameters.AddWithValue("premium", tradeInItem.premium);
+            cmd.Parameters.AddWithValue("cost", tradeInItem.cost);
+            cmd.Parameters.AddWithValue("price", tradeInItem.price);
+            cmd.Parameters.AddWithValue("quantity", tradeInItem.quantity);
+            cmd.Parameters.AddWithValue("clubSpec", tradeInItem.clubSpec);
+            cmd.Parameters.AddWithValue("shaftSpec", tradeInItem.shaftSpec);
+            cmd.Parameters.AddWithValue("shaftFlex", tradeInItem.shaftFlex);
+            cmd.Parameters.AddWithValue("dexterity", tradeInItem.dexterity);
+            cmd.Parameters.AddWithValue("typeID", tradeInItem.typeID);
+            cmd.Parameters.AddWithValue("locationID", loc);
+            cmd.Parameters.AddWithValue("used", tradeInItem.used);
+            cmd.Parameters.AddWithValue("comments", tradeInItem.comments);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
         }
         //Sending all of the invoice information to the database 
         public void mainInvoice(CheckoutManager ckm, List<Cart> cart, List<Checkout> mops, Customer c, Employee e, int transactionType, string invoiceNumber, string comments)
@@ -864,7 +692,7 @@ namespace SweetSpotProShop
                 nextInvoiceSubNum = Convert.ToInt32(invoiceNumber.Split('-')[2]);
             }
             //If the transaction is a return
-            else if (transactionType == 2)
+            else if(transactionType == 2)
             {
                 //Gets the next sub num
                 nextInvoiceSubNum = getNextInvoiceSubNum(nextInvoiceNum);
@@ -876,43 +704,66 @@ namespace SweetSpotProShop
 
             //Step 4: Insert all relevent info into the mainInvoice table
             //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, tradeinAmount, governmentTax, provincialTax, balanceDue, transactionType, comments
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("insertInvoice", con))
-            {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("invoiceNum", nextInvoiceNum);
-                cmd.Parameters.AddWithValue("invoiceSubNum", nextInvoiceSubNum);
-                cmd.Parameters.AddWithValue("invoiceDate", date);
-                cmd.Parameters.AddWithValue("invoiceTime", time);
-                cmd.Parameters.AddWithValue("custID", c.customerId);
-                cmd.Parameters.AddWithValue("empID", e.employeeID);
-                cmd.Parameters.AddWithValue("locationID", e.locationID);
-                cmd.Parameters.AddWithValue("subTotal", ckm.dblSubTotal);
-                cmd.Parameters.AddWithValue("shippingAmount", ckm.dblShipping);
-                cmd.Parameters.AddWithValue("discountAmount", ckm.dblDiscounts);
-                cmd.Parameters.AddWithValue("tradeinAmount", ckm.dblTradeIn);
-                double gTax = 0;
-                //If the GST is included, set it's value to the checkoutmanager GST value otherwise it stays at 0
-                if (ckm.blGst) { gTax = ckm.dblGst; }
-                cmd.Parameters.AddWithValue("governmentTax", gTax);
-                double pTax = 0;
-                //If the GST is included, set it's value to the checkoutmanager GST value otherwise it stays at 0
-                if (ckm.blPst) { pTax = ckm.dblPst; }
-                cmd.Parameters.AddWithValue("provincialTax", pTax);
-                cmd.Parameters.AddWithValue("balanceDue", ckm.dblBalanceDue);
-                cmd.Parameters.AddWithValue("transactionType", transactionType);
-                cmd.Parameters.AddWithValue("comments", comments);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                cmd.ExecuteNonQuery();
-                con.Close();
-            }
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            //+ ", '" + date + "', '" + time + "', "
+            cmd.CommandText = "Insert Into tbl_invoice (invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, "
+                + "subTotal, shippingAmount, discountAmount, tradeinAmount, governmentTax, provincialTax, balanceDue, "
+                + "transactionType, comments) values(@invoiceNum, @invoiceSubNum, @invoiceDate, @invoiceTime, @custID, "
+                + "@empID, @locationID, @subtotal, @shippingAmount, @discountAmount, @tradeinAmount, @governmentTax, "
+                + "@provincialTax, @balanceDue, @transactionType, @comments);";
+
+            //"update tbl_invoice set " +
+            //    "invoiceSubNum = @invoiceSubNum, " +
+            //    "custID = @custID, " +
+            //    "empID = @empID, " +
+            //    "locationID = @locationID, " +
+            //    "subTotal = @subtotal, " +
+            //    "shippingAmount = @shippingAmount, " +
+            //    "discountAmount = @discountAmount, " +
+            //    "tradeinAmount = @tradeinAmount, " +
+            //    "governmentTax = @governmentTax, " +
+            //    "provincialTax = @provincialTax, " +
+            //    "balanceDue = @balanceDue, " +
+            //    "transactionType = @transactionType, " +
+            //    "comments = @comments" +
+            //    " where invoiceNum = @invoiceNum;";
+
+            cmd.Parameters.AddWithValue("invoiceNum", nextInvoiceNum);
+            cmd.Parameters.AddWithValue("invoiceSubNum", nextInvoiceSubNum);
+            cmd.Parameters.AddWithValue("invoiceDate", date);
+            cmd.Parameters.AddWithValue("invoiceTime", time);
+            cmd.Parameters.AddWithValue("custID", c.customerId);
+            cmd.Parameters.AddWithValue("empID", e.employeeID);
+            cmd.Parameters.AddWithValue("locationID", e.locationID);
+            cmd.Parameters.AddWithValue("subTotal", ckm.dblSubTotal);
+            cmd.Parameters.AddWithValue("shippingAmount", ckm.dblShipping);
+            cmd.Parameters.AddWithValue("discountAmount", ckm.dblDiscounts);
+            cmd.Parameters.AddWithValue("tradeinAmount", ckm.dblTradeIn);
+            double gTax = 0;
+            //If the GST is included, set it's value to the checkoutmanager GST value otherwise it stays at 0
+            if (ckm.blGst) { gTax = ckm.dblGst; }
+            cmd.Parameters.AddWithValue("governmentTax", gTax);
+            double pTax = 0;
+            //If the GST is included, set it's value to the checkoutmanager GST value otherwise it stays at 0
+            if (ckm.blPst) { pTax = ckm.dblPst; }
+            cmd.Parameters.AddWithValue("provincialTax", pTax);
+            cmd.Parameters.AddWithValue("balanceDue", ckm.dblBalanceDue);
+            cmd.Parameters.AddWithValue("transactionType", transactionType);
+            cmd.Parameters.AddWithValue("comments", comments);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            //while (reader.Read())
+            //{
+            //    nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
+            //}
+            conn.Close();
             //Step 5: Insert each item into the invoiceItem table
             //invoiceNum, invoiceSubNum, sku, itemQuantity, itemCost, itemPrice, itemDiscount, Percentage
             string tbl = "";
             //If it is a sale, use tbl_invoiceItem
-            if (transactionType == 1)
+            if(transactionType == 1)
             {
                 tbl = "tbl_invoiceItem";
             }
@@ -926,111 +777,112 @@ namespace SweetSpotProShop
             {
                 int percentage = 0;
                 if (item.percentage)
-                { percentage = 1; }
-                else
-                { percentage = 0; }
-                using (var cmd = new SqlCommand("insertInvoiceItem", con))
                 {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("invoiceNum", nextInvoiceNum);
-                    cmd.Parameters.AddWithValue("invoiceSubNum", nextInvoiceSubNum);
-                    cmd.Parameters.AddWithValue("sku", item.sku);
-                    cmd.Parameters.AddWithValue("quantity", item.quantity);
-                    cmd.Parameters.AddWithValue("cost", item.cost);
-                    cmd.Parameters.AddWithValue("price", item.price);
-                    cmd.Parameters.AddWithValue("discount", item.discount);
-                    cmd.Parameters.AddWithValue("returnAmount", item.returnAmount);
-                    cmd.Parameters.AddWithValue("percentage", percentage);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
+                    percentage = 1;
                 }
+                else
+                {
+                    percentage = 0;
+                }
+                string insert = "insert into " + tbl + " values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", " + item.sku + ", " + item.quantity + ", " +
+                    item.cost + ", " + item.price + ", " + item.discount + ", " + item.returnAmount + ", " + percentage + ");";
+                //Inserts the item
+                invoiceItem(insert);
             }
             //Step 6: Insert each MOP into the invoiceMOP table
             //ID(autoincrementing), invoiceNum, invoiceSubNum, mopID, amountPaid
             //Loops through the checkout to get the mops
             foreach (Checkout mop in mops)
             {
-                using (var cmd = new SqlCommand("insertInvoiceMop", con))
-                {
-                    //Adding the parameters
-                    cmd.Parameters.AddWithValue("invoiceNum", nextInvoiceNum);
-                    cmd.Parameters.AddWithValue("invoiceSubNum", nextInvoiceSubNum);
-                    cmd.Parameters.AddWithValue("methodOfPayment", mop.methodOfPayment);
-                    cmd.Parameters.AddWithValue("amountPaid", mop.amountPaid);
-                    //Executing the SP
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                }
+                string insert = "insert into tbl_invoiceMOP values(" + nextInvoiceNum + ", " + nextInvoiceSubNum + ", '" + mop.methodOfPayment + "', " + mop.amountPaid + ");";
+                //Inserts the mop
+                invoiceMOP(insert);
             }
         }
         //Returns the max invoice num + 1
         public int getNextInvoiceNum()
         {
             int nextInvoiceNum = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getInvoiceMaxNum", con))
-            using (var da = new SqlDataAdapter(cmd))
+            
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select Max(invoiceNum) as invoiceNum from tbl_InvoiceNumbers";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-                DataRow row = table.Rows[0];
-                nextInvoiceNum = Convert.ToInt32(row["invoiceNum"]);
-            }
-            if (table.Rows.Count != 0)
-            {
-                //Take the found invoiceNum, and increment by 1 so there won't be a duplicate
-                nextInvoiceNum = nextInvoiceNum + 1;
+                //If there there is no invoiceNum
+                if (reader["invoiceNum"] == DBNull.Value)
+                {
+                    nextInvoiceNum = 0;
+                }
+                //If an invoiceNum is found
+                else
+                {
+                    //Take the found invoiceNum, and increment by 1 so there won't be a duplicate
+                    nextInvoiceNum = Convert.ToInt32(reader["invoiceNum"]) + 1;
+                }
                 //Creates the invoice with the next invoice num
                 createInvoiceNum(nextInvoiceNum);
             }
+            conn.Close();
             //Returns the next invoiceNum
             return nextInvoiceNum;
         }
         //Create  the newly found invoice number
         public void createInvoiceNum(int invNum)
         {
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("reserveInvoiceNum", con))
-            {
-                //Adding the parameters
-                cmd.Parameters.AddWithValue("invNum", invNum);
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                cmd.ExecuteNonQuery();
-                con.Close();
-            }
+            //string date = DateTime.Now.ToString("yyyy-MM-dd");
+            //string time = DateTime.Now.ToString("HH:mm:ss");
+
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            //invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, tradeinAmount
+            //governmentTax, provincialTax, balanceDue, transactionType, comments
+            cmd.CommandText = "Insert into tbl_InvoiceNumbers(invoiceNum) values(@invNum);";
+
+            //"Insert into tbl_invoice(invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, " +
+            //"empID, locationID, subTotal, shippingAmount, discountAmount, tradeinAmount, " +
+            //"governmentTax, provincialTax, balanceDue, transactionType, comments) values(@invNum, @invSubNum, @date, @time" +
+            //", 1, @empID, 1, 0, 0, 0, 0, 0, 0, 0, 1, '');";
+            cmd.Parameters.AddWithValue("invNum", invNum);
+            //cmd.Parameters.AddWithValue("invSubNum", subNum);
+            //cmd.Parameters.AddWithValue("date", date);
+            //cmd.Parameters.AddWithValue("time", time);            
+            //cmd.Parameters.AddWithValue("@empID", empID);
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            conn.Close();
         }
         //Returns the max invoice subNum
         public int getNextInvoiceSubNum(int invoiceNumber)
         {
             int invoiceSubNum = 0;
-            SqlConnection con = new SqlConnection(connectionString);
-            using (var cmd = new SqlCommand("getInvoiceMaxSubNum", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select Max(invoiceSubNum) as invoiceSubNum from tbl_invoice Where invoiceNum = " + invoiceNumber + ";";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                //Executing the SP
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-                DataRow row = table.Rows[0];
-                invoiceSubNum = Convert.ToInt32(row["invoiceNum"]);
+                //If there is no invoice sub num, set it to 0
+                if (reader["invoiceSubNum"] == DBNull.Value)
+                {
+                    invoiceSubNum = 0;
+                }
+                else
+                {
+                    //If an invoice sub num is found, increment it
+                    invoiceSubNum = Convert.ToInt32(reader["invoiceSubNum"]) + 1;
+                }
             }
-            if (table.Rows.Count != 0)
-            {
-                //Take the found invoiceNum, and increment by 1 so there won't be a duplicate
-                invoiceSubNum = invoiceSubNum + 1;
-            }
+            conn.Close();
             //Return the invoice sub num
             return invoiceSubNum;
         }
-
-        //**Recent changes made these methods not used
         //Adding items to the invoice 
         public void invoiceItem(string insert)
         {
@@ -1054,27 +906,6 @@ namespace SweetSpotProShop
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
-        }
-        //Recent changes made these methods not used**
-
-        //Returns the employee ID from a password
-        public int returnEmployeeIDfromPassword(int pWord)
-        {
-            string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select empID from tbl_userInfo where password = " + pWord;
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            int empID = 0;
-            while (reader.Read())
-            {
-                empID = Convert.ToInt32(reader["empID"]);
-            }
-            conn.Close();
-            //Returns the employee ID
-            return empID;
         }
         //Returns max sku
         public int maxSku(int sku, string table)
@@ -1149,420 +980,5 @@ namespace SweetSpotProShop
             SqlDataReader reader = cmd.ExecuteReader();
             conn.Close();
         }
-        //************************Deleting invoices**********************************
-        public void deleteInvoice(int invoiceNum, int invoiceSubNum, string deletionReason)
-        {
-            //Step 1: Re-add the removed items back into inventory
-            //Gathering items in the invoice
-            List<Items> itemsToAdd = getItemsToReAdd(invoiceNum, invoiceSubNum);
-            foreach (Items i in itemsToAdd)
-            {
-                //Checks what type of item the item from the invoice is
-                bool isClub = checkInClub(i.sku);
-                bool isClothing = checkInClothing(i.sku);
-                bool isAccessorie = checkInAccessories(i.sku);
-                int previousQuantity = 0;
-                if (isClub == true)
-                {
-                    //Gets the current quantity in the inventory
-                    previousQuantity = getQuantity(i.sku, "clubs");
-                    //Updates the current inventory's quantity by adding the previous quantity with the quantity in the invoice
-                    reAddingItems(i.sku, previousQuantity + i.quantity, "clubs");
-                }
-                else if (isClothing == true)
-                {
-                    previousQuantity = getQuantity(i.sku, "clothing");
-                    reAddingItems(i.sku, previousQuantity + i.quantity, "clothing");
-                }
-                else if (isAccessorie == true)
-                {
-                    previousQuantity = getQuantity(i.sku, "accessories");
-                    reAddingItems(i.sku, previousQuantity + i.quantity, "accessories");
-                }
-            }
-            //Step 2: Get invoice Data and transfer to the deleted invoice table
-            getInvoiceData(invoiceNum, invoiceSubNum, deletionReason);
-            getInvoiceItems(invoiceNum, invoiceSubNum);
-            getInvoiceMOPs(invoiceNum, invoiceSubNum);
-
-
-            //Step 3: Remove MOPS 
-            deleteInvoiceMOP(invoiceNum, invoiceSubNum);
-            //Step 4: Remove Items
-            deleteInvoiceItem(invoiceNum, invoiceSubNum);
-            //Step 5: Remove the overall Invoice
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "delete tbl_invoice where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-        }
-        //Returns a list of the items in the invoice to update their quantities
-        public List<Items> getItemsToReAdd(int invoiceNum, int invoiceSubNum)
-        {
-            List<Items> items = new List<Items>();
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "select sku, itemQuantity from tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                items.Add(new Items(
-                    Convert.ToInt32(reader["sku"]),
-                    Convert.ToInt32(reader["itemQuantity"])));
-            }
-            conn.Close();
-            //Returns the list of items
-            return items;
-        }
-        //Looks in the club table for the sku
-        public bool checkInClub(int sku)
-        {
-            bool isClub = false;
-            //New command
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "select count(*) from tbl_clubs where sku = " + sku;
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute search
-            cmd.ExecuteNonQuery();
-            int itemExists = (int)cmd.ExecuteScalar();
-
-            //If item exists
-            if (itemExists > 0)
-            {
-                isClub = true;
-            }
-            //If item doesn't exist
-            else
-            {
-                isClub = false;
-            }
-            //Closing
-            con.Close();
-            //Returns a boolean to signal if it is or isn't a club
-            return isClub;
-        }
-        //Looks in the clothing table for the sku
-        public bool checkInClothing(int sku)
-        {
-            bool isClothing = false;
-            //New command
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "select count(*) from tbl_clothing where sku = " + sku;
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute search
-            cmd.ExecuteNonQuery();
-            int itemExists = (int)cmd.ExecuteScalar();
-
-            //If item exists
-            if (itemExists > 0)
-            {
-                isClothing = true;
-            }
-            //If item doesn't exist
-            else
-            {
-                isClothing = false;
-            }
-            //Closing
-            con.Close();
-            //Returns a boolean to signal if it is or isn't clothing
-            return isClothing;
-        }
-        //Looks in the accessories table for the sku
-        public bool checkInAccessories(int sku)
-        {
-            bool isAccessorie = false;
-            //New command
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "select count(*) from tbl_accessories where sku = " + sku;
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute search
-            cmd.ExecuteNonQuery();
-            int itemExists = (int)cmd.ExecuteScalar();
-
-            //If item exists
-            if (itemExists > 0)
-            {
-                isAccessorie = true;
-            }
-            //If item doesn't exist
-            else
-            {
-                isAccessorie = false;
-            }
-            //Closing
-            con.Close();
-            //Returns a boolean to signal if it is or isn't an accessory
-            return isAccessorie;
-        }
-        //Gets the quantity of the item being returned
-        public int getQuantity(int sku, string table)
-        {
-            int quantity = 0;
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select Max(quantity) as itemQuantity from tbl_" + table + " Where sku = @sku;";
-            cmd.Parameters.AddWithValue("sku", sku);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                //If the item doesn't have a quantity, set to 0
-                if (reader["itemQuantity"] == DBNull.Value)
-                {
-                    quantity = 0;
-                }
-                else
-                {
-                    //If the item has a quantity
-                    quantity = Convert.ToInt32(reader["itemQuantity"]);
-                }
-            }
-            conn.Close();
-            //Returns the item's quantity
-            return quantity;
-        }
-        //This method updates the item's quantity in the databse(clubs, accessories, clothing) by adding the returned items
-        public void reAddingItems(int sku, int quantity, string table)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "update tbl_" + table + " set quantity = @quantity where sku = @sku;";
-            cmd.Parameters.AddWithValue("sku", sku);
-            cmd.Parameters.AddWithValue("quantity", quantity);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-        }
-        //This method gets the data from tbl_invoice and transfers it to the deletedInvoice table
-        public void getInvoiceData(int invoiceNum, int invoiceSubNum, string deletionReason)
-        {
-            Invoice i = new Invoice();
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select * from tbl_invoice where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                i = new Invoice(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]), Convert.ToDateTime(reader["invoiceDate"]),
-                    Convert.ToString(reader["invoiceTime"]), Convert.ToInt32(reader["custID"]), Convert.ToInt32(reader["empID"]),
-                    Convert.ToInt32(reader["locationID"]), Convert.ToDouble(reader["subTotal"]), Convert.ToDouble(reader["shippingAmount"]),
-                    Convert.ToDouble(reader["discountAmount"]), Convert.ToDouble(reader["tradeinAmount"]), Convert.ToDouble(reader["governmentTax"]),
-                    Convert.ToDouble(reader["provincialTax"]), Convert.ToDouble(reader["balanceDue"]), Convert.ToInt32(reader["transactionType"]),
-                    Convert.ToString(reader["comments"]));
-            }
-            conn.Close();
-            //Sends the invoice and the deletion reason to the transfer method for invoices
-            transferMainInvoice(i, deletionReason);
-        }
-        //This method gets the items in the invoice that is being deleted and transfers each item to the deleted invoice item table
-        public void getInvoiceItems(int invoiceNum, int invoiceSubNum)
-        {
-            List<InvoiceItems> it = new List<InvoiceItems>();
-            InvoiceItems inItem = new InvoiceItems();
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select * from tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                inItem = new InvoiceItems(Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]),
-                    Convert.ToInt32(reader["sku"]), Convert.ToInt32(reader["itemQuantity"]), Convert.ToDouble(reader["itemCost"]),
-                    Convert.ToDouble(reader["itemPrice"]), Convert.ToDouble(reader["itemDiscount"]), Convert.ToBoolean(reader["percentage"]));
-                //Adds the found item to a list of type InvoiceItems
-                it.Add(inItem);
-            }
-            conn.Close();
-            //Loops through each item found and transfers them to the deleted invoice item table
-            foreach (InvoiceItems iItems in it)
-            {
-                //Sends the item to the transfer method for items
-                transferInvoiceItem(iItems);
-            }
-        }
-        //This method get the mops in the invoice that is being deleted and transfers each mop to the deleted invoice mop table
-        public void getInvoiceMOPs(int invoiceNum, int invoiceSubNum)
-        {
-            List<InvoiceMOPs> im = new List<InvoiceMOPs>();
-            InvoiceMOPs inMOPS = new InvoiceMOPs();
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select * from tbl_invoiceMOP where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                inMOPS = new InvoiceMOPs(Convert.ToInt32(reader["ID"]), Convert.ToInt32(reader["invoiceNum"]), Convert.ToInt32(reader["invoiceSubNum"]),
-                    Convert.ToString(reader["mopType"]), Convert.ToDouble(reader["amountPaid"]));
-                //Adds the found mop to a list of type InvoiceMOPs
-                im.Add(inMOPS);
-            }
-            conn.Close();
-            //Loops through each mop found and transfers them to the deleted invoice mop table
-            foreach (InvoiceMOPs iMOPS in im)
-            {
-                //Sends the mop to the transfer method for items
-                transferInoviceMOP(iMOPS);
-            }
-        }
-        //This method transfers the invoice that is being deleted to the deleted invoice table
-        public void transferMainInvoice(Invoice i, string deletionReason)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText =
-                "insert into tbl_deletedInvoice values( " +
-                "@invoiceNum, " +
-                "@invoiceSubNum, " +
-                "@invoiceDate, " +
-                "@invoiceTime, " +
-                "@custID, " +
-                "@empID, " +
-                "@locationID, " +
-                "@subtotal, " +
-                "@shippingAmount, " +
-                "@discountAmount, " +
-                "@tradeinAmount, " +
-                "@governmentTax, " +
-                "@provincialTax, " +
-                "@balanceDue, " +
-                "@transactionType, " +
-                "@comments, " +
-                "@deletionReason);";
-            cmd.Parameters.AddWithValue("invoiceNum", i.invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", i.invoiceSub);
-            cmd.Parameters.AddWithValue("invoiceDate", i.invoiceDate);
-            cmd.Parameters.AddWithValue("invoiceTime", i.invoiceTime);
-            cmd.Parameters.AddWithValue("custID", i.customerID);
-            cmd.Parameters.AddWithValue("empID", i.employeeID);
-            cmd.Parameters.AddWithValue("locationID", i.locationID);
-            cmd.Parameters.AddWithValue("subTotal", i.subTotal);
-            cmd.Parameters.AddWithValue("shippingAmount", i.shippingAmount);
-            cmd.Parameters.AddWithValue("discountAmount", i.discountAmount);
-            cmd.Parameters.AddWithValue("tradeinAmount", i.tradeinAmount);
-            cmd.Parameters.AddWithValue("governmentTax", i.governmentTax);
-            cmd.Parameters.AddWithValue("provincialTax", i.provincialTax);
-            cmd.Parameters.AddWithValue("balanceDue", i.balanceDue);
-            cmd.Parameters.AddWithValue("transactionType", i.transactionType);
-            cmd.Parameters.AddWithValue("comments", i.comments);
-            cmd.Parameters.AddWithValue("deletionReason", deletionReason);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-        }
-        //This method transfers the item from the deleted invoice to the deleted invoice items table
-        public void transferInvoiceItem(InvoiceItems im)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText =
-                "insert into tbl_deletedInvoiceItem values( " +
-                "@invoiceNum, " +
-                "@invoiceSubNum, " +
-                "@sku, " +
-                "@itemQuantity, " +
-                "@itemCost, " +
-                "@itemPrice, " +
-                "@itemDiscount, " +
-                "@percentage);";
-            cmd.Parameters.AddWithValue("invoiceNum", im.invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", im.invoiceSubNum);
-            cmd.Parameters.AddWithValue("sku", im.sku);
-            cmd.Parameters.AddWithValue("itemQuantity", im.itemQuantity);
-            cmd.Parameters.AddWithValue("itemCost", im.itemCost);
-            cmd.Parameters.AddWithValue("itemPrice", im.itemPrice);
-            cmd.Parameters.AddWithValue("itemDiscount", im.itemDiscount);
-            cmd.Parameters.AddWithValue("percentage", im.percentage);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-
-        }
-        //This method inserts the mops from the deleted invoice into the deleted invoice mops table
-        public void transferInoviceMOP(InvoiceMOPs im)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText =
-                "insert into tbl_deletedInvoiceMOP values( " +
-                "@ID, " +
-                "@invoiceNum, " +
-                "@invoiceSubNum, " +
-                "@mopType, " +
-                "@amountPaid);";
-            cmd.Parameters.AddWithValue("ID", im.id);
-            cmd.Parameters.AddWithValue("invoiceNum", im.invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", im.invoiceSubNum);
-            cmd.Parameters.AddWithValue("mopType", im.mopType);
-            cmd.Parameters.AddWithValue("amountPaid", im.amountPaid);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-        }
-        //This method deletes the mops that have an invoiceNum and subNum that belongs to the deleted invoice
-        public void deleteInvoiceMOP(int invoiceNum, int invoiceSubNum)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "delete tbl_invoiceMOP where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-        }
-        //This method deletes the items that have an invoiceNum and subNum that belongs to the deleted invoice
-        public void deleteInvoiceItem(int invoiceNum, int invoiceSubNum)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "delete tbl_invoiceItem where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum;";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            conn.Close();
-
-
-        }
-
-
     }
 }

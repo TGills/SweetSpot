@@ -127,7 +127,7 @@
             </div>
             <asp:Button ID="btnReturnInvoice" runat="server" Text="Search For Invoice" OnClick="btnReturnInvoice_Click" />--%>
             <%--Testing--%>
-            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClick="btnTesting_Click" /><asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+            <asp:Button ID="btnTesting" runat="server" Text="Test" OnClientClick="javascript:return getInput();" /><asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
 
 
 
