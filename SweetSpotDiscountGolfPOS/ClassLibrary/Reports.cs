@@ -36,65 +36,64 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         private System.Data.DataTable exportInvoiceTable;
         private System.Data.DataTable exportInvoiceItemTable;
         private System.Data.DataTable exportInvoiceMOPTable;
+
         //Connection String
         public Reports()
         {
             connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
         }
         //*******************CASHOUT UTILITIES*******************************************************
-        
         //This method connects to the database and gets the totals for the MOPs based on location and dates
         public List<Cashout> cashoutAmounts(DateTime startDate, DateTime endDate, int locationID)
         {
-            System.Data.DataTable table = new System.Data.DataTable();
             SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getCashoutTotals", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                cmd.Parameters.AddWithValue("@startDate", startDate);
-                cmd.Parameters.AddWithValue("@endDate", endDate);
-                cmd.Parameters.AddWithValue("@locationID", locationID);
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "Select tbl_invoiceMOP.mopType, tbl_invoiceMOP.amountPaid, tbl_invoice.tradeinAmount, " +
+                "tbl_invoice.subTotal, tbl_invoice.governmentTax, tbl_invoice.provincialTax from tbl_invoiceMOP " +
+                "INNER JOIN tbl_invoice ON tbl_invoiceMOP.invoiceNum = tbl_invoice.invoiceNum AND tbl_invoiceMOP.invoiceSubNum = tbl_invoice.invoiceSubNum" +
+                " where tbl_invoice.invoiceDate between @startDate and @endDate and tbl_invoice.locationID = @locationID;";
+            cmd.Parameters.AddWithValue("@startDate", startDate);
+            cmd.Parameters.AddWithValue("@endDate", endDate);
+            cmd.Parameters.AddWithValue("@locationID", locationID);
+            cmd.Connection = con;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
                 Cashout cs = new Cashout(
-                    Convert.ToString(row["mopType"]),
-                    Convert.ToDouble(row["amountPaid"]),
-                    Convert.ToDouble(row["tradeinAmount"]));
-
+                    Convert.ToString(reader["mopType"]),
+                    Convert.ToDouble(reader["amountPaid"]),
+                    Convert.ToDouble(reader["tradeinAmount"]));                    
                 //Adding the mops to the list of type cashout
                 cashout.Add(cs);
             }
+            con.Close();
             //Returns the list of type cashout
             return cashout;
         }
         //Used to get the subTotal, government tax, and provincial tax from the invoices based on a location ID and dates
         public List<Cashout> getRemainingCashout(DateTime startDate, DateTime endDate, int locationID)
         {
-            System.Data.DataTable table = new System.Data.DataTable();
             SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getCashoutOtherTotals", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                cmd.Parameters.AddWithValue("@startDate", startDate);
-                cmd.Parameters.AddWithValue("@endDate", endDate);
-                cmd.Parameters.AddWithValue("@locationID", locationID);
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "Select subTotal, governmentTax, provincialTax from  tbl_invoice" +                
+                " where invoiceDate between @startDate and @endDate and locationID = @locationID;";
+            cmd.Parameters.AddWithValue("@startDate", startDate);
+            cmd.Parameters.AddWithValue("@endDate", endDate);
+            cmd.Parameters.AddWithValue("@locationID", locationID);
+            cmd.Connection = con;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
                 Cashout cs = new Cashout(
-                    Convert.ToDouble(row["governmentTax"]),
-                    Convert.ToDouble(row["provincialTax"]),
-                    Convert.ToDouble(row["subTotal"]));
-                //Adding the mops to the list of type cashout
+                    Convert.ToDouble(reader["governmentTax"]),
+                    Convert.ToDouble(reader["provincialTax"]),
+                    Convert.ToDouble(reader["subTotal"]));
+                //Adding the totals to a list of type cashout
                 remainingCashout.Add(cs);
             }
+            con.Close();
             //Return the list of type cashout
             return remainingCashout;
         }
@@ -102,22 +101,21 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         public double getTradeInsCashout(DateTime startDate, DateTime endDate, int locationID)
         {
             double tradeintotal = 0;
-            System.Data.DataTable table = new System.Data.DataTable();
             SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getCashoutTradeInTotals", con))
-            using (var da = new SqlDataAdapter(cmd))
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "Select tradeinAmount from  tbl_invoice" +
+                " where invoiceDate between @startDate and @endDate and locationID = @locationID;";
+            cmd.Parameters.AddWithValue("@startDate", startDate);
+            cmd.Parameters.AddWithValue("@endDate", endDate);
+            cmd.Parameters.AddWithValue("@locationID", locationID);
+            cmd.Connection = con;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                cmd.Parameters.AddWithValue("@startDate", startDate);
-                cmd.Parameters.AddWithValue("@endDate", endDate);
-                cmd.Parameters.AddWithValue("@locationID", locationID);
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
+                tradeintotal += Convert.ToDouble(reader["tradeinAmount"]);                
             }
-            foreach (DataRow row in table.Rows)
-            {
-                tradeintotal += Convert.ToDouble(row["tradeinAmount"]);
-            }
+            con.Close();
             //Returns the total value of the trade ins
             return tradeintotal;
         }
@@ -126,44 +124,65 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         {
             int processed = 0;
             int finalized = 0;
-            if (cas.processed == true)
-            { processed = 1; }
-            else
-            { processed = 0; }
-            if (cas.finalized == true)
-            { finalized = 1; }
-            else
-            { finalized = 0; }
-            System.Data.DataTable table = new System.Data.DataTable();
-            SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getCashoutOtherTotals", con))
+            if (cas.processed)
             {
-                cmd.Parameters.AddWithValue("@cashoutDate", cas.date);
-                cmd.Parameters.AddWithValue("@cashoutTime", cas.time);
-                cmd.Parameters.AddWithValue("@saleTradeIn", cas.saleTradeIn);
-                cmd.Parameters.AddWithValue("@saleGiftCard", cas.saleGiftCard);
-                cmd.Parameters.AddWithValue("@saleCash", cas.saleCash);
-                cmd.Parameters.AddWithValue("@saleDebit", cas.saleDebit);
-                cmd.Parameters.AddWithValue("@saleMasterCard", cas.saleMasterCard);
-                cmd.Parameters.AddWithValue("@saleVisa", cas.saleVisa);
-                cmd.Parameters.AddWithValue("@receiptTradeIn", cas.receiptTradeIn);
-                cmd.Parameters.AddWithValue("@receiptGiftCard", cas.receiptGiftCard);
-                cmd.Parameters.AddWithValue("@receiptCash", cas.receiptCash);
-                cmd.Parameters.AddWithValue("@receiptDebit", cas.receiptDebit);
-                cmd.Parameters.AddWithValue("@receiptMasterCard", cas.receiptMasterCard);
-                cmd.Parameters.AddWithValue("@receiptVisa", cas.receiptVisa);
-                cmd.Parameters.AddWithValue("@preTax", cas.preTax);
-                cmd.Parameters.AddWithValue("@governmentTax", cas.saleGST);
-                cmd.Parameters.AddWithValue("@provincialTax", cas.salePST);
-                cmd.Parameters.AddWithValue("@overShort", cas.overShort);
-                cmd.Parameters.AddWithValue("@finalized", finalized);
-                cmd.Parameters.AddWithValue("@processed", processed);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                cmd.ExecuteNonQuery();
-                con.Close();
+                processed = 1;
             }
+            if (cas.finalized)
+            {
+                finalized = 1;
+            }
+
+            SqlConnection con = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            //This is a mess...
+            cmd.CommandText = "Insert into tbl_cashout values('" +
+               cas.date + "', '" + cas.time + "', " + cas.saleTradeIn + ", " + cas.saleGiftCard + ", " +
+               cas.saleCash + ", "  + cas.saleDebit + ", " + cas.saleMasterCard + ", " +
+               cas.saleVisa + ", " +  cas.receiptTradeIn + ", " + cas.receiptGiftCard + ", " +
+               cas.receiptCash + ", "  + cas.receiptDebit + ", " + cas.receiptMasterCard + ", " + cas.receiptVisa + ", " +
+               cas.preTax + ", " + cas.saleGST + ", " +  cas.salePST + ", " + 
+               cas.overShort + ", " + finalized + ", " + processed + ");";
+
+            //" saleTradeIn = @saleTradeIn, " +
+            //" saleGiftCard = @saleGiftCard, saleCash = @saleCash, saleCheque = @saleCheque, " +
+            //" saleDebit = @saleDebit, saleMasterCard = @saleMasterCard, saleVisa = @saleVisa, " +
+            //" saleAmex = @saleAmex, receiptTradeIn = @receiptTradeIn, receiptGiftCard = @receiptGiftCard, " +
+            //" receiptCash = @receiptCash, receiptCheque = @receiptCheque, receiptDebit = @receiptDebit, " +
+            //" receiptMasterCard = @receiptMasterCard, receiptVisa = @receiptVisa, receiptAmex = @receiptAmex, " +
+            //" overShort = @overShort, finalized = @finalized, processed = @processed);";
+
+            //cmd.Parameters.AddWithValue("@cashoutDate", cas.date);
+            //cmd.Parameters.AddWithValue("@cashoutTime", cas.time);
+            //cmd.Parameters.AddWithValue("@saleTradeIn", cas.saleTradeIn);
+
+            //cmd.Parameters.AddWithValue("@saleGiftCard", cas.saleGiftCard);
+            //cmd.Parameters.AddWithValue("@saleCash", cas.saleCash);
+            //cmd.Parameters.AddWithValue("@saleCheque", cas.saleCheque);
+
+            //cmd.Parameters.AddWithValue("@saleDebit", cas.saleDebit);
+            //cmd.Parameters.AddWithValue("@saleMasterCard", cas.saleMasterCard);
+            //cmd.Parameters.AddWithValue("@saleVisa", cas.saleVisa);
+
+            //cmd.Parameters.AddWithValue("@saleAmex", cas.saleAmex);
+            //cmd.Parameters.AddWithValue("@receiptTradeIn", cas.receiptTradeIn);
+            //cmd.Parameters.AddWithValue("@receiptGiftCard", cas.receiptGiftCard);
+
+            //cmd.Parameters.AddWithValue("@receiptCash", cas.receiptCash);
+            //cmd.Parameters.AddWithValue("@receiptCheque", cas.receiptCheque);
+            //cmd.Parameters.AddWithValue("@receiptDebit", cas.receiptDebit);
+
+            //cmd.Parameters.AddWithValue("@receiptMasterCard", cas.receiptMasterCard);
+            //cmd.Parameters.AddWithValue("@receiptVisa", cas.receiptVisa);
+            //cmd.Parameters.AddWithValue("@receiptAmex", cas.receiptAmex);
+
+            //cmd.Parameters.AddWithValue("@overShort", cas.overShort);
+            //cmd.Parameters.AddWithValue("@finalized", finalized);
+            //cmd.Parameters.AddWithValue("@processed", processed);
+            cmd.Connection = con;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            con.Close();
         }
         //********************IMPORTING***************************************************************
 
@@ -1075,8 +1094,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             ExcelApp.ActiveWorkbook.Saved = true;
             ExcelApp.Quit();
         } //**Incorrect format
-
-
         //Export all items in inventory
         public System.Data.DataTable exportAllItems()
         {
@@ -1117,109 +1134,123 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         //Puts the clubs in the export table
         public void exportAllAdd_Clubs()
         {
-            System.Data.DataTable table = new System.Data.DataTable();
-            SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getClubsAll", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            //This query gathers all required information. No other methods needed
+            cmd.CommandText = "select tbl_clubs.sku, " +
+                                    "(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_clubs.modelID ) as modelName , " +
+                                    "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clubs.brandID ) as brandName , " +
+                                    "tbl_clubs.clubType, tbl_clubs.shaft, tbl_clubs.numberOfClubs, tbl_clubs.premium, tbl_clubs.cost, tbl_clubs.price," +
+                                    "tbl_clubs.quantity, tbl_clubs.clubSpec, tbl_clubs.shaftSpec, tbl_clubs.shaftFlex, tbl_clubs.dexterity, " +
+                                    "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clubs.typeID ) as itemType , " +
+                                    "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clubs.locationID) as locationName, " +
+                                    "tbl_clubs.used, tbl_clubs.comments from tbl_clubs";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
                 exportTable.Rows.Add("",
-                     row["locationName"].ToString(),
-                     (Convert.ToInt32(row["sku"])).ToString(),
-                     "",
-                     row["brandName"].ToString(),
-                     row["modelName"].ToString(),
-                     row["clubType"].ToString(),
-                     row["shaft"].ToString(),
-                     row["numberOfClubs"].ToString(),
-                     0,
-                     Convert.ToDouble(row["premium"]),
-                     Convert.ToDouble(row["cost"]),
-                     Convert.ToInt32(row["quantity"]),
-                     0,
-                     Convert.ToDouble(row["price"]),
-                     row["comments"].ToString(),
-                     "",
-                     row["clubSpec"].ToString(),
-                     row["shaftSpec"].ToString(),
-                     row["shaftFlex"].ToString(),
-                     row["dexterity"].ToString(),
-                     "",
-                     "",
-                     "");
+                    reader["locationName"].ToString(),
+                    (Convert.ToInt32(reader["sku"])).ToString(),
+                    "",
+                    reader["brandName"].ToString(),
+                    reader["modelName"].ToString(),
+                    reader["clubType"].ToString(),
+                    reader["shaft"].ToString(),
+                    reader["numberOfClubs"].ToString(),
+                    0,
+                    Convert.ToDouble(reader["premium"]),
+                    Convert.ToDouble(reader["cost"]),
+                    Convert.ToInt32(reader["quantity"]),
+                    0,
+                    Convert.ToDouble(reader["price"]),
+                    reader["comments"].ToString(),
+                    "",
+                    reader["clubSpec"].ToString(),
+                    reader["shaftSpec"].ToString(),
+                    reader["shaftFlex"].ToString(),
+                    reader["dexterity"].ToString(),
+                    "",
+                    "",
+                    "");
             }
+            conn.Close();
         }
         //Puts the accessories in the export table
         public void exportAllAdd_Accessories()
         {
-            System.Data.DataTable table = new System.Data.DataTable();
-            SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getAccessoriesAll", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            //This query gathers all required information. No other methods needed
+            cmd.CommandText = "select tbl_accessories.sku, tbl_accessories.size, tbl_accessories.colour, tbl_accessories.price, tbl_accessories.cost, " +
+                                    "(select tbl_model.modelName from tbl_model where tbl_model.modelID = tbl_accessories.modelID ) as modelName , " +
+                                    "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_accessories.brandID ) as brandName ," +
+                                    "tbl_accessories.accessoryType, tbl_accessories.quantity, " +
+                                    "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_accessories.typeID ) as itemType , " +
+                                    "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_accessories.locationID) as locationName, " +
+                                    "tbl_accessories.comments " +
+                                    "from tbl_accessories; ";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
                 exportTable.Rows.Add("",
-                    row["locationName"].ToString(),
-                    (Convert.ToInt32(row["sku"])).ToString(),
+                    reader["locationName"].ToString(),
+                    (Convert.ToInt32(reader["sku"])).ToString(),
                     "",
-                    row["brandName"].ToString(),
-                    row["modelName"].ToString(),
+                    reader["brandName"].ToString(),
+                    reader["modelName"].ToString(),
                     "",
                     "",
                     "",
                     0,
                     0,
-                    Convert.ToDouble(row["cost"]),
-                    Convert.ToInt32(row["quantity"]),
+                    Convert.ToDouble(reader["cost"]),
+                    Convert.ToInt32(reader["quantity"]),
                     0,
-                    Convert.ToDouble(row["price"]),
+                    Convert.ToDouble(reader["price"]),
                     "", "", "", "", "", "", "", "", "");
             }
+            conn.Close();
         }
         //Puts the clothing in the export table
         public void exportAllAdd_Clothing()
         {
-            System.Data.DataTable table = new System.Data.DataTable();
-            SqlConnection con = new SqlConnection(connectionString);
-            //using (var cmd = new SqlCommand("singleEmployee", con))
-            using (var cmd = new SqlCommand("getClothingAll", con))
-            using (var da = new SqlDataAdapter(cmd))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                da.Fill(table);
-            }
-            foreach (DataRow row in table.Rows)
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            //This query gathers all required information. No other methods needed
+            cmd.CommandText = "select tbl_clothing.sku, tbl_clothing.size, tbl_clothing.colour, tbl_clothing.gender, tbl_clothing.style, tbl_clothing.price, tbl_clothing.cost,  " +
+                                    "(select tbl_brand.brandName from tbl_brand where tbl_brand.brandID = tbl_clothing.brandID ) as brandName , " +
+                                    "tbl_clothing.quantity, " +
+                                    "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clothing.typeID ) as itemType ,  " +
+                                    "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clothing.locationID) as locationName,  " +
+                                    "tbl_clothing.comments from tbl_clothing;";
+            conn.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
                 exportTable.Rows.Add("",
-                    row["locationName"].ToString(),
-                    (Convert.ToInt32(row["sku"])).ToString(),
+                    reader["locationName"].ToString(),
+                    (Convert.ToInt32(reader["sku"])).ToString(),
                     "",
-                    row["brandName"].ToString(),
-                    row["gender"].ToString(),
-                    row["style"].ToString(),
+                    reader["brandName"].ToString(),
+                    reader["gender"].ToString(),
+                    reader["style"].ToString(),
                     "",
                     "",
                     0,
                     0,
-                    Convert.ToDouble(row["cost"]),
-                    Convert.ToInt32(row["quantity"]),
+                    Convert.ToDouble(reader["cost"]),
+                    Convert.ToInt32(reader["quantity"]),
                     0,
-                    Convert.ToDouble(row["price"]),
+                    Convert.ToDouble(reader["price"]),
                     "", "", "", "", "", "", "", "", "");
             }
+            conn.Close();
         }
-
-        //*****None of these are being used
         //Export ALL sales/invoices to excel
         public void exportAllSalesToExcel()
         {
@@ -1467,8 +1498,5 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             }
             conn.Close();
         }
-
-
-
     }
 }

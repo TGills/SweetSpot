@@ -10,34 +10,7 @@
 namespace SweetSpotDiscountGolfPOS {
     
     
-    public partial class ReportsHomePage {
-        
-        /// <summary>
-        /// sqlLocations control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource sqlLocations;
-        
-        /// <summary>
-        /// lblReport control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblReport;
-        
-        /// <summary>
-        /// lbldate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lbldate;
+    public partial class ReturnsHomePage {
         
         /// <summary>
         /// pnlDefaultButton control.
@@ -49,84 +22,93 @@ namespace SweetSpotDiscountGolfPOS {
         protected global::System.Web.UI.WebControls.Panel pnlDefaultButton;
         
         /// <summary>
-        /// ddlLocation control.
+        /// tblInvoiceSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlLocation;
+        protected global::System.Web.UI.WebControls.Table tblInvoiceSearch;
         
         /// <summary>
-        /// txtStartDate control.
+        /// rdbSearchByCustomer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtStartDate;
+        protected global::System.Web.UI.WebControls.RadioButton rdbSearchByCustomer;
         
         /// <summary>
-        /// txtEndDate control.
+        /// rdbSearchByInvoiceNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEndDate;
+        protected global::System.Web.UI.WebControls.RadioButton rdbSearchByInvoiceNumber;
         
         /// <summary>
-        /// calStartDate control.
+        /// lblInvoiceSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Calendar calStartDate;
+        protected global::System.Web.UI.WebControls.Label lblInvoiceSearch;
         
         /// <summary>
-        /// calEndDate control.
+        /// txtInvoiceSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Calendar calEndDate;
+        protected global::System.Web.UI.WebControls.TextBox txtInvoiceSearch;
         
         /// <summary>
-        /// btnRunReport control.
+        /// lblSearchDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnRunReport;
+        protected global::System.Web.UI.WebControls.Label lblSearchDate;
         
         /// <summary>
-        /// btnTesting control.
+        /// txtSearchDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnTesting;
+        protected global::System.Web.UI.WebControls.TextBox txtSearchDate;
         
         /// <summary>
-        /// Label1 control.
+        /// cvSearchDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Label1;
+        protected global::System.Web.UI.WebControls.CompareValidator cvSearchDate;
         
         /// <summary>
-        /// hidden control.
+        /// btnSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hidden;
+        protected global::System.Web.UI.WebControls.Button btnSearch;
+        
+        /// <summary>
+        /// grdInvoiceSelection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView grdInvoiceSelection;
     }
 }

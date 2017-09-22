@@ -32,12 +32,13 @@
     <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
 </asp:Content>
 <asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server">
+
     <script>
         function printReport(printable) {
             window.print();
         }
     </script>
-    <%--<link rel="stylesheet" type="text/css" href="CSS/displayPrintableInvoice.css" />--%>
+    <link rel="stylesheet" type="text/css" href="CSS/displayPrintableInvoice.css" />
     <div id="printable" runat="server">
         <div id="Invoice" class="yesPrint">
             <h3><b>Invoice: </b>

@@ -29,7 +29,6 @@ namespace SweetShop
         }
 
         /*******Customer Utilities************************************************************************************/
-
         //Retrieves Customer from search parameters Nathan and Tyler created
         public List<Customer> GetCustomerfromSearch(string searchField)
         {
@@ -539,7 +538,6 @@ namespace SweetShop
             con.Close();
             return item;
         }
-
         //Trade-in specific club from inventory lookup
         public Clubs tradeInItemLookUp(int sku)
         {
@@ -579,7 +577,6 @@ namespace SweetShop
             //The trade in item is being returned
             return clubs;
         }
-
         //Select specific club from inventory Nathan and Tyler created
         public Clubs singleItemLookUp(int sku)
         {
@@ -621,7 +618,6 @@ namespace SweetShop
             //Returns the club
             return clubs;
         }
-
         //Adds new Item to tables Nathan created
         public int addItem(Object o)
         {
@@ -644,7 +640,6 @@ namespace SweetShop
             //Returns the sku of the new item
             return returnItemNumber(o);
         }
-
         //Looks to see if the item already exists
         public void checkForItem(Object o)
         {
@@ -665,7 +660,6 @@ namespace SweetShop
                 checkClothing(cl);
             }
         }
-
         //returns sku number after adding to reload page with new item Nathan created
         public int returnItemNumber(Object o)
         {
@@ -739,7 +733,6 @@ namespace SweetShop
             //Returns the sku of the item
             return sku;
         }
-
         //These three actully add the item to specific tables Nathan created
         public void addClub(Clubs c)
         {
@@ -868,7 +861,6 @@ namespace SweetShop
             cmd.ExecuteNonQuery();
             con.Close();
         }
-
         //Get item type
         public int getItemType(int sku)
         {
@@ -895,7 +887,6 @@ namespace SweetShop
                 return 0;
             }
         }
-
         //Checks tbl_clubs for the sku. Used to see if the item is a club
         public bool checkClubForItem(int sku)
         {
@@ -915,11 +906,6 @@ namespace SweetShop
             if (itemExists > 0)
             {
                 isClub = true;
-            }
-            //If item doesn't exist
-            else
-            {
-                isClub = false;
             }
             //Closing
             con.Close();
@@ -986,8 +972,6 @@ namespace SweetShop
             //Returns true or false
             return isClothing;
         }
-
-
         //The check methods check if an item already exists or does not exist. It will update if it exists, and add if not.
         public void checkClub(Clubs c)
         {
@@ -1074,30 +1058,6 @@ namespace SweetShop
             //Closing
             con.Close();
         }
-
-
-        //Converts a dbnull to string
-        public string convertDBNullToString(Object o)
-        {
-            if (o is DBNull)
-                o = "";
-            //Returns a blank string
-            return o.ToString();
-
-        }
-        //Converts a dbnull to a double
-        public double convertDBNullToDouble(Object o)
-        {
-            double dbl = 0.0;
-            if (o is DBNull)
-                dbl = 0.0;
-            else
-                dbl = Convert.ToDouble(o);
-            //Returns a double equaling 0.0 
-            return dbl;
-
-        }
-
         //Returns single accessory Nathan created
         public Accessories getAccessory(int sku)
         {
@@ -1170,87 +1130,6 @@ namespace SweetShop
             //Returns the clothing
             return c;
         }
-        //**RELIC METHOD
-        public void addItem(Clubs c)
-        {
-            //New command
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.CommandText = "SET IDENTITY_INSERT Item ON; INSERT INTO Item(sku,shipmentDate, brand, model, clubType, shaft, numberOfClubs, tradeInPrice," +
-                "premium, wePay, quantity, extendedPrice, retailPrice, comments, clubSpec, shaftSpec," +
-                "shaftFlex, dexterity, destination, received, paid, gst, pst)" +
-                "VALUES(@sku, @shipmentDate, @brand, @model, @clubType, @shaft, @numberOfClubs, @tradeInPrice, " +
-                "@premium, @wePay, @quantity, @extendedPrice, @retailPrice, @comments, @clubSpec, @shaftSpec," +
-                "@shaftFlex, @dexterity, @destination, @received, @paid, @gst, @pst); SET IDENTITY_INSERT Item OFF;";
-            cmd.Parameters.AddWithValue("sku", c.sku);
-            cmd.Parameters.AddWithValue("shipmentDate", c.ShipmentDate);
-            cmd.Parameters.AddWithValue("brand", c.brandID);
-            cmd.Parameters.AddWithValue("model", c.modelID);
-            cmd.Parameters.AddWithValue("clubType", c.clubType);
-            cmd.Parameters.AddWithValue("shaft", c.shaft);
-            cmd.Parameters.AddWithValue("numberOfClubs", c.numberOfClubs);
-            cmd.Parameters.AddWithValue("tradeInPrice", c.TradeInPrice);
-            cmd.Parameters.AddWithValue("premium", c.premium);
-            cmd.Parameters.AddWithValue("wePay", c.WePay);
-            cmd.Parameters.AddWithValue("quantity", c.quantity);
-            cmd.Parameters.AddWithValue("extendedPrice", c.ExtendedPrice);
-            cmd.Parameters.AddWithValue("retailPrice", c.RetailPrice);
-            cmd.Parameters.AddWithValue("comments", c.comments);
-            cmd.Parameters.AddWithValue("clubSpec", c.clubSpec);
-            cmd.Parameters.AddWithValue("shaftSpec", c.shaftSpec);
-            cmd.Parameters.AddWithValue("shaftFlex", c.shaftFlex);
-            cmd.Parameters.AddWithValue("dexterity", c.dexterity);
-            cmd.Parameters.AddWithValue("destination", c.Destination);
-            cmd.Parameters.AddWithValue("received", c.Received);
-            cmd.Parameters.AddWithValue("paid", c.Paid);
-            cmd.Parameters.AddWithValue("gst", c.Gst);
-            cmd.Parameters.AddWithValue("pst", c.Pst);
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute Insert
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //**RELIC MTHOD
-        public void updateItemInvoice(Clubs c)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "UPDATE Item SET  quantityInOrder = @quantityInOrder,brand = @brand, model = @model," +
-                "clubType = @clubType, shaft = @shaft, numberOfClubs = @numberOfClubs, tradeInPrice = @tradeInPrice," +
-                "premium = @premium, wePay = @wePay, quantity = @quantity, extendedPrice = @extendedPrice," +
-                "retailPrice = @retailPrice, clubSpec = @clubSpec, shaftSpec = @shaftSpec," +
-                "shaftFlex = @shaftFlex, dexterity = @dexterity, gst = @gst, pst = @pst WHERE sku = @sku";
-
-            cmd.Parameters.AddWithValue("@sku", c.sku);
-            cmd.Parameters.AddWithValue("@quantityInOrder", c.QuantityInOrder);
-            cmd.Parameters.AddWithValue("@brand", c.brandID);
-            cmd.Parameters.AddWithValue("@model", c.modelID);
-            cmd.Parameters.AddWithValue("@clubType", c.clubType);
-            cmd.Parameters.AddWithValue("@shaft", c.shaft);
-            cmd.Parameters.AddWithValue("@numberOfClubs", c.numberOfClubs);
-            cmd.Parameters.AddWithValue("@tradeInPrice", c.TradeInPrice);
-            cmd.Parameters.AddWithValue("@premium", c.premium);
-            cmd.Parameters.AddWithValue("@wePay", c.WePay);
-            cmd.Parameters.AddWithValue("@quantity", c.quantity);
-            cmd.Parameters.AddWithValue("@extendedPrice", c.ExtendedPrice);
-            cmd.Parameters.AddWithValue("@retailPrice", c.RetailPrice);
-            cmd.Parameters.AddWithValue("@clubSpec", c.clubSpec);
-            cmd.Parameters.AddWithValue("@shaftSpec", c.shaftSpec);
-            cmd.Parameters.AddWithValue("@shaftFlex", c.shaftFlex);
-            cmd.Parameters.AddWithValue("@dexterity", c.dexterity);
-            cmd.Parameters.AddWithValue("@gst", c.Gst);
-            cmd.Parameters.AddWithValue("@pst", c.Pst);
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute Insert
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-
         //Update club in inventory updated Nathan 
         public void updateClub(Clubs c)
         {
@@ -1355,7 +1234,6 @@ namespace SweetShop
             //Returns true or false
             return trade;
         }
-
         //Determines what type an item is
         public int whatTypeIsItem(int sku)
         {
@@ -1402,7 +1280,6 @@ namespace SweetShop
             //Returns the item type ID
             return intType;
         }
-
         //Returns the description of the searched item
         public string getDescription(int sku, int type)
         {
@@ -1458,58 +1335,11 @@ namespace SweetShop
             //Returns the description
             return desc;
         }
-        //Updates the item quantity
-        public void updateItemQuantity(int quantity, int sku)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "UPDATE Item SET quantity = quantity + @quantity WHERE sku = @sku";
-            cmd.Parameters.AddWithValue("@sku", sku);
-            cmd.Parameters.AddWithValue("@quantity", quantity);
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute Insert
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //Delete item from inventory
-        public void deleteItem(int sku)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "DELETE FROM Item WHERE sku=@sku";
-            cmd.Parameters.AddWithValue("sku", sku);
-            cmd.Connection = con;
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-
         /*******Invoice Utilities************************************************************************************/
-        //**RELIC METHOD
-        public int getInvoiceID(DateTime saleDate)
-        {
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select invoiceID FROM Invoice Where saleDate = @saleDate";
-            cmd.Parameters.AddWithValue("saleDate", saleDate);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            // Invoice invoice = new Invoice();
-            int invoiceID = 0;
-            while (reader.Read())
-            {
-                invoiceID = Convert.ToInt32(reader["invoiceID"]);
-            }
-            conn.Close();
-            //Returns the invoice ID
-            return invoiceID;
-        }
         //Get Invoice by invoiceID and return the invoice object
         public List<Invoice> getInvoice(int invoiceID)
         {
+            //12
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, invoiceDate, invoiceTime, custID, empID, locationID, subTotal, discountAmount, "
@@ -1678,9 +1508,7 @@ namespace SweetShop
             con.Close();
             //Returns a list of invoices that match the search criteria
             return i;
-
         }
-        
         public List<Cart> returningItems(int invoiceNumber, int invoiceSub)
         {
             //The list where the invoice items will go
@@ -1770,79 +1598,16 @@ namespace SweetShop
             //The items that can be returned
             return finalItems;
         }
-        //public void updateReturnToInvoice(int invoiceID, double gstRefund, double pstRefund, double retailPrice, double totalRefund)
-        //{
-        //    SqlConnection con = new SqlConnection(connectionString);
-        //    SqlCommand cmd = new SqlCommand();
-
-        //    cmd.CommandText = "UPDATE Invoice SET gst = gst - @gst, pst = pst - @pst, subtotal = subtotal - @retailPrice,"+
-        //        "total = total - @totalRefund, paymentTotal = paymentTotal - @totalRefund WHERE invoiceID = @invoiceID";
-        //    cmd.Parameters.AddWithValue("invoiceID", invoiceID);
-        //    cmd.Parameters.AddWithValue("gst", gstRefund);
-        //    cmd.Parameters.AddWithValue("pst", pstRefund);
-        //    cmd.Parameters.AddWithValue("retailPrice", retailPrice);
-        //    cmd.Parameters.AddWithValue("totalRefund", totalRefund);
-        //    //Declare and open connection
-        //    cmd.Connection = con;
-        //    con.Open();
-        //    //Execute Insert
-        //    cmd.ExecuteNonQuery();
-        //    con.Close();
-        //}
-
-        //**RELIC METHOD
-        public void addInvoice(Invoice i)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.CommandText = "INSERT INTO Invoice( customerID, gst, pst, paymentTotal, balance, subTotal, total, discount, tradeIn, paymentID, stateprovID, posted, inProcess, saleDate) VALUES ( @customerID, @gst, @pst, @paymentTotal, @balance, @subTotal, @total, @discount, @tradeIn, @paymentID, @stateprovID, @posted, @inProcess, @saleDate)";
-
-            //cmd.Parameters.AddWithValue("customerID", i.customerId);
-            //cmd.Parameters.AddWithValue("gst", i.gst);
-            //cmd.Parameters.AddWithValue("pst", i.pst);
-            //cmd.Parameters.AddWithValue("paymentTotal", i.paymentTotal);
-            //cmd.Parameters.AddWithValue("balance", i.balance);
-            //cmd.Parameters.AddWithValue("subTotal", i.subTotal);
-            //cmd.Parameters.AddWithValue("total", i.total);
-            //cmd.Parameters.AddWithValue("discount", i.discount);
-            //cmd.Parameters.AddWithValue("tradeIn", i.tradeIn);
-            //cmd.Parameters.AddWithValue("paymentID", i.paymentID);
-            //cmd.Parameters.AddWithValue("stateprovID", i.stateprovID);
-            //cmd.Parameters.AddWithValue("posted", i.posted);
-            //cmd.Parameters.AddWithValue("inProcess", i.inProcess);
-            //cmd.Parameters.AddWithValue("saleDate", i.saleDate);
-            cmd.Connection = con;
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //Sets affected invoices to posted and replaces the null value with a posted date.
-        public void postInvoices(int invoiceID, DateTime PostedDate)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "Update Invoice SET posted = 1, postedDate = @PostedDate WHERE invoiceID = @invoiceID";
-            cmd.Parameters.AddWithValue("invoiceID", invoiceID);
-            cmd.Parameters.AddWithValue("postedDate", PostedDate);
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute update
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
         //Gets invoices between dates
-        public List<Invoice> getInvoiceBetweenDates(string startDate, string endDate, string table, string locationID)
+        public List<Invoice> getInvoiceBetweenDates(DateTime startDate, DateTime endDate)
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, custID, empID, subTotal, discountAmount, "
-                + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM " + table
-                + " WHERE locationID = @locationID and invoiceSubNum > 0 and invoiceDate between @startDate AND @endDate";
+            cmd.CommandText = "SELECT invoiceNum, invoiceSubNum, invoiceDate, custID, empID, locationID, subTotal, discountAmount, "
+                + "tradeinAmount, governmentTax, provincialTax, balanceDue FROM tbl_invoice "
+                + "WHERE invoiceDate between @startDate AND @endDate";
             cmd.Parameters.AddWithValue("startDate", startDate);
             cmd.Parameters.AddWithValue("endDate", endDate);
-            cmd.Parameters.AddWithValue("locationID", locationID);
             cmd.Connection = con;
             con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
@@ -1852,8 +1617,10 @@ namespace SweetShop
                 Invoice inv = new Invoice();
                 inv.invoiceNum = Convert.ToInt32(reader["invoiceNum"]);
                 inv.invoiceSub = Convert.ToInt32(reader["invoiceSubNum"]);
+                inv.invoiceDate = Convert.ToDateTime(reader["invoiceDate"]);
                 inv.customerID = Convert.ToInt32(reader["custID"]);
                 inv.employeeID = Convert.ToInt32(reader["empID"]);
+                inv.locationID = Convert.ToInt32(reader["locationID"]);
                 inv.subTotal = Convert.ToDouble(reader["subTotal"]);
                 inv.discountAmount = Convert.ToDouble(reader["discountAmount"]);
                 inv.tradeinAmount = Convert.ToDouble(reader["tradeinAmount"]);
@@ -1866,26 +1633,6 @@ namespace SweetShop
             con.Close();
             //Returns the list of invoices
             return i;
-        }
-        //Get customer ID
-        public int invoice_getCustID(int invoiceNum, int invoiceSubNum, string table)
-        {
-            int custID = 0;
-            SqlConnection conn = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "Select custID FROM " + table + " Where invoiceNum = @invoiceNum and invoiceSubNum = @invoiceSubNum";
-            cmd.Parameters.AddWithValue("invoiceNum", invoiceNum);
-            cmd.Parameters.AddWithValue("invoiceSubNum", invoiceSubNum);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                custID = Convert.ToInt32(reader["custID"]);
-            }
-            conn.Close();
-            //Returns customer ID
-            return custID;
         }
         //Get Items
         public List<Cart> invoice_getItems(int invoiceNum, int invoiceSubNum, string table)
@@ -2021,133 +1768,6 @@ namespace SweetShop
             //Returns the reason the invoice was deleted
             return reason;
         }
-        /*******Sale Utilities************************************************************************************/
-        //**RELIC METHOD
-        //Get sale by invoiceID
-        public void getSaleByInvoiceIDAndSKU(int invoiceID, int SKU)
-        {
-            //New command
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "SELECT * FROM Sale WHERE invoiceID = @invoiceID AND SKU = @SKU";
-            cmd.Parameters.AddWithValue("invoiceID", invoiceID);
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            //Execute Update
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //**RELIC METHOD
-        public void addSale(Sale s)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.CommandText = "INSERT INTO Sale( invoiceID, sku, quantity) VALUES (@invoiceID, @sku, @quantity)";
-
-            cmd.Parameters.AddWithValue("invoiceID", s.invoiceId);
-            cmd.Parameters.AddWithValue("sku", s.sku);
-            cmd.Parameters.AddWithValue("quantity", s.quantity);
-            cmd.Connection = con;
-            con.Open();
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //**RELIC METHOD
-        public void returnUpdatedQuantity(int sku, int quantityInOrder)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            cmd.CommandText = "UPDATE Item SET quantity = quantity - @quantityInOrder WHERE sku = @sku";
-            cmd.Parameters.AddWithValue("sku", sku);
-            cmd.Parameters.AddWithValue("quantityInOrder", quantityInOrder);
-
-            cmd.Connection = con;
-            con.Open();
-
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //**RELIC METHOD
-        //Delete sale of specific item on an invoice
-        public void deleteSale(int invoiceID, int sku)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            //Delete item from sale table
-            cmd.CommandText = "DELETE FROM Sale WHERE invoiceID = @invoiceID AND sku=@sku";
-            cmd.Parameters.AddWithValue("sku", sku);
-            cmd.Parameters.AddWithValue("invoiceID", invoiceID);
-
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-
-            //Execute Update
-            cmd.ExecuteNonQuery();
-            con.Close();
-        }
-        //**RELIC METHOD
-        //Get Sale object for a specific item on an invoice
-        public List<Sale> getSale(int invoiceID, int sku)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            //Delete item from sale table
-            cmd.CommandText = "Select * FROM Sale WHERE invoiceID = @invoiceID AND sku=@sku";
-            cmd.Parameters.AddWithValue("sku", sku);
-            cmd.Parameters.AddWithValue("invoiceID", invoiceID);
-
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            List<Sale> s = new List<Sale>();
-            //Initialize SQLdatareader and initialize new sale object with results
-            SqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                s.Add(new Sale(Convert.ToInt32(reader["invoiceID"]), Convert.ToInt32(reader["sku"]),
-                Convert.ToInt32(reader["quantity"])));
-            }
-            //Close Connection
-            con.Close();
-
-            //return sale object
-            return s;
-        }
-        //**RELIC METHOD
-        //Get Sale object for a specific item on an invoice
-        public Sale getSaleByInvAndSKU(int invoiceID, int sku)
-        {
-            SqlConnection con = new SqlConnection(connectionString);
-            SqlCommand cmd = new SqlCommand();
-
-            //Delete item from sale table
-            cmd.CommandText = "Select * FROM Sale WHERE invoiceID = @invoiceID AND sku=@sku";
-            cmd.Parameters.AddWithValue("sku", sku);
-            cmd.Parameters.AddWithValue("invoiceID", invoiceID);
-
-            //Declare and open connection
-            cmd.Connection = con;
-            con.Open();
-            Sale s = new Sale();
-            //Initialize SQLdatareader and initialize new sale object with results
-            SqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                s = (new Sale(Convert.ToInt32(reader["invoiceID"]), Convert.ToInt32(reader["sku"]),
-                Convert.ToInt32(reader["quantity"])));
-            }
-            //Close Connection
-            con.Close();
-
-            //return sale object
-            return s;
-        }
         /*******Tax Utilities************************************************************************************/
         public List<Tax> getTaxes(int provStateID, DateTime recDate)
         {
@@ -2175,237 +1795,25 @@ namespace SweetShop
             //Returns the list of taxes
             return tax;
         }
-        //    public void updateTax(int regionID, double gst, double pst)
-        //{
-        //    SqlConnection con = new SqlConnection(connectionString);
-        //    SqlCommand cmd = new SqlCommand();
-
-        //    cmd.CommandText = "UPDATE StateProvLT SET gst = @gst, pst = @pst WHERE stateProvID = @stateProvID";
-        //    cmd.Parameters.AddWithValue("@stateProvID", regionID);
-        //    cmd.Parameters.AddWithValue("@gst", gst);
-        //    cmd.Parameters.AddWithValue("@pst", pst);
-
-        //    //Declare and open connection
-        //    cmd.Connection = con;
-        //    con.Open();
-
-        //    //Execute Insert
-        //    cmd.ExecuteNonQuery();
-        //    con.Close();
-        //}
-
-        //public Tax getTaxByStateProvID(int stateProvID)
-        //{
-        //    //New command
-        //    SqlConnection con = new SqlConnection(connectionString);
-        //    SqlCommand cmd = new SqlCommand();
-        //    cmd.CommandText = "SELECT gst, pst FROM StateProvLT WHERE stateProvID = @stateProvID";
-        //    cmd.Parameters.AddWithValue("stateProvID", stateProvID);
-
-        //    //Declare and open connection
-        //    cmd.Connection = con;
-        //    con.Open();
-        //    Tax t = new Tax();
-        //    SqlDataReader read = cmd.ExecuteReader();
-        //    while (read.Read())
-        //    {
-        //            t = new Tax(Convert.ToDouble(read["gst"]),
-        //            Convert.ToDouble(read["pst"]));
-        //    }
-        //    con.Close();
-        //    return t;
-        //}
-
-
-
-
-
-
-        //*******Report Utilities************************************************************************************/
-        //**RELIC METHOD
-        //Export customer table to excel file in users Downloads folder
-        public void exportCustomers()
-        {
-            SqlConnection sqlCon = new SqlConnection(connectionString);
-            sqlCon.Open();
-            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Customer", sqlCon);
-            DataTable dtMainSQLData = new DataTable();
-            da.Fill(dtMainSQLData);
-            DataColumnCollection dcCollection = dtMainSQLData.Columns;
-
-            // Export Data into EXCEL Sheet
-            Microsoft.Office.Interop.Excel.Application ExcelApp = new
-            Microsoft.Office.Interop.Excel.Application();
-            ExcelApp.Application.Workbooks.Add(Type.Missing);
-
-            for (int i = 1; i < dtMainSQLData.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < dtMainSQLData.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        ExcelApp.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        ExcelApp.Cells[i, j] = dtMainSQLData.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Get users profile, downloads folder path, and save to workstation
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = Path.Combine(pathUser, "Downloads");
-            ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\Customers-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
-            ExcelApp.ActiveWorkbook.Saved = true;
-            ExcelApp.Quit();
-        }
-        //**RELIC METHOD
-        //Export Inventory Sales to excel file in users Downloads folder
-        public void exportInvoices(DateTime startDate, DateTime endDate)
-        {
-            SqlConnection sqlCon = new SqlConnection(connectionString);
-            sqlCon.Open();
-            string sqlStatement = "SELECT Invoice.invoiceID, Item.SKU, Sale.quantity, Item.brand, Item.model, Item.clubType, Item.shaft, Item.numberOfClubs, Item.clubSpec, Item.shaftSpec, Item.shaftFlex, Item.dexterity, Item.wePay, Item.retailPrice FROM Invoice INNER JOIN Customer ON Invoice.customerID = Customer.customerId INNER JOIN Sale ON Invoice.invoiceID = Sale.invoiceID INNER JOIN Item ON Sale.SKU = Item.SKU WHERE (Invoice.saleDate BETWEEN '" + startDate + "' AND '" + endDate + "')";
-            SqlDataAdapter da = new SqlDataAdapter(sqlStatement, sqlCon);
-            DataTable dtMainSQLData = new DataTable();
-            da.Fill(dtMainSQLData);
-            DataColumnCollection dcCollection = dtMainSQLData.Columns;
-
-            // Export Data into EXCEL Sheet
-            Microsoft.Office.Interop.Excel.Application ExcelApp = new
-            Microsoft.Office.Interop.Excel.Application();
-            ExcelApp.Application.Workbooks.Add(Type.Missing);
-
-            for (int i = 1; i < dtMainSQLData.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < dtMainSQLData.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        ExcelApp.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        ExcelApp.Cells[i, j] = dtMainSQLData.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Get users profile, downloads folder path, and save to workstation
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = Path.Combine(pathUser, "Downloads");
-            ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\Inventory Sales-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
-            ExcelApp.ActiveWorkbook.Saved = true;
-            ExcelApp.Quit();
-        }
-        //**RELIC METHOD
-        //Export items table to excel file in users Downloads folder
-        public void exportItems()
-        {
-            SqlConnection sqlCon = new SqlConnection(connectionString);
-            sqlCon.Open();
-            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM item", sqlCon);
-            DataTable dtMainSQLData = new DataTable();
-            da.Fill(dtMainSQLData);
-            DataColumnCollection dcCollection = dtMainSQLData.Columns;
-
-            // Export Data into EXCEL Sheet
-            Microsoft.Office.Interop.Excel.Application ExcelApp = new
-            Microsoft.Office.Interop.Excel.Application();
-            ExcelApp.Application.Workbooks.Add(Type.Missing);
-
-            for (int i = 1; i < dtMainSQLData.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < dtMainSQLData.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        ExcelApp.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        ExcelApp.Cells[i, j] = dtMainSQLData.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Get users profile, downloads folder path, and save to workstation
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = Path.Combine(pathUser, "Downloads");
-            ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\Inventory-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
-            ExcelApp.ActiveWorkbook.Saved = true;
-            ExcelApp.Quit();
-        }
-        //**RELIC METHOD
-        //Export Invoice table to excel 
-        public void exportInvoices()
-        {
-            SqlConnection sqlCon = new SqlConnection(connectionString);
-            sqlCon.Open();
-            string sqlStatement = "SELECT * FROM Invoice";
-            SqlDataAdapter da = new SqlDataAdapter(sqlStatement, sqlCon);
-            DataTable dtMainSQLData = new DataTable();
-            da.Fill(dtMainSQLData);
-            DataColumnCollection dcCollection = dtMainSQLData.Columns;
-
-            // Export Data into EXCEL Sheet
-            Microsoft.Office.Interop.Excel.Application ExcelApp = new
-            Microsoft.Office.Interop.Excel.Application();
-            ExcelApp.Application.Workbooks.Add(Type.Missing);
-
-            for (int i = 1; i < dtMainSQLData.Rows.Count + 2; i++)
-            {
-                for (int j = 1; j < dtMainSQLData.Columns.Count + 1; j++)
-                {
-                    if (i == 1)
-                    {
-                        ExcelApp.Cells[i, j] = dcCollection[j - 1].ToString();
-                    }
-                    else
-                        ExcelApp.Cells[i, j] = dtMainSQLData.Rows[i - 2][j - 1].ToString();
-                }
-            }
-            //Get users profile, downloads folder path, and save to workstation
-            string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string pathDownload = Path.Combine(pathUser, "Downloads");
-            ExcelApp.ActiveWorkbook.SaveCopyAs(pathDownload + "\\Inventory-" + DateTime.Now.ToString("d MMM yyyy") + ".xlsx");
-            ExcelApp.ActiveWorkbook.Saved = true;
-            ExcelApp.Quit();
-        }
-        //************************************Inventory Sales Utilities********************************************/
-
-        //**RELIC METHOD
-        //This method will select all invoices involved in a sale between the specified dates and encapsulated them in a list.
-        public List<InvSale> selectAllInventorySales(DateTime startDate, DateTime endDate)
+        public void updateNewTaxRate(int provID, DateTime taxDate, int taxID, double taxRate)
         {
             SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "SELECT Invoice.invoiceID, Item.SKU, Sale.quantity, Item.brand, Item.model, Item.clubType, Item.shaft, Item.numberOfClubs, Item.clubSpec, Item.shaftSpec, Item.shaftFlex, Item.dexterity, Item.wePay, Item.retailPrice FROM Invoice INNER JOIN Customer ON Invoice.customerID = Customer.customerId INNER JOIN Sale ON Invoice.invoiceID = Sale.invoiceID INNER JOIN Item ON Sale.SKU = Item.SKU WHERE (Invoice.saleDate BETWEEN @startDate AND @endDate)";
-            cmd.Parameters.AddWithValue("startDate", startDate);
-            cmd.Parameters.AddWithValue("endDate", endDate);
 
+            cmd.CommandText = "Insert Into tbl_taxRate values(@provID, @taxDate, @taxID, @taxRate)";
+            cmd.Parameters.AddWithValue("@provID", provID);
+            cmd.Parameters.AddWithValue("@taxDate", taxDate);
+            cmd.Parameters.AddWithValue("@taxID", taxID);
+            cmd.Parameters.AddWithValue("@taxRate", taxRate);
+
+            //Declare and open connection
             cmd.Connection = con;
             con.Open();
-
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            List<InvSale> ivs = new List<InvSale>();
-            while (reader.Read())
-            {
-                InvSale isl = new InvSale(Convert.ToInt32(reader["invoiceID"]),
-                    Convert.ToInt32(reader["sku"]),
-                    Convert.ToInt32(reader["quantity"]),
-                    Convert.ToString(reader["brand"]),
-                    Convert.ToString(reader["model"]),
-                    Convert.ToString(reader["clubType"]),
-                    Convert.ToString(reader["shaft"]),
-                    Convert.ToString(reader["numberOfClubs"]),
-                    Convert.ToString(reader["clubSpec"]),
-                    Convert.ToString(reader["shaftSpec"]),
-                    Convert.ToString(reader["shaftFlex"]),
-                    Convert.ToString(reader["dexterity"]),
-                    Convert.ToDouble(reader["wePay"]),
-                    Convert.ToDouble(reader["retailPrice"]));
-
-                ivs.Add(isl);
-            }
-
+            //Execute Insert
+            cmd.ExecuteNonQuery();
             con.Close();
-            return ivs;
-
         }
+        //************************************Inventory Sales Utilities********************************************/
         //Returns the total discount of the cart
         public double returnDiscount(List<Cart> itemsSold)
         {
@@ -2531,8 +1939,6 @@ namespace SweetShop
                         Convert.ToBoolean(reader["used"].ToString()),
                         reader["comments"].ToString());
 
-
-
                         o = transferClub as Object;
                         addItem(o);
                         transferTradeInDeleteOld(transferClub.sku);
@@ -2546,7 +1952,6 @@ namespace SweetShop
             SqlConnection conn = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-
             cmd.CommandText = "Delete from tbl_tempTradeInCartSkus Where sku = " + sku;
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();

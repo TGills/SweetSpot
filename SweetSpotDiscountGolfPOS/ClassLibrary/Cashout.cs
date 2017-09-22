@@ -37,22 +37,19 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         public string date { get; set; }
         public string time { get; set; }
 
-        public Cashout() { }
+        public Cashout() { } //These could be cleaned up after the cashout process get cleaned up
         public Cashout(string m, double a, double t)
         {
             mop = m;
             amount = a;
             tradeIn = t;
         }
-
-
         public Cashout(double sgt, double spt, double ssub)
         {
             saleGST = sgt;
             salePST = spt;
             saleSubTotal = ssub;
         }
-
         //Used to store values for Session["saleCashout"]
         public Cashout(double st, double sg, double sc, double sd, double smc,
             double sv,  double sgt, double spt, double ssub)
@@ -67,7 +64,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             salePST = spt;
             saleSubTotal = ssub;
         }
-
         //Used to store values for Session["receiptCashout"]
         public Cashout(string throwaway, double rt, double rg, double rc, double rd,
             double rmc, double rv, double os, double rgt, double rpt, double rsub)
@@ -81,11 +77,8 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             receiptGST = rgt;
             receiptPST = rpt;
             receiptSubTotal = rsub;
-
-
             overShort = os;
         }
-
         //Used for storing the cashout
         public Cashout(string d, string t, double st, double sg, double sc,  double sd, double smc,
             double sv,  double sgt, double spt, double ssub, double rt, double rg, double rc,  double rd,
@@ -103,7 +96,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             saleGST = sgt;
             salePST = spt;
             saleSubTotal = ssub;
-
             receiptTradeIn = rt;
             receiptGiftCard = rg;
             receiptCash = rc;
@@ -113,15 +105,10 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             receiptGST = rgt;
             receiptPST = rpt;
             receiptSubTotal = rsub;
-
             preTax = prt;
-
             overShort = os;
-
             finalized = f;
-
             processed = p;
         }
-
     }
 }

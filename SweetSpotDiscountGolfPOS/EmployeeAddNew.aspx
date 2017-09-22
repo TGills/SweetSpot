@@ -132,7 +132,28 @@
                 <asp:TableRow>
                     <asp:TableCell ColumnSpan="4"><hr /></asp:TableCell>
                 </asp:TableRow>
-
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:Label ID="lblNewPassword" runat="server" Text="Enter New Password" Visible="false"></asp:Label>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:TextBox ID="txtNewPassword" TextMode="Password" runat="server" Text="" Visible="false"></asp:TextBox>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label ID="lblPasswordFormat" runat="server" Text="Passwords are only Numeric" Visible="false"></asp:Label>
+                    </asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:Label ID="lblNewPassword2" runat="server" Text="Retype New Password" Visible="false"></asp:Label>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:TextBox ID="txtNewPassword2" TextMode="Password" runat="server" Text="" Visible="false"></asp:TextBox>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Button ID="btnSavePassword" runat="server" Text="Save New Password" Visible="false" OnClick="btnSavePassword_Click"></asp:Button>
+                    </asp:TableCell>
+                </asp:TableRow>
                 <asp:TableRow>
                     <asp:TableCell ColumnSpan="4"><hr /></asp:TableCell>
                 </asp:TableRow>

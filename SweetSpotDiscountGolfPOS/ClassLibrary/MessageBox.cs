@@ -16,7 +16,6 @@ namespace SweetSpotProShop
             MyPage.ClientScript.RegisterStartupScript(MyPage.GetType(),
                 "MessageBox", "alert('" + MessageText.Replace("'", "\'") + "');", true);
         }
-
         //This method was to be used to get user input. Javascript is being used instead
         public string inputBoxV2(string title, string promptText)
         {

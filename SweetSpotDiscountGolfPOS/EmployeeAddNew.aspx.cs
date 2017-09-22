@@ -230,6 +230,13 @@ namespace SweetSpotDiscountGolfPOS
                 btnAddEmployee.Visible = false;
                 btnCancel.Visible = true;
                 btnBackToSearch.Visible = false;
+                //Add or Update the password for employee
+                lblNewPassword.Visible = true;
+                txtNewPassword.Visible = true;
+                lblPasswordFormat.Visible = true;
+                lblNewPassword2.Visible = true;
+                txtNewPassword2.Visible = true;
+                btnSavePassword.Visible = true;
             }
             //Exception catch
             catch (ThreadAbortException tae) { }
@@ -308,6 +315,13 @@ namespace SweetSpotDiscountGolfPOS
                 btnCancel.Visible = false;
                 btnAddEmployee.Visible = false;
                 btnBackToSearch.Visible = true;
+                lblNewPassword.Visible = false;
+                txtNewPassword.Visible = false;
+                lblPasswordFormat.Visible = false;
+                lblNewPassword2.Visible = false;
+                txtNewPassword2.Visible = false;
+                btnSavePassword.Visible = false;
+
                 //reloads current page
                 Server.Transfer(Request.RawUrl, false);
             }
@@ -366,6 +380,51 @@ namespace SweetSpotDiscountGolfPOS
                 Session["key"] = null;
                 //Changes page to the settings page
                 Server.Transfer("SettingsHomePage.aspx", false);
+            }
+            //Exception catch
+            catch (ThreadAbortException tae) { }
+            catch (Exception ex)
+            {
+                //Log employee number
+                int employeeID = cu.empID;
+                //Log current page
+                string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
+                er.logError(ex, employeeID, currPage, method, this);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
+                //Server.Transfer(prevPage, false);
+            }
+        }
+        protected void btnSavePassword_Click(object sender, EventArgs e)
+        {
+            string method = "btnSavePassword_Click";
+            try
+            {
+                //Compare the 2 passwords entered to make sure they are identical
+                int npWord = Convert.ToInt32(txtNewPassword.Text);
+                int npWord2 = Convert.ToInt32(txtNewPassword2.Text);
+                if(npWord == npWord2)
+                {
+                    //Call method to add the new password
+                    bool bolAdded = empM.saveNewPassword(Convert.ToInt32(Session["key"].ToString()), npWord);
+                    //Check if the password was added or not
+                    if (!bolAdded)
+                    {
+                        //The password was not added because it is already in use by employee
+                        MessageBox.ShowMessage("The password supplied is not available. "
+                            + "Please try another password.", this);
+                    }
+                }
+                else
+                {
+                    //Passwords do not match
+                    MessageBox.ShowMessage("The passwords do not match. "
+                            + "Please retype the passwords again.", this);
+                }
             }
             //Exception catch
             catch (ThreadAbortException tae) { }

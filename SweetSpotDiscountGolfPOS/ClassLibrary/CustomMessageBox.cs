@@ -11,7 +11,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
 {
     //The custom message box class was ment to be used as a way to get user input but javascript is currently being used.
 
-        //Might revisit it at a later point
+    //Might revisit it at a later point
     public class CustomMessageBox
     {
         public string InputBox(string title, string promptText)
@@ -27,26 +27,21 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             label.SetBounds(9, 10, 372, 13);
             textBox.SetBounds(12, 36, 372, 20);
             buttonOk.SetBounds(228, 72, 75, 23);
-            
-                label.AutoSize = true;
-                label.Anchor = AnchorStyles.Left;
-                textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
-                buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-                form.ClientSize = new Size(396, 107);
-                form.Controls.AddRange(new Control[] { label, textBox, buttonOk });//Out of memory error caused on this line
-                form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
-                form.FormBorderStyle = FormBorderStyle.FixedDialog;
-                form.StartPosition = FormStartPosition.CenterScreen;
-                form.MinimizeBox = false;
-                form.MaximizeBox = false;
-                form.AcceptButton = buttonOk;
-                DialogResult dialogResult = form.ShowDialog();
-                return textBox.Text;
-            
-            
+            label.AutoSize = true;
+            label.Anchor = AnchorStyles.Left;
+            textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            form.ClientSize = new Size(396, 107);
+            form.Controls.AddRange(new Control[] { label, textBox, buttonOk });//Out of memory error caused on this line
+            form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.AcceptButton = buttonOk;
+            DialogResult dialogResult = form.ShowDialog();
+            return textBox.Text;
         }
-
-
         public string inputBoxV2(string title, string promptText)
         {
             Form prompt = new Form();
@@ -59,7 +54,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             confirmation.Click += (sender, e) => { prompt.Close(); };
             prompt.Controls.Add(confirmation);
             prompt.Controls.Add(textLabel);
-            prompt.Controls.Add(inputBox);            
+            prompt.Controls.Add(inputBox);
             prompt.ShowDialog();
             return inputBox.Text;
         }

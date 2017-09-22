@@ -78,7 +78,6 @@
                 <br />
                 <asp:Label ID="lblDate" runat="server" Text="Date:"></asp:Label>
                 <asp:Label ID="lblDateDisplay" runat="server" Text=""></asp:Label>
-                
                 <hr />
             </div>
             <div>

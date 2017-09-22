@@ -19,7 +19,7 @@
     </div>
     <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
 </asp:Content>
-<asp:Content ID="CheckoutPageContent" ContentPlaceHolderID="IndividualPageContent" runat="server">
+<asp:Content ID="ReturnsCheckoutPageContent" ContentPlaceHolderID="IndividualPageContent" runat="server">
     <h3>Transaction Details</h3>
     <div>
         <%--REMEMBER TO SET DEFAULT BUTTON--%>

@@ -15,7 +15,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         public string mopType { get; set; }
         public double amountPaid { get; set; }
 
-
         public InvoiceMOPs() { }
         public InvoiceMOPs(int i, int inn, int isn, string mp, double ap)
         {
@@ -25,7 +24,5 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             mopType = mp;
             amountPaid = ap;
         }
-
-
     }
 }

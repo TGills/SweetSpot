@@ -18,10 +18,9 @@ namespace SweetShop
         public bool percentage { get; set; }
         public bool tradeIn { get; set; }
         public int typeID { get; set; }
-
         public double returnAmount { get; set; }
-        public Cart() { }
 
+        public Cart() { }
         public Cart(int s, string de, int q, double pr, double c, double d, bool p, double retA, bool t, int id)
         {
             sku = s;
@@ -35,7 +34,6 @@ namespace SweetShop
             tradeIn = t;
             typeID = id;
         }
-
         public Cart(int s, string de, int q, double pr, double c, double d, bool p, bool t, int id)
         {
             sku = s;
@@ -48,7 +46,6 @@ namespace SweetShop
             tradeIn = t;
             typeID = id;
         }
-
         public Cart(int s, string de, int q, double pr, double c, double d, bool p, double retA)
         {
             sku = s;
@@ -60,19 +57,5 @@ namespace SweetShop
             percentage = p;
             returnAmount = retA;
         }
-
-        public Cart(int s, string de, int q, double pr, double c, double d, bool p)
-        {
-            sku = s;
-            description = de;
-            quantity = q;
-            price = pr;
-            cost = c;
-            discount = d;
-            percentage = p;
-        }
-        //public List<Items> ItemsInCart(int sku)
-        //{
-        //}
     }
 }
