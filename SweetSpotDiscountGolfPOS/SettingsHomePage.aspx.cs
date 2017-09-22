@@ -6,6 +6,7 @@ using SweetSpotProShop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -26,6 +27,7 @@ namespace SweetSpotDiscountGolfPOS
         Reports r = new Reports();
         internal static readonly Page aspx;
         CurrentUser cu = new CurrentUser();
+        
         protected void Page_Load(object sender, EventArgs e)
         {
             //Collects current method and page for error tracking
@@ -39,6 +41,11 @@ namespace SweetSpotDiscountGolfPOS
                 {
                     //Go back to Login to log in
                     Server.Transfer("LoginPage.aspx", false);
+                }
+                lblCurrentDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
+                if (txtDate.Text == "")
+                {
+                    txtDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
                 }
                 //Checks if the user is an Admin
                 //if (cu.jobID != 0)
@@ -400,6 +407,191 @@ namespace SweetSpotDiscountGolfPOS
                 r.exportAccessories();
                 //Displays message
                 MessageBox.ShowMessage("Export Complete", this);
+            }
+            //Exception catch
+            catch (ThreadAbortException tae) { }
+            catch (Exception ex)
+            {
+                //Log employee number
+                int employeeID = cu.empID;
+                //Log current page
+                string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
+                er.logError(ex, employeeID, currPage, method, this);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
+                //Server.Transfer(prevPage, false);
+            }
+        }
+        protected void btnExportInvoices_Click(object sender, EventArgs e)
+        {
+            //Collects current method for error tracking
+            string method = "btnExportInvoices_Click";
+            try
+            {
+                //Sets up database connection
+                string connectionString = ConfigurationManager.ConnectionStrings["SweetSpotDevConnectionString"].ConnectionString;
+                SqlConnection sqlCon = new SqlConnection(connectionString);
+                //Selects everything form the invoice table
+                sqlCon.Open();
+                SqlDataAdapter im = new SqlDataAdapter("SELECT * FROM tbl_invoice", sqlCon);
+                DataTable dtim = new DataTable();
+                im.Fill(dtim);
+                DataColumnCollection dcimHeaders = dtim.Columns;
+                sqlCon.Close();
+                //Selects everything form the invoice item table
+                sqlCon.Open();
+                SqlDataAdapter ii = new SqlDataAdapter("SELECT * FROM tbl_invoiceItem", sqlCon);
+                DataTable dtii = new DataTable();
+                ii.Fill(dtii);
+                DataColumnCollection dciiHeaders = dtii.Columns;
+                sqlCon.Close();
+                //Selects everything form the invoice mop table
+                sqlCon.Open();
+                SqlDataAdapter imo = new SqlDataAdapter("SELECT * FROM tbl_invoiceMOP", sqlCon);
+                DataTable dtimo = new DataTable();
+                imo.Fill(dtimo);
+                DataColumnCollection dcimoHeaders = dtimo.Columns;
+                sqlCon.Close();
+                //Sets path and file name to download report to
+                string pathUser = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string pathDownload = (pathUser + "\\Downloads\\");
+                FileInfo newFile = new FileInfo(pathDownload + "InvoiceReport.xlsx");
+                using (ExcelPackage xlPackage = new ExcelPackage(newFile))
+                {
+                    //Creates a seperate sheet for each data table
+                    ExcelWorksheet invoiceMain = xlPackage.Workbook.Worksheets.Add("Invoice Main");
+                    ExcelWorksheet invoiceItems = xlPackage.Workbook.Worksheets.Add("Invoice Items");
+                    ExcelWorksheet invoiceMOPS = xlPackage.Workbook.Worksheets.Add("Invoice MOPS");
+                    // write to sheet
+
+                    //Initiating Everything   
+                    DataTable exportInvoiceTable = r.initiateInvoiceTable();
+                    DataTable exportInvoiceItemTable = r.initiateInvoiceItemTable();
+                    DataTable exportInvoiceMOPTable = r.initiateInvoiceMOPTable();
+
+                    //Export main invoice
+                    for (int i = 1; i < exportInvoiceTable.Rows.Count; i++)
+                    {
+                        for (int j = 1; j < exportInvoiceTable.Columns.Count + 1; j++)
+                        {
+                            if (i == 1)
+                            {
+                                invoiceMain.Cells[i, j].Value = dcimHeaders[j - 1].ToString();
+                            }
+                            else
+                            {
+                                invoiceMain.Cells[i, j].Value = exportInvoiceTable.Rows[i - 1][j - 1];
+                            }
+                        }
+                    }
+                    //Export item invoice
+                    for (int i = 1; i < exportInvoiceItemTable.Rows.Count; i++)
+                    {
+                        for (int j = 1; j < exportInvoiceItemTable.Columns.Count + 1; j++)
+                        {
+                            if (i == 1)
+                            {
+                                invoiceItems.Cells[i, j].Value = dciiHeaders[j - 1].ToString();
+                            }
+                            else
+                            {
+                                invoiceItems.Cells[i, j].Value = exportInvoiceItemTable.Rows[i - 1][j - 1];
+                            }
+                        }
+                    }
+                    //Export mop invoice
+                    for (int i = 1; i < exportInvoiceMOPTable.Rows.Count; i++)
+                    {
+                        for (int j = 1; j < exportInvoiceMOPTable.Columns.Count + 1; j++)
+                        {
+                            if (i == 1)
+                            {
+                                invoiceMOPS.Cells[i, j].Value = dcimoHeaders[j - 1].ToString();
+                            }
+                            else
+                            {
+                                invoiceMOPS.Cells[i, j].Value = exportInvoiceMOPTable.Rows[i - 1][j - 1];
+                            }
+                        }
+                    }
+                    Response.Clear();
+                    Response.AddHeader("content-disposition", "attachment; filename=InvoiceReport.xlsx");
+                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    Response.BinaryWrite(xlPackage.GetAsByteArray());
+                    Response.End();
+                }
+            }
+            //Exception catch
+            catch (ThreadAbortException tae) { }
+            catch (Exception ex)
+            {
+                //Log employee number
+                int employeeID = cu.empID;
+                //Log current page
+                string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
+                er.logError(ex, employeeID, currPage, method, this);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
+                //Server.Transfer(prevPage, false);
+            }
+        }
+
+        protected void ddlTax_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string method = "ddlTax_SelectedIndexChanged";
+            try
+            {
+                string sel = ddlTax.SelectedItem.ToString();
+                List<Tax> t = new List<Tax>();
+                t = ssm.getTaxes(Convert.ToInt32(ddlProvince.SelectedValue), Convert.ToDateTime(lblCurrentDate.Text));
+                foreach (var tax in t)
+                {
+                    if (tax.taxName == sel)
+                    {
+                        lblCurrentDisplay.Text = tax.taxRate.ToString("#0.00");
+                    }
+                }
+            }
+            //Exception catch
+            catch (ThreadAbortException tae) { }
+            catch (Exception ex)
+            {
+                //Log employee number
+                int employeeID = cu.empID;
+                //Log current page
+                string currPage = Convert.ToString(Session["currPage"]);
+                //Log all info into error table
+                er.logError(ex, employeeID, currPage, method, this);
+                //string prevPage = Convert.ToString(Session["prevPage"]);
+                //Display message box
+                MessageBox.ShowMessage("An Error has occured and been logged. "
+                    + "If you continue to receive this message please contact "
+                    + "your system administrator", this);
+                //Server.Transfer(prevPage, false);
+            }
+        }
+        protected void btnSaveTheTax_Click(object sender, EventArgs e)
+        {
+            string method = "btnSaveTheTax_Click";
+            try
+            {
+                int psID = Convert.ToInt32(ddlProvince.SelectedValue);
+                int tID = Convert.ToInt32(ddlTax.SelectedValue);
+                DateTime tDate = Convert.ToDateTime(txtDate.Text);
+                double tRate = Convert.ToDouble(txtNewRate.Text);
+
+                ssm.updateNewTaxRate(psID, tDate, tID, tRate);
+                txtDate.Text = "";
+                txtNewRate.Text = "";
+
             }
             //Exception catch
             catch (ThreadAbortException tae) { }

@@ -54,7 +54,7 @@
     </div>
     <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
 </asp:Content>
-<asp:Content ID="CartPageContent" ContentPlaceHolderID="IndividualPageContent" runat="server">
+<asp:Content ID="ReturnsCartPageContent" ContentPlaceHolderID="IndividualPageContent" runat="server">
     <div id="ReturnCart">
         <asp:Panel ID="pnlDefaultButton" runat="server" DefaultButton="btnProceedToReturnCheckout">
             <asp:Label ID="lblCustomer" runat="server" Text="Customer Name:"></asp:Label>

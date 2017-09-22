@@ -31,15 +31,6 @@ namespace SweetShop
         public double shippingAmount { get; set; }
 
         public Invoice() { }
-        public Invoice(int I, double G, double P, double S, double B, int T)
-        {
-            invoiceNum = I;
-            governmentTax = G;
-            provincialTax = P;
-            subTotal = S;
-            balanceDue = B;
-            transactionType = T;
-        }
         public Invoice(int I, int S, DateTime D, string CN, double BD, string LN, string EN)
         {
             invoiceNum = I;
@@ -50,26 +41,29 @@ namespace SweetShop
             locationName = LN;
             employeeName = EN;
         }
-        public Invoice(int I, double TR, double S, double G, double P, double B, int T, DateTime D)
+        public Invoice(int I, int S, DateTime D, string CN, double DA, double TA, double ST, double G, double P, double BD, string EN)
         {
             invoiceNum = I;
-            tradeinAmount = TR;
-            subTotal = S;
+            invoiceSub = S;
+            invoiceDate = D;
+            customerName = CN;
+            discountAmount = DA;
+            tradeinAmount = TA;
+            subTotal = ST;
             governmentTax = G;
             provincialTax = P;
-            balanceDue = B;
-            transactionType = T;
-            invoiceDate = D;
+            balanceDue = BD;
+            employeeName = EN;
         }
-        public Invoice(int I, int IS, DateTime ID, string IT, int CN, int EN, int L, double ST, double DA, double TA, double G, double P, double BD, int TT, string C)
+        public Invoice(int I, int S, DateTime D, string T, int CID, int EID, int LID, double ST, double DA, double TA, double G, double P, double BD, int TT, string C)
         {
             invoiceNum = I;
-            invoiceSub = IS;
-            invoiceDate = ID;
-            invoiceTime = IT;
-            customerID = CN;
-            employeeID = EN;
-            locationID = L;
+            invoiceSub = S;
+            invoiceDate = D;
+            invoiceTime = T;
+            customerID = CID;
+            employeeID = EID;
+            locationID = LID;
             subTotal = ST;
             discountAmount = DA;
             tradeinAmount = TA;
@@ -79,15 +73,15 @@ namespace SweetShop
             transactionType = TT;
             comments = C;
         }
-        public Invoice(int I, int IS, DateTime ID, string IT, int CN, int EN, int L, double ST, double SA, double DA, double TA, double G, double P, double BD, int TT, string C)
+        public Invoice(int I, int S, DateTime D, string T, int CID, int EID, int LID, double ST, double SA, double DA, double TA, double G, double P, double BD, int TT, string C)
         {
             invoiceNum = I;
-            invoiceSub = IS;
-            invoiceDate = ID;
-            invoiceTime = IT;
-            customerID = CN;
-            employeeID = EN;
-            locationID = L;
+            invoiceSub = S;
+            invoiceDate = D;
+            invoiceTime = T;
+            customerID = CID;
+            employeeID = EID;
+            locationID = LID;
             subTotal = ST;
             shippingAmount = SA;
             discountAmount = DA;
@@ -98,62 +92,5 @@ namespace SweetShop
             transactionType = TT;
             comments = C;
         }
-        //public Invoice(int invoiceID)
-        //{
-        //    invoiceId = invoiceID;
-        //}
-        //     public Invoice(int InvoiceID, int CustomerID, double GST, double PST, double PaymentTotal,
-        //         double SubTotal, double Total, double Discount, double TradeIn, int PaymentID, int StateProveID, bool Posted,
-        //         bool InProcess, DateTime PostedDate, DateTime DateModified, DateTime SaleDate)
-        //     {
-        //         invoiceId = InvoiceID;
-        //         customerId = CustomerID;
-        //         gst = GST;
-        //         pst = PST;
-        //         paymentTotal = PaymentTotal;
-        //         subTotal = SubTotal;
-        //         total = Total;
-        //         discount = Discount;
-        //         tradeIn = TradeIn;
-        //         paymentID = PaymentID;
-        //stateprovID = StateProveID;
-        //         posted = Posted;
-        //         inProcess = InProcess;
-        //         postedDate = PostedDate;
-        //         dateModified = DateModified;
-        //         saleDate = SaleDate;
-
-        //     }
-        //     public Invoice(int InvoiceID, int CustomerID, double GST, double PST,  double PaymentTotal, double SubTotal, double Total, DateTime SaleDate)
-        //     {
-        //         invoiceId = InvoiceID;
-        //         customerId = CustomerID;
-        //         gst = GST;
-        //         pst = PST;
-        //         paymentTotal = PaymentTotal;
-        //         subTotal = SubTotal;
-        //         total = Total;
-        //         saleDate = SaleDate;
-        //     }
-        //public Invoice(int InvoiceID, double GST, double PST, double Total, int PaymentID, DateTime SaleDate)
-        //{
-        //    invoiceId = InvoiceID;
-        //    gst = GST;
-        //    pst = PST;
-        //    total = Total;
-        //    paymentID = PaymentID;
-        //    saleDate = SaleDate;
-        //}
-        //public Invoice(int InvoiceID, double TradeIn, double SubTotal, double GST, double PST, double Total, int PaymentID, DateTime SaleDate)
-        //{
-        //    invoiceId = InvoiceID;
-        //    tradeIn = TradeIn;
-        //    subTotal = SubTotal;
-        //    gst = GST;
-        //    pst = PST;
-        //    total = Total;
-        //    paymentID = PaymentID;
-        //    saleDate = SaleDate;
-        //}
     }
 }

@@ -112,6 +112,7 @@
     <Content Include="SalesCart.aspx" />
     <Content Include="ReturnsCheckout.aspx" />
     <Content Include="SalesCheckout.aspx" />
+    <Content Include="ReturnsHomePage.aspx" />
     <Content Include="SalesHomePage.aspx" />
     <Content Include="SettingsHomePage.aspx" />
     <Content Include="TradeINEntry.aspx" />
@@ -137,18 +138,14 @@
     <Compile Include="ClassLibrary\Invoice.cs" />
     <Compile Include="ClassLibrary\InvoiceItems.cs" />
     <Compile Include="ClassLibrary\InvoiceMOPs.cs" />
-    <Compile Include="ClassLibrary\InvSale.cs" />
     <Compile Include="ClassLibrary\ItemDataUtilities.cs" />
     <Compile Include="ClassLibrary\Items.cs" />
     <Compile Include="ClassLibrary\Location.cs" />
     <Compile Include="ClassLibrary\LocationManager.cs" />
     <Compile Include="ClassLibrary\MessageBox.cs" />
     <Compile Include="ClassLibrary\Reports.cs" />
-    <Compile Include="ClassLibrary\Sale.cs" />
     <Compile Include="ClassLibrary\SweetShopManager.cs" />
     <Compile Include="ClassLibrary\Tax.cs" />
-    <Compile Include="ClassLibrary\tbl_userinfo.cs" />
-    <Compile Include="ClassLibrary\tbl_userinfomanager.cs" />
     <Compile Include="CustomerAddNew.aspx.cs">
       <DependentUpon>CustomerAddNew.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -259,6 +256,13 @@
     </Compile>
     <Compile Include="SalesCheckout.aspx.designer.cs">
       <DependentUpon>SalesCheckout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ReturnsHomePage.aspx.cs">
+      <DependentUpon>ReturnsHomePage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ReturnsHomePage.aspx.designer.cs">
+      <DependentUpon>ReturnsHomePage.aspx</DependentUpon>
     </Compile>
     <Compile Include="SalesHomePage.aspx.cs">
       <DependentUpon>SalesHomePage.aspx</DependentUpon>

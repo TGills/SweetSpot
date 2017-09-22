@@ -24,17 +24,5 @@ namespace SweetShop
             locationName = ln;
             password = p;
         }
-        //public CurrentUser(int id, int loc)
-        //{
-        //    empID = id;
-        //    locationID = loc;
-        //}
-        //public CurrentUser(int password)
-        //{
-        //    this.password = password;
-        //}
-
-
-
     }
 }

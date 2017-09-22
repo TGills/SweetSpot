@@ -18,7 +18,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         public double itemDiscount { get; set; }
         public bool percentage { get; set; }
 
-
         public InvoiceItems(){}
         public InvoiceItems(int inn, int isn, int s, int iq, double ic, double ip, double id, bool p)
         {
@@ -31,9 +30,5 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             itemDiscount = id;
             percentage = p;
         }
-
-
-
-
     }
 }

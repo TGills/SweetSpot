@@ -16,22 +16,22 @@
         </div>
         <asp:Panel ID="pnlDefaultButton" runat="server" DefaultButton="btnRunReport">
             <h2>Reports Selection</h2>
+            <br />
+            <asp:Label runat="server" Text="Select Location:" />
+            <asp:DropDownList ID="ddlLocation" runat="server" AutoPostBack="True" DataSourceID="sqlLocations" DataTextField="locationName" DataValueField="locationID" Visible="true"></asp:DropDownList>
             <hr />
             <%--Start Calendar--%>
             <asp:Table runat="server">
                 <asp:TableRow>
-                    <asp:TableCell>
+                    <asp:TableCell Width="33%">
                         <asp:Label runat="server" Text="Start Date:"></asp:Label>
                     </asp:TableCell>
-                    <asp:TableCell>
+                    <asp:TableCell Width="33%">
                         <asp:Label runat="server" Text="End Date:"></asp:Label>
                     </asp:TableCell>
-                    <asp:TableCell>
+                    <%--<asp:TableCell Width="33%">
                         <asp:Label runat="server" Text="Inovice Number:"></asp:Label>
-                    </asp:TableCell>
-                    <asp:TableCell>
-                        <asp:Label runat="server" Text="Select Location for Invoice Viewing:" />
-                    </asp:TableCell>
+                    </asp:TableCell>--%>
                 </asp:TableRow>
                 <asp:TableRow>
                     <asp:TableCell>
@@ -40,12 +40,9 @@
                     <asp:TableCell>
                         <asp:TextBox ID="txtEndDate" ReadOnly="true" Width="195px" placeholder="Please select a ending date." Text="" runat="server"></asp:TextBox>
                     </asp:TableCell>
-                    <asp:TableCell>
+                    <%--<asp:TableCell>
                         <asp:TextBox ID="txtInvoiceNum" Width="195px" placeholder="Please enter an invoice number" Text="" runat="server"></asp:TextBox>
-                    </asp:TableCell>
-                    <asp:TableCell>
-                        <asp:DropDownList ID="ddlLocation" runat="server" AutoPostBack="True" DataSourceID="sqlLocations" DataTextField="locationName" DataValueField="locationID" Visible="true"></asp:DropDownList>
-                    </asp:TableCell>
+                    </asp:TableCell>--%>
                 </asp:TableRow>
                 <asp:TableRow>
                     <asp:TableCell>
@@ -120,22 +117,22 @@
                 <asp:Button ID="btnRunReport" runat="server" Text="CashOut Report" Width="200px" OnClick="btnSubmit_Click" />
             </div>
 
-            <asp:Button ID="btnExportInvoices" runat="server" Text="Invoice Report" Width="200px" OnClick="btnExportInvoices_Click" />
-            <div>
+            
+            <%--<div>
                 <div>
                     <asp:Label runat="server" Text="Search Between Dates For:"></asp:Label>
                 </div>
                 <asp:Button ID="btnInvoiceBetweenDates" runat="server" Text="Invoices" Width="200px" OnClick="btnInvoiceBetweenDates_Click" />
-                <%--<asp:Button ID="btnDeletedInvoiceBetweenDates" runat="server" Text="Deleted Invoices" Width="200px" OnClick="btnDeletedInvoiceBetweenDates_Click" />--%>
+                <%--<asp:Button ID="btnDeletedInvoiceBetweenDates" runat="server" Text="Deleted Invoices" Width="200px" OnClick="btnDeletedInvoiceBetweenDates_Click" />
             </div>
-            <asp:Button ID="btnReturnInvoice" runat="server" Text="Search For Invoice" OnClick="btnReturnInvoice_Click" />
+            <asp:Button ID="btnReturnInvoice" runat="server" Text="Search For Invoice" OnClick="btnReturnInvoice_Click" />--%>
             <%--Testing--%>
             <asp:Button ID="btnTesting" runat="server" Text="Test" OnClick="btnTesting_Click" /><asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
 
 
 
             <hr />
-            <asp:GridView ID="grdInvoicesBetweenDates" runat="server" AutoGenerateColumns="False" Width="100%" >
+            <%--<asp:GridView ID="grdInvoicesBetweenDates" runat="server" AutoGenerateColumns="False" Width="100%" >
                 <Columns>
                     <asp:TemplateField HeaderText="Invoice Number">
                         <ItemTemplate>
@@ -148,7 +145,7 @@
                     <asp:ItemTemplate>
                         <asp:Label ID="lblEmployee" runat="server" Text='<%#Eval("employeeID")%>'></asp:Label>
                     </asp:ItemTemplate>
-                </asp:TemplateField>--%>
+                </asp:TemplateField>
                     <asp:BoundField DataField="discountAmount" ReadOnly="true" HeaderText="Discount" DataFormatString="{0:0.00}" />
                     <asp:BoundField DataField="tradeinAmount" ReadOnly="true" HeaderText="Trade In" DataFormatString="{0:0.00}" />
                     <asp:BoundField DataField="subTotal" ReadOnly="true" HeaderText="Subtotal" DataFormatString="{0:0.00}" />
@@ -160,9 +157,9 @@
                             <%--<asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="return confirm('Are you sure you want to delete?');" CausesValidation="false" />
                             <asp:LinkButton Text="Delete" runat="server" CommandName="Delete" OnClientClick="userInput()" CausesValidation="false" />
                         </ItemTemplate>
-                    </asp:TemplateField>--%>
+                    </asp:TemplateField>
                 </Columns>
-            </asp:GridView>
+            </asp:GridView>--%>
             <div>
                 <asp:HiddenField ID="hidden" runat="server" />
 

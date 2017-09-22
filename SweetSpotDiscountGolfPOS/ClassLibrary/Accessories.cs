@@ -23,47 +23,5 @@ namespace SweetShop
         public string accessoryType { get; set; }
 
         public Accessories() { }
-        public Accessories(int s, int b, string z, string clr, double p, double c, int q, int t, int l)
-        {
-            sku = s;
-            brandID = b;
-            size = z;
-            colour = clr;
-            price = p;
-            cost = c;
-            quantity = q;
-            typeID = t;
-            locID = l;
-        }
-
-        public Accessories(int s, int b, string z, string clr, double p, double c, int q, int t, int l, string com)
-        {
-            sku = s;
-            brandID = b;
-            size = z;
-            colour = clr;
-            price = p;
-            cost = c;
-            quantity = q;
-            typeID = t;
-            locID = l;
-            comments = com;
-        }
-
-        public Accessories(int s, int b, int m, string a, string z, string clr, double p, double c, int q, int t, int l, string com)
-        {
-            sku = s;
-            brandID = b;
-            modelID = m;
-            accessoryType = a;
-            size = z;
-            colour = clr;
-            price = p;
-            cost = c;
-            quantity = q;
-            typeID = t;
-            locID = l;
-            comments = com;
-        }
     }
 }

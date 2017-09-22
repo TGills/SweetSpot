@@ -11,8 +11,8 @@ namespace SweetShop
     {
         public double taxRate { get; set; }
         public string taxName { get; set; }
-        public Tax() { }
 
+        public Tax() { }
         public Tax(string tName, double tRate)
         {
             taxName = tName;

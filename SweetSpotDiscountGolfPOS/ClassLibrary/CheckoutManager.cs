@@ -21,9 +21,10 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
         public double dblRemainingBalance { get; set; }
         public double dblAmountPaid { get; set; }
         public double dblBalanceDue { get; set; }
+
         public CheckoutManager() { }
         public CheckoutManager(double T, double D, double TI, double S, bool bG, bool bP, double dG, double dP, double AP)
-        {
+        {//Subtotals are calculated differently both of these are getting used so need to determin which is right and remove the other
             dblTotal = T;
             dblDiscounts = D;
             dblTradeIn = TI;
@@ -36,14 +37,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             dblSubTotal = T + TI - D;
             dblRemainingBalance = dblSubTotal + S;
             dblBalanceDue = dblSubTotal + S + dblGst + dblPst;
-
         }
-
-
-
         public CheckoutManager(double D, double TI, double S, bool bG, bool bP, double dG, double dP, double AP, double st)
-        {
-            
+        {//Subtotals are calculated differently both of these are getting used so need to determin which is right and remove the other
             dblDiscounts = D;
             dblTradeIn = TI;
             dblShipping = S;
@@ -55,7 +51,6 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             dblSubTotal = st;
             dblRemainingBalance = dblSubTotal + S;
             dblBalanceDue = dblSubTotal + S + dblGst + dblPst;
-
         }
     }
 }

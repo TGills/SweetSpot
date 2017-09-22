@@ -17,7 +17,7 @@
         
             <%--Textboxes and Labels for user to enter inventory info--%>
             <h2>Trade-In Item</h2>
-            <asp:Label ID="tempLocation" runat="server" Text="temp Location variable = 0"></asp:Label>
+            <%--<asp:Label ID="tempLocation" runat="server" Text="temp Location variable = 0"></asp:Label>--%>
 
 
             <asp:SqlDataSource ID="sqlItemType" runat="server" ConnectionString="<%$ ConnectionStrings:SweetSpotDevConnectionString %>" SelectCommand="SELECT [typeID], [typeDescription] FROM [tbl_itemType] ORDER BY [typeDescription]"></asp:SqlDataSource>

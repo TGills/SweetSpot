@@ -2,20 +2,19 @@
 
 <%--<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 </asp:Content>--%>
-<asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server">
+<asp:Content ID="NonActive" ContentPlaceHolderID="SPMaster" runat="server" >
     <style media="print">
-        .noPrint {
-            display: none;
-            /*margin-left: 0;*/
-        }
-
-        .yesPrint { 
-            display: inline-block !important;
-            /* margin-right:100px;
+		.noPrint {
+			display: none;
+			margin-left: 0;
+		}
+		.yesPrint {
+			display: inline-block !important;
+			/* margin-right:100px;
            float: right;*/
-            margin-left: 10px !important;
-        }
-    </style>
+			margin-left: 10px !important;
+		}
+	</style>
     <div id="menu_simple" class="noPrint">
         <ul>
             <li><a>HOME</a></li>
@@ -31,7 +30,7 @@
     </div>
     <link rel="stylesheet" type="text/css" href="CSS/MainStyleSheet.css" />
 </asp:Content>
-<asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server">
+<asp:Content ID="printableInvoiceDisplay" ContentPlaceHolderID="IndividualPageContent" runat="server" >
 
     <script>
         function printReport(printable) {
@@ -114,17 +113,17 @@
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Retail Price">
                         <ItemTemplate>
-                            <asp:Label ID="retail" Text='<%# (Convert.ToInt32(Session["TranType"])  == 1 || Convert.ToInt32(Session["TranType"])  == 3) ? Eval("price","{0:.00}") : (Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-Convert.ToDouble(Eval("discount"))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00")) %>' runat="server"></asp:Label>
+                            <asp:Label ID="retail" Text='<%#Eval("price","{0:.00}")%>' runat="server"></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Discounts/Bonus Applied">
                         <ItemTemplate>
-                            <asp:Label ID="discount" Text='<%# (Convert.ToInt32(Session["TranType"])  == 1 || Convert.ToInt32(Session["TranType"])  == 3) ? Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))).ToString("#0.00") : (Convert.ToBoolean(Eval("percentage")) == false ? (((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))) - Convert.ToDouble(Eval("returnAmount"))).ToString("#0.00") : (((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))) - Convert.ToDouble(Eval("returnAmount"))).ToString("#0.00")) %>' runat="server" />
+                            <%# Convert.ToBoolean(Eval("percentage")) == false ? (Eval("discount","{0:.00}")).ToString() : ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))).ToString("#0.00") %>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Extended Price">
                         <ItemTemplate>
-                            <asp:Label ID="extended" Text='<%# (Convert.ToInt32(Session["TranType"])  == 1 || Convert.ToInt32(Session["TranType"])  == 3) ? (Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00")) : Eval("returnAmount","{0:.00}") %>' runat="server" />
+                            <%# Convert.ToBoolean(Eval("percentage")) == false ? ((Convert.ToDouble(Eval("price")))-(Convert.ToDouble(Eval("discount")))).ToString("#0.00") : ((Convert.ToDouble(Eval("price")) - ((Convert.ToDouble(Eval("discount")) / 100) * Convert.ToDouble(Eval("price"))))).ToString("#0.00") %>
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
@@ -212,8 +211,8 @@
                 <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>--%>
             </div>
             <p><b>PLEASE NOTE: </b>All used equipment is sold as is and it is understood that its' condition</p>
-            <p>and usability may reflect prior use. The Sweet Spot Discount Golf assumes no responsibility</p>
-            <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>
+                <p>and usability may reflect prior use. The Sweet Spot Discount Golf assumes no responsibility</p>
+                <p>beyond the point of sale. <b>ALL SALES FINAL</b> Thank you for shopping at the Sweet Spot.</p>
         </div>
     </div>
 

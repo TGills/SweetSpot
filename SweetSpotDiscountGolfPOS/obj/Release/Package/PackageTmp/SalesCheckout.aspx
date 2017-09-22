@@ -35,7 +35,7 @@
                                 <td>
                                     <%--<asp:Button ID="mopAmericanExpress" runat="server" Text="American Express" OnClick="mopAmericanExpress_Click" Width="163px" OnClientClick="return confirm('Confirm American Express');" />--%>
                                     <asp:Button ID="mopCash" runat="server" Text="Cash" OnClick="mopCash_Click" Width="163px" OnClientClick="return confirm('Confirm Cash');" />
-
+                                    
                                 </td>
                                 <td>
                                     <asp:Button ID="mopVisa" runat="server" Text="Visa" OnClick="mopVisa_Click" Width="163px" OnClientClick="return confirm('Confirm Visa');" />
@@ -54,15 +54,17 @@
                                 <td>
                                     <asp:Button ID="mopGiftCard" runat="server" Text="Gift Card" OnClick="mopGiftCard_Click" Width="163px" OnClientClick="return confirm('Confirm Gift Card');" />
                                 </td>
-                                <td></td>
+                                <td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td>
-
+                                    
                                     <%--<asp:Button ID="mopOnAccount" runat="server" Text="Charge to Account" OnClick="mopOnAccount_Click" Width="163px" />--%>
                                 </td>
                                 <td>
-                                    <%-- <asp:Button ID="mopGiftCard" runat="server" Text="Gift Card" OnClick="mopGiftCard_Click" Width="163px" OnClientClick="return confirm('Confirm Gift Card');" />--%>
+                                   <%-- <asp:Button ID="mopGiftCard" runat="server" Text="Gift Card" OnClick="mopGiftCard_Click" Width="163px" OnClientClick="return confirm('Confirm Gift Card');" />--%>
                                 </td>
                             </tr>
                             <tr>
@@ -202,11 +204,11 @@
                         <asp:Button ID="btnLayaway" runat="server" Text="Layaway" OnClick="btnLayaway_Click" Width="163px" Visible="false" />
                     </td>
                     <td>
-                        <asp:Button ID="btnFinalize" runat="server" Text="Process Sale" OnClick="btnFinalize_Click" Width="163px" />
+                        <asp:Button ID="btnFinalize" runat="server" Text="Process Sale" OnClick="btnFinalize_Click" Width="163px" />                        
                     </td>
-                    <%--<td>
+                    <td>
                         <asp:CheckBox ID="chbxDoesNotEqualZero" Text="Check box to bypass MOPs" runat="server" />
-                    </td>--%>
+                    </td>
                 </tr>
             </table>
             <p>
@@ -216,22 +218,6 @@
             </p>
         </asp:Panel>
     </div>
-    <script>
-        function userInput(owing) {
-            var given = prompt("Enter the amount of cash", "");
-            var change = owing - given;
-            if (change < 0) {
-                var give = String(change.toFixed(2));
-                alert("Change: " + give);
-            }
-            else if (change >= 0) {
-                
-            }
-            
-
-        }
-
-    </script>
 </asp:Content>
 <asp:Content ID="Content1" runat="server" ContentPlaceHolderID="head">
     <style type="text/css">

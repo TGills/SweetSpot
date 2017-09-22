@@ -23,11 +23,8 @@ namespace SweetShop
         public int provState { get; set; }
         public int country { get; set; }
         public string postZip { get; set; }
-
-
-
+        
         public Employee() { }
-
         public Employee(int ID, string first, string last, int job, int location, string email,
             string pcNumber, string scNumber, string pAddress, string sAddress, string cty, int pState,
             int cntry, string pZip)

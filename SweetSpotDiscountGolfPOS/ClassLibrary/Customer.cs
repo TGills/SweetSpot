@@ -24,7 +24,6 @@ namespace SweetShop
         public string postalCode { get; set; }
 
         public Customer() { }
-
         public Customer(int CustomerID, string FirstName, string LastName, string pAddress,
            string sAddress, string pPhoneNumber, string sPhoneNumber, string billAddress, string Email,
            string City, int Province, int Country, string PostalCode)
@@ -43,13 +42,5 @@ namespace SweetShop
             country = Country;
             postalCode = PostalCode;
         }
-
-        public Customer(string fname, string lname)
-        {
-            firstName = fname;
-            lastName = lname;
-        }
-
-
     }
 }
