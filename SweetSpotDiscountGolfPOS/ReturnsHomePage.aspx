@@ -14,9 +14,9 @@
             <asp:Table ID="tblInvoiceSearch" runat="server" Width="100%">
                 <asp:TableRow>
                     <asp:TableCell Width="15%">
-                        <asp:RadioButton ID="rdbSearchByCustomer" runat="server" Text="Customer" Checked="True" GroupName="rgInvoiceSearch" />
+                        <asp:RadioButton ID="rdbSearchByCustomer" runat="server" Text="Customer" GroupName="rgInvoiceSearch" />
                         <br />
-                        <asp:RadioButton ID="rdbSearchByInvoiceNumber" runat="server" Text="Invoice" GroupName="rgInvoiceSearch" />
+                        <asp:RadioButton ID="rdbSearchByInvoiceNumber" runat="server" Text="Invoice" Checked="True" GroupName="rgInvoiceSearch" />
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:Label ID="lblInvoiceSearch" runat="server" Text="Enter Invoice, Name, or Phone Number: "></asp:Label>
