@@ -314,6 +314,8 @@ namespace SweetSpotDiscountGolfPOS
             //Method currently not used
             try
             {
+                //int test = idu.insertBrand("test3");
+                //Label1.Text = test.ToString();
                 //string variable = " ";
                 //Response.Write("<script>Request.QueryString("variable")</script>");
                 //Label1.Text = variable;

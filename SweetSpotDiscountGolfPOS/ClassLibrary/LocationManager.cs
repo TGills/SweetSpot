@@ -166,7 +166,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
             using (var cmd = new SqlCommand("getLocationIDFromCity", con))
             using (var da = new SqlDataAdapter(cmd))
             {
-                cmd.Parameters.AddWithValue("@cityName", cityname);
+                cmd.Parameters.AddWithValue("@cityName", locationName);
                 cmd.CommandType = CommandType.StoredProcedure;
                 da.Fill(table);
             }
