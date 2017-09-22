@@ -267,6 +267,51 @@ namespace SweetShop
             //Returns the job name
             return job;
         }
+        //Save new password into user_info
+        public bool saveNewPassword(int empID, int pWord)
+        {
+            bool bolAdded = false;
+            //First check if the password is in use by another user.
+            SqlConnection conn = new SqlConnection(connectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = "Select empID from tbl_userInfo where password = @pWord";
+            cmd.Parameters.AddWithValue("pWord", pWord);
+            conn.Open();
+            SqlDataReader pWordUsedReader = cmd.ExecuteReader();
+            //Checks to see if the password is already in use
+            if (!pWordUsedReader.HasRows)
+            {
+                conn.Close();
+                //When password not in use check if the employee is already in the user info table
+                SqlCommand cmd2 = new SqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "Select empID from tbl_userInfo where empID = @empID";
+                cmd2.Parameters.AddWithValue("empID", empID);
+                conn.Open();
+                SqlDataReader empInTableReader = cmd2.ExecuteReader();
 
+                SqlCommand cmdEmpPass = new SqlCommand();
+                cmdEmpPass.Connection = conn;
+                if (empInTableReader.HasRows)
+                {
+                    //Employee is in the userInfo table update password
+                    cmdEmpPass.CommandText = "Update tbl_userInfo SET password = @pWord Where empID = @empID";
+                }
+                else
+                {
+                    //Employee is not in the table add user and password
+                    cmdEmpPass.CommandText = "Insert Into tbl_userInfo values(@empID, @pWord)";
+                }
+                cmdEmpPass.Parameters.AddWithValue("empID", empID);
+                cmdEmpPass.Parameters.AddWithValue("pWord", pWord);
+                conn.Close();
+                conn.Open();
+                cmdEmpPass.ExecuteNonQuery();
+                bolAdded = true;
+            }
+            conn.Close();
+            return bolAdded;
+        }
     }
 }
