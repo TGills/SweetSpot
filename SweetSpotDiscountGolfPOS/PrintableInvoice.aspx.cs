@@ -87,17 +87,8 @@ namespace SweetSpotDiscountGolfPOS
                 lblSweetShopStreetAddress.Text = l.address.ToString();
                 lblSweetShopPostalAddress.Text = l.city.ToString() + ", " + lm.provinceName(l.provID) + " " + l.postal.ToString();
                 lblSweetShopPhone.Text = l.phone.ToString();
-
-                if (l.location.ToString().Equals("The Sweet Spot Discount Golf"))
-                {
-                    //Show tax number if in Moose Jaw
-                    lblTaxNum.Text = "842165458RT0001";
-                }
-                else if (l.location.ToString().Equals("Golf Traders"))
-                {
-                    //Show tax number if in Calgary
-                    lblTaxNum.Text = "778164723";
-                }
+                lblTaxNum.Text = lm.getLocationTaxNumber(cu.locationID);
+                
                 //Gather transaction type from Session
                 tranType = Convert.ToInt32(Session["TranType"]);
                 //Determins the session to get the cart items from

@@ -396,19 +396,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 }
                                 //***************LOCATIONID***************
                                 try
-                                {
+                                {//Column 22 = location
                                     //NEEDS TO BE REWORKED
-                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 22].Value).Equals(null))
                                     {
-                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
-                                        {
-                                            a.locID = lm.locationID("The Sweet Spot Discount Golf");
-
-                                        }
-                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
-                                        {
-                                            a.locID = lm.locationID("Golf Traders");
-                                        }
+                                        a.locID = lm.getLocationIDFromSecondaryIdentifier((worksheet.Cells[i, 22].Value).ToString());
                                     }
                                     else
                                     {
@@ -583,17 +575,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 try
                                 {
                                     //NEEDS TO BE REWORKED
-                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 22].Value).Equals(null))
                                     {
-                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
-                                        {
-                                            cl.locID = lm.locationID("The Sweet Spot Discount Golf");
-
-                                        }
-                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
-                                        {
-                                            cl.locID = lm.locationID("Golf Traders");
-                                        }
+                                        cl.locID = lm.getLocationIDFromSecondaryIdentifier((worksheet.Cells[i, 22].Value).ToString());
                                     }
                                     else
                                     {
@@ -871,17 +855,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 try
                                 {
                                     //NEEDS TO BE REWORKED
-                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 22].Value).Equals(null))
                                     {
-                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
-                                        {
-                                            c.itemlocation = lm.locationID("The Sweet Spot Discount Golf");
-
-                                        }
-                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
-                                        {
-                                            c.itemlocation = lm.locationID("Golf Traders");
-                                        }
+                                        c.itemlocation = lm.getLocationIDFromSecondaryIdentifier((worksheet.Cells[i, 22].Value).ToString());
                                     }
                                     else
                                     {

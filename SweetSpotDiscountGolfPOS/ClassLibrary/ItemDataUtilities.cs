@@ -103,10 +103,9 @@ namespace SweetSpotProShop
                 cmd.CommandType = CommandType.StoredProcedure;
                 da.Fill(table);
             }
-            foreach (DataRow row in table.Rows)
-            {
-                brandID = Convert.ToInt32(row["brandID"]);
-            }
+            DataRow row = table.Rows[0];
+            brandID = Convert.ToInt32(row["brandID"]);
+            
             //Returns the brandID
             return brandID;
         }
