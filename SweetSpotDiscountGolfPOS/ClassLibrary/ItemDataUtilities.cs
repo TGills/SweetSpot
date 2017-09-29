@@ -83,7 +83,13 @@ namespace SweetSpotProShop
             }
             foreach (DataRow row in table.Rows)
             {
-                model = Convert.ToInt32(row["modelID"]);
+                //This was causing some problems with it being DBNull. 
+                //I put an if statement in place to try to prevent that from
+                //happening again. 
+                if(!DBNull.Value.Equals(row["modelID"]))
+                {
+                    model = Convert.ToInt32(row["modelID"]);
+                }                
             }
             //Returns the modelID 
             return model;
