@@ -396,19 +396,11 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 }
                                 //***************LOCATIONID***************
                                 try
-                                {
+                                {//Column 22 = location
                                     //NEEDS TO BE REWORKED
-                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 22].Value).Equals(null))
                                     {
-                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
-                                        {
-                                            a.locID = lm.locationID("The Sweet Spot Discount Golf");
-
-                                        }
-                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
-                                        {
-                                            a.locID = lm.locationID("Golf Traders");
-                                        }
+                                        a.locID = lm.getLocationIDFromSecondaryIdentifier((worksheet.Cells[i, 22].Value).ToString());
                                     }
                                     else
                                     {
@@ -583,17 +575,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 try
                                 {
                                     //NEEDS TO BE REWORKED
-                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 22].Value).Equals(null))
                                     {
-                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
-                                        {
-                                            cl.locID = lm.locationID("The Sweet Spot Discount Golf");
-
-                                        }
-                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
-                                        {
-                                            cl.locID = lm.locationID("Golf Traders");
-                                        }
+                                        cl.locID = lm.getLocationIDFromSecondaryIdentifier((worksheet.Cells[i, 22].Value).ToString());
                                     }
                                     else
                                     {
@@ -871,17 +855,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                 try
                                 {
                                     //NEEDS TO BE REWORKED
-                                    if (!(worksheet.Cells[i, 2].Value).Equals(null))
+                                    if (!(worksheet.Cells[i, 22].Value).Equals(null))
                                     {
-                                        if ((worksheet.Cells[i, 2].Value).Equals("Pro Shop"))
-                                        {
-                                            c.itemlocation = lm.locationID("The Sweet Spot Discount Golf");
-
-                                        }
-                                        else if ((worksheet.Cells[i, 2].Value).Equals("Calgary Store"))
-                                        {
-                                            c.itemlocation = lm.locationID("Golf Traders");
-                                        }
+                                        c.itemlocation = lm.getLocationIDFromSecondaryIdentifier((worksheet.Cells[i, 22].Value).ToString());
                                     }
                                     else
                                     {
@@ -1145,6 +1121,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                     "tbl_clubs.quantity, tbl_clubs.clubSpec, tbl_clubs.shaftSpec, tbl_clubs.shaftFlex, tbl_clubs.dexterity, " +
                                     "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clubs.typeID ) as itemType , " +
                                     "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clubs.locationID) as locationName, " +
+                                    "(select tbl_location.secondaryIdentifier from tbl_location where tbl_location.locationID = tbl_clubs.locationID) as locationSecondary, " +
                                     "tbl_clubs.used, tbl_clubs.comments from tbl_clubs";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
@@ -1171,7 +1148,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                     reader["shaftSpec"].ToString(),
                     reader["shaftFlex"].ToString(),
                     reader["dexterity"].ToString(),
-                    "",
+                    reader["locationSecondary"].ToString(),
                     "",
                     "");
             }
@@ -1190,6 +1167,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                     "tbl_accessories.accessoryType, tbl_accessories.quantity, " +
                                     "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_accessories.typeID ) as itemType , " +
                                     "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_accessories.locationID) as locationName, " +
+                                    "(select tbl_location.secondaryIdentifier from tbl_location where tbl_location.locationID = tbl_accessories.locationID) as locationSecondary, " +
                                     "tbl_accessories.comments " +
                                     "from tbl_accessories; ";
             conn.Open();
@@ -1211,7 +1189,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                     Convert.ToInt32(reader["quantity"]),
                     0,
                     Convert.ToDouble(reader["price"]),
-                    "", "", "", "", "", "", "", "", "");
+                    "", "", "", "", "", "",
+                    reader["locationSecondary"].ToString(),
+                    "", "");
             }
             conn.Close();
         }
@@ -1227,6 +1207,7 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                                     "tbl_clothing.quantity, " +
                                     "(select tbl_itemType.typeDescription from tbl_itemType where tbl_itemType.typeID = tbl_clothing.typeID ) as itemType ,  " +
                                     "(select tbl_location.locationName from tbl_location where tbl_location.locationID = tbl_clothing.locationID) as locationName,  " +
+                                    "(select tbl_location.secondaryIdentifier from tbl_location where tbl_location.locationID = tbl_clothing.locationID) as locationSecondary,  " +
                                     "tbl_clothing.comments from tbl_clothing;";
             conn.Open();
             SqlDataReader reader = cmd.ExecuteReader();
@@ -1247,7 +1228,9 @@ namespace SweetSpotDiscountGolfPOS.ClassLibrary
                     Convert.ToInt32(reader["quantity"]),
                     0,
                     Convert.ToDouble(reader["price"]),
-                    "", "", "", "", "", "", "", "", "");
+                    "", "", "", "", "", "",
+                    reader["locationSecondary"].ToString(),
+                    "", "");
             }
             conn.Close();
         }
